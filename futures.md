@@ -18,3 +18,7 @@ when different wrapper versions are required.  Usage: expand
 Cache inspected Java method signatures to speed up repeated calls to heavily
 used BaseMod hooks.  Usage: extend ``JavaCallableWrapper`` with a lookup table so
 plugins do not incur repeated reflection overhead.
+
+## LimeWire decryption pipeline
+
+Build a Python implementation of the LimeWire content decrypter so that the encrypted jars downloaded during bundling can be unwrapped automatically. Usage: mirror the `GE#getContentItemDecryptionKeys` flow in Python, deriving AES keys from the passphrase and decrypting the AES-CTR stream into usable game jars.
