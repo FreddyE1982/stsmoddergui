@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Iterable
 
 from .loader import ensure_basemod_environment, ensure_jpype
+from .project import BundleOptions, ModProject, compileandbundle, create_project
 
 ensure_jpype()
 from .proxy import JavaPackageWrapper, create_package_wrapper
@@ -68,6 +69,10 @@ PLUGIN_MANAGER.expose("basemod", basemod)
 PLUGIN_MANAGER.expose("cardcrawl", cardcrawl)
 PLUGIN_MANAGER.expose("modthespire", modthespire)
 PLUGIN_MANAGER.expose("libgdx", libgdx)
+PLUGIN_MANAGER.expose("create_project", create_project)
+PLUGIN_MANAGER.expose("compileandbundle", compileandbundle)
+PLUGIN_MANAGER.expose("ModProject", ModProject)
+PLUGIN_MANAGER.expose("BundleOptions", BundleOptions)
 PLUGIN_MANAGER.expose_module("modules.basemod_wrapper", alias="basemod_wrapper")
 
 __all__ = [
@@ -76,4 +81,8 @@ __all__ = [
     "cardcrawl",
     "modthespire",
     "libgdx",
+    "ModProject",
+    "BundleOptions",
+    "create_project",
+    "compileandbundle",
 ]
