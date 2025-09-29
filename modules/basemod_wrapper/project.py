@@ -173,6 +173,7 @@ class BundleOptions:
     version: str = "0.1.0"
     sts_version: str = "2020-12-01"
     mts_version: str = "3.30.1"
+    dependencies: Sequence[str] = ("basemod", "stslib")
 
 
 class ModProject:
@@ -407,7 +408,7 @@ class ModProject:
             "version": options.version,
             "sts_version": options.sts_version,
             "mts_version": options.mts_version,
-            "dependencies": ["basemod"],
+            "dependencies": list(dict.fromkeys(options.dependencies)),
         }
         return json.dumps(manifest, indent=2)
 
@@ -426,7 +427,8 @@ class ModProject:
 
     @staticmethod
     def _build_classpath(entries: Sequence[Path]) -> str:
-        return os.pathsep.join(str(entry) for entry in entries)
+        ordered = list(dict.fromkeys(entries))
+        return os.pathsep.join(str(entry) for entry in ordered)
 
 
 def create_project(mod_id: str, name: str, author: str, description: str, version: str = "0.1.0") -> ModProject:

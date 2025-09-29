@@ -17,8 +17,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from importlib import import_module
+from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Callable, Dict, Iterable, MutableMapping, Optional
+from typing import Any, Callable, Dict, Iterable, Optional
 
 
 class PluginError(RuntimeError):
@@ -33,6 +34,52 @@ class PluginRecord:
     module: str
     obj: Any
     exposed: MappingProxyType
+
+
+class _LazyModuleProxy:
+    """Proxy that imports a module on first attribute access."""
+
+    def __init__(self, module_name: str) -> None:
+        self._module_name = module_name
+        self._module: Optional[Any] = None
+
+    def _load(self) -> Any:
+        if self._module is None:
+            self._module = import_module(self._module_name)
+        return self._module
+
+    def __getattr__(self, item: str) -> Any:
+        return getattr(self._load(), item)
+
+    def __dir__(self) -> Iterable[str]:  # pragma: no cover - simple passthrough
+        return dir(self._load())
+
+
+class _RepositoryNamespace:
+    """Collects lazily imported modules under friendly aliases."""
+
+    def __init__(self, modules: Dict[str, _LazyModuleProxy]) -> None:
+        self._modules = modules
+        self._aliases: Dict[str, _LazyModuleProxy] = {}
+        for name, proxy in modules.items():
+            alias = name.split(".")[-1]
+            self._aliases.setdefault(alias, proxy)
+
+    def module(self, name: str) -> _LazyModuleProxy:
+        return self._modules[name]
+
+    def __getattr__(self, item: str) -> Any:
+        if item in self._aliases:
+            return self._aliases[item]
+        if item in self._modules:
+            return self._modules[item]
+        raise AttributeError(item)
+
+    def __dir__(self) -> Iterable[str]:  # pragma: no cover - trivial glue
+        return sorted(set(self._modules) | set(self._aliases))
+
+    def items(self):
+        return self._modules.items()
 
 
 class PluginManager:
@@ -91,6 +138,13 @@ class PluginManager:
             if not key.startswith("_")
         }
         self.expose(export_name, MappingProxyType(export))
+
+    def expose_lazy_module(self, module_name: str, alias: Optional[str] = None) -> None:
+        """Expose ``module_name`` lazily under ``alias`` for plugin access."""
+
+        proxy = _LazyModuleProxy(module_name)
+        export_name = alias or module_name
+        self.expose(export_name, proxy)
 
     def register_plugin(self, module_name: str, attr: str = "setup_plugin") -> PluginRecord:
         """Import ``module_name`` and run its setup function.
@@ -152,10 +206,47 @@ class PluginManager:
             )
 
 
+# ---------------------------------------------------------------------------
+# repository exposure helpers
+# ---------------------------------------------------------------------------
+def _module_name_from_path(root: Path, path: Path) -> Optional[str]:
+    rel = path.relative_to(root)
+    if rel.name == "__init__.py":
+        parts = rel.parts[:-1]
+    else:
+        parts = rel.with_suffix("").parts
+    if not parts:
+        return None
+    return ".".join(parts)
+
+
+def _discover_repository_modules(root: Path) -> Dict[str, _LazyModuleProxy]:
+    modules: Dict[str, _LazyModuleProxy] = {}
+    for path in root.rglob("*.py"):
+        if path.name.startswith("_"):
+            continue
+        module_name = _module_name_from_path(root, path)
+        if not module_name:
+            continue
+        modules[module_name] = _LazyModuleProxy(module_name)
+    return modules
+
+
 # Expose the global plugin manager instance immediately for general use.
 PLUGIN_MANAGER = PluginManager()
 
 # Make sure plugin authors can introspect the plugin infrastructure itself.
 PLUGIN_MANAGER.expose_module("plugins")
+
+_REPO_ROOT = Path(__file__).resolve().parent
+_MODULE_PROXIES = _discover_repository_modules(_REPO_ROOT)
+_REPOSITORY_NAMESPACE = _RepositoryNamespace(_MODULE_PROXIES)
+
+for module_name in _MODULE_PROXIES:
+    if module_name in PLUGIN_MANAGER.exposed:
+        continue
+    PLUGIN_MANAGER.expose_lazy_module(module_name)
+
+PLUGIN_MANAGER.expose("repository", _REPOSITORY_NAMESPACE)
 
 __all__ = ["PLUGIN_MANAGER", "PluginManager", "PluginError", "PluginRecord"]
