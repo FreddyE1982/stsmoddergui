@@ -1,0 +1,3 @@
+__pycache__/
+modules/basemod_wrapper/lib/
+*.pyc
