@@ -43,3 +43,7 @@ can grab the `basemod_environment`, `basemod`, `cardcrawl`, `modthespire` and
 Running BaseMod still requires Slay the Spire and the ModTheSpire loader.  This
 wrapper focuses on exposing the API – it does not attempt to emulate the game or
 ship its assets.
+
+## High level project builder
+
+The `ModProject` helper lets you declare colours, cards and characters without touching BaseMod hooks. After defining your content you can call `enable_runtime()` to wire all hooks or `compileandbundle()` to produce a ModTheSpire ready bundle. See the [Full Mod Tutorial](../../docs/full_mod_tutorial.md) for a concrete walkthrough that creates a complete character, registers their starting deck, and outputs a ready-to-install mod folder.
