@@ -1,0 +1,17869 @@
+var af = Object.defineProperty;
+var qc = e => {
+    throw TypeError(e)
+};
+var sf = (e, t, r) => t in e ? af(e, t, {
+    enumerable: !0,
+    configurable: !0,
+    writable: !0,
+    value: r
+}) : e[t] = r;
+var zi = (e, t, r) => sf(e, typeof t != "symbol" ? t + "" : t, r),
+    Hc = (e, t, r) => t.has(e) || qc("Cannot " + r);
+var Y = (e, t, r) => (Hc(e, t, "read from private field"), r ? r.call(e) : t.get(e)),
+    Le = (e, t, r) => t.has(e) ? qc("Cannot add the same private member more than once") : t instanceof WeakSet ? t.add(e) : t.set(e, r),
+    Ue = (e, t, r, n) => (Hc(e, t, "write to private field"), n ? n.call(e, r) : t.set(e, r), r);
+import {
+    j as ce
+} from "./jsx-runtime-D_zvdyIk.js";
+import {
+    r as Re
+} from "./index-CN2MckQH.js";
+import {
+    _ as Ys
+} from "./typeof-QjJsDpFa.js";
+import {
+    m as Ye,
+    d as Hn,
+    i as Oa,
+    h as Eo,
+    e as Dr,
+    S as nt
+} from "./startWith-DmPOlQ7q.js";
+import {
+    m as of
+} from "./mergeWith-wJkLJUvA.js";
+import {
+    c as cf,
+    g as uf
+} from "./_commonjsHelpers-D6-XlEtG.js";
+import {
+    d as Te,
+    f as Kr
+} from "./firstValueFrom-M2ifl7I8.js";
+import {
+    m as lf
+} from "./merge-B6twGqPr.js";
+import {
+    B as Kt
+} from "./BehaviorSubject-D-fby5tU.js";
+import {
+    a as Oe,
+    b as xt,
+    E as Hr,
+    u as xr,
+    j as df,
+    h as _o,
+    k as hf,
+    m as ff,
+    l as hl,
+    n as pf,
+    o as mf,
+    f as Ta,
+    g as Jn,
+    p as yf,
+    q as vf,
+    w as ca,
+    A as Xr,
+    c as Jc,
+    s as gf,
+    e as wf
+} from "./get-api-D_j7dmQH.js";
+import {
+    B as fl,
+    R as yt,
+    J as gt,
+    V as Jr
+} from "./runtime-C9vxkWZ8.js";
+import {
+    B as bf,
+    J as Rn,
+    V as ji
+} from "./runtime-DDW7HZDi.js";
+import {
+    a as Sf
+} from "./VerificationStatusEnum-BMWjV5ER.js";
+import {
+    a as zc
+} from "./AccountSubscriptionTier-Cz37hh3K.js";
+import {
+    a as Ef,
+    b as _f,
+    c as Pf,
+    d as kf
+} from "./UsStateCodeAlpha2-JNjTMX_I.js";
+import {
+    c as pl
+} from "./combineLatest-DG18zSp0.js";
+import {
+    f as ml,
+    n as Cf
+} from "./form-schema-utils-s_iZSVfo.js";
+import {
+    u as yl
+} from "./use-state-ref-D-DnwfXi.js";
+import {
+    u as Nn
+} from "./use-callback-ref-CJKKuL-G.js";
+import {
+    M as vl,
+    u as If,
+    a as gl,
+    c as wl,
+    b as bl
+} from "./modal-content-window-title-header-DJnmM3KA.js";
+import {
+    A as Zi
+} from "./alert-se59gAEm.js";
+import {
+    f as ua
+} from "./form-validation-Cr-e9cBn.js";
+import {
+    o as Sl,
+    s as Rf,
+    Z as Df,
+    N as Kf
+} from "./types-NbUVopYS.js";
+import {
+    a as Qs
+} from "./button-CTv7---N.js";
+import {
+    L as xf
+} from "./link-button-Di_R81Ej.js";
+const Qr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+    Tn = typeof Uint8Array > "u" ? [] : new Uint8Array(256);
+for (let e = 0; e < Qr.length; e++) Tn[Qr.charCodeAt(e)] = e;
+const wt = e => {
+        let t = e.length * .75,
+            r = 0,
+            n, i, s, c;
+        e[e.length - 1] === "=" && (t--, e[e.length - 2] === "=" && t--);
+        const u = new ArrayBuffer(t),
+            h = new Uint8Array(u);
+        for (let v = 0; v < e.length; v += 4) n = Tn[e.charCodeAt(v)], i = Tn[e.charCodeAt(v + 1)], s = Tn[e.charCodeAt(v + 2)], c = Tn[e.charCodeAt(v + 3)], h[r++] = n << 2 | i >> 4, h[r++] = (i & 15) << 4 | s >> 2, h[r++] = (s & 3) << 6 | c & 63;
+        return u
+    },
+    Ne = e => {
+        const t = new Uint8Array(e),
+            r = t.length;
+        let n = "";
+        for (let i = 0; i < r; i += 3) n += Qr[t[i] >> 2], n += Qr[(t[i] & 3) << 4 | t[i + 1] >> 4], n += Qr[(t[i + 1] & 15) << 2 | t[i + 2] >> 6], n += Qr[t[i + 2] & 63];
+        return r % 3 === 2 ? n = n.substring(0, n.length - 1) + "=" : r % 3 === 1 && (n = n.substring(0, n.length - 2) + "=="), n
+    },
+    El = e => e ? e.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") : "",
+    _l = e => {
+        if (!e) return "";
+        let t = e.replace(/-/g, "+").replace(/_/g, "/");
+        const r = 4 - t.length % 4;
+        return r !== 4 && (t += "=".repeat(r)), t
+    };
+class Of {
+    constructor(t) {
+        this.events = new Map, this.anyEvents = new Set, t && this.addEvents(t)
+    }
+    addEvents(t) {
+        return this.addRemoveEvents(!1, t)
+    }
+    on(t, r) {
+        return this.manageEventSet(!1, t, r)
+    }
+    onAny(t) {
+        return this.manageAnyEventSet(!1, t)
+    }
+    removeEvents(t) {
+        return this.addRemoveEvents(!0, t)
+    }
+    off(t, r) {
+        return this.manageEventSet(!0, t, r)
+    }
+    offAny(t) {
+        return this.manageAnyEventSet(!0, t)
+    }
+    emit(t, r) {
+        this.events.forEach((n, i) => {
+            i === t && n.forEach(s => {
+                s(...r)
+            })
+        }), this.anyEvents.forEach(n => {
+            n({
+                eventName: t,
+                args: r
+            })
+        })
+    }
+    clear(t) {
+        t ? this.events.forEach((r, n) => {
+            t === n && r.clear()
+        }) : this.events.clear()
+    }
+    clearAny() {
+        this.anyEvents.clear()
+    }
+    addRemoveEvents(t, r) {
+        const n = Object.entries(r).reduce((i, [s, c]) => (i.push(this.manageEventSet(t, s, c)), i), []);
+        return () => {
+            n.forEach(i => i())
+        }
+    }
+    manageEventSet(t, r, n) {
+        const i = this.events.get(r) || new Set;
+        return (Array.isArray(n) ? n : [n]).forEach(s => {
+            typeof s == "function" && (t ? i.delete(s) : i.add(s))
+        }), this.events.set(r, i), () => {
+            this.manageEventSet(!t, r, n)
+        }
+    }
+    manageAnyEventSet(t, r) {
+        return (Array.isArray(r) ? r : [r]).forEach(i => {
+            typeof i == "function" && (t ? this.anyEvents.delete(i) : this.anyEvents.add(i))
+        }), () => {
+            this.manageAnyEventSet(!t, r)
+        }
+    }
+}
+
+function Tf(e) {
+    return e ? El(btoa(JSON.stringify(e))) : ""
+}
+const jc = "last-event-id",
+    Ks = "text/event-stream";
+class Gc extends Error {}
+const Af = (e, t) => {
+        let r = "connecting",
+            n = null;
+        const i = new Headers,
+            s = new AbortController,
+            {
+                onOpen: c,
+                onError: u,
+                onMessage: h,
+                onClose: v,
+                onConnectionStateChange: m,
+                appendLastEventIdHeader: y = !1,
+                ...w
+            } = t || {},
+            {
+                promise: S,
+                resolve: b
+            } = Oe(),
+            P = F => {
+                const U = r;
+                U !== F && (r = F, m == null || m(r, U))
+            },
+            T = F => {
+                P("closed"), v == null || v(F), b(F), s.signal.aborted || s.abort(F)
+            };
+        return s.signal.addEventListener("abort", () => {
+            const {
+                reason: F
+            } = s.signal;
+            T(xt(new Hr(xr(F, new Error(`Event-source aborted: ${F}`)))))
+        }), (async () => {
+            P("connecting");
+            const F = new URL(df(e));
+            F.searchParams.set("event-source-id", crypto.randomUUID());
+            const U = await _o(F, {
+                ...w,
+                async retry(M, z) {
+                    return P("connecting"), u == null || u(z), await pf(w.retry, M, z) ?? n
+                },
+                async init(M) {
+                    const z = await hf(w.init, M) || {};
+                    return ff(s, z.signal), {
+                        ...z,
+                        signal: s.signal,
+                        headers: hl({
+                            accept: Ks
+                        }, (z || {}).headers, i)
+                    }
+                },
+                async inspect(M, z) {
+                    if (!M.ok) return xt(new Hr(new Error(`Event-source not available from "${M.url}"`), M));
+                    const H = M.headers.get("content-type") || "";
+                    if (!H.startsWith(Ks)) return xt(new Hr(new Gc(`Response content-type is "${H}" instead of "${Ks}"`)));
+                    if (!(M.body instanceof ReadableStream)) return xt(new Hr(new Gc("Response body is no Readable Stream")));
+                    P("connected"), c == null || c(M, z);
+                    const Q = Bf({
+                        onId(W) {
+                            (typeof y == "function" ? y(W) : y) ? i.set(jc, W): i.delete(jc)
+                        },
+                        onRetry(W) {
+                            n = W
+                        },
+                        onMessage: h
+                    });
+                    try {
+                        await M.body.pipeTo(new WritableStream({
+                            write(W) {
+                                Q(W)
+                            }
+                        }), {
+                            signal: s.signal
+                        })
+                    } catch (W) {
+                        return xt(new Hr(xr(W, new Error(`Event-source stream error: ${W}`)), M))
+                    }
+                }
+            });
+            T(U)
+        })(), {
+            close: () => T(xt(new Hr(new Error("Event-source closed")))),
+            getState: () => r,
+            result: S
+        }
+    },
+    Dn = {
+        newLine: 10,
+        carriageReturn: 13,
+        space: 32,
+        colon: 58
+    },
+    Nf = (e, t) => {
+        const r = new Uint8Array(e.length + t.length);
+        return r.set(e), r.set(t, e.length), r
+    },
+    Vc = () => ({
+        data: "",
+        event: "",
+        id: "",
+        retry: void 0
+    }),
+    Bf = ({
+        onId: e,
+        onRetry: t,
+        onMessage: r
+    }) => {
+        const n = new TextDecoder;
+        let i = Vc(),
+            s, c, u, h = !1;
+        const v = (m, y) => {
+            if (m.length === 0) r == null || r(i), i = Vc();
+            else if (y > 0) {
+                const w = n.decode(m.subarray(0, y)),
+                    S = y + (m[y + 1] === Dn.space ? 2 : 1),
+                    b = n.decode(m.subarray(S));
+                switch (w) {
+                    case "data": {
+                        i.data = i.data ? i.data + `
+` + b : b;
+                        break
+                    }
+                    case "event": {
+                        i.event = b;
+                        break
+                    }
+                    case "id": {
+                        e == null || e(i.id = b);
+                        break
+                    }
+                    case "retry": {
+                        const P = parseInt(b, 10);
+                        isNaN(P) || t == null || t(i.retry = P);
+                        break
+                    }
+                }
+            }
+        };
+        return m => {
+            s === void 0 ? (s = m, c = 0, u = -1) : s = Nf(s, m);
+            const y = s.length;
+            let w = 0;
+            for (; c < y;) {
+                h && (s[c] === Dn.newLine && (w = ++c), h = !1);
+                let S = -1;
+                for (; c < y && S === -1; ++c) switch (s[c]) {
+                    case Dn.colon:
+                        u === -1 && (u = c - w);
+                        break;
+                    case Dn.carriageReturn:
+                        h = !0;
+                    case Dn.newLine:
+                        S = c;
+                        break
+                }
+                if (S === -1) break;
+                v(s.subarray(w, S), u), w = c, u = -1
+            }
+            w === y ? s = void 0 : w !== 0 && (s = s.subarray(w), c -= w)
+        }
+    },
+    Mf = e => e instanceof TypeError,
+    Ff = "/build/assets/download-service-worker-response-body-test-B_SY1GJM.txt",
+    z_ = {
+        Month: "MONTH",
+        Year: "YEAR"
+    };
+
+function Yc(e) {
+    return Lf(e)
+}
+
+function Lf(e, t) {
+    return e
+}
+const j_ = {
+    Trialing: "TRIALING"
+};
+
+function Uf(e) {
+    return Wf(e)
+}
+
+function Wf(e, t) {
+    return e == null ? e : {
+        status: e.status == null ? void 0 : e.status,
+        purchasePriceUsdcCent: e.purchasePriceUsdcCent,
+        period: Yc(e.period),
+        periodAfterCurrentTerm: e.periodAfterCurrentTerm == null ? void 0 : Yc(e.periodAfterCurrentTerm),
+        createdAt: new Date(e.createdAt),
+        currentTermStart: new Date(e.currentTermStart),
+        currentTermEnd: e.currentTermEnd == null ? void 0 : new Date(e.currentTermEnd),
+        trialEnd: e.trialEnd == null ? void 0 : new Date(e.trialEnd)
+    }
+}
+
+function $f(e) {
+    return qf(e)
+}
+
+function qf(e, t) {
+    return e == null ? e : {
+        subscription: Uf(e.subscription),
+        tier: zc(e.tier),
+        tierAfterCurrentTerm: zc(e.tierAfterCurrentTerm),
+        discountedByLimeWireOriginal: e.discountedByLimeWireOriginal,
+        discountedByLimeWireOriginalAfterCurrentTerm: e.discountedByLimeWireOriginalAfterCurrentTerm,
+        nextCreditsForYearlySubscription: e.nextCreditsForYearlySubscription == null ? void 0 : new Date(e.nextCreditsForYearlySubscription),
+        nextCreditsForTrialingSubscription: e.nextCreditsForTrialingSubscription == null ? void 0 : new Date(e.nextCreditsForTrialingSubscription),
+        nextCreditsForBasicLmwoSubscription: e.nextCreditsForBasicLmwoSubscription == null ? void 0 : new Date(e.nextCreditsForBasicLmwoSubscription)
+    }
+}
+
+function Xs(e) {
+    return Hf(e)
+}
+
+function Hf(e, t) {
+    return e == null ? e : {
+        downloadUrl: e.downloadUrl == null ? void 0 : e.downloadUrl,
+        id: e.id,
+        uploadType: e.uploadType,
+        ownerId: e.ownerId,
+        mimeType: e.mimeType == null ? void 0 : e.mimeType,
+        assetType: e.assetType,
+        assetPurpose: e.assetPurpose == null ? void 0 : e.assetPurpose,
+        postProcessingStatus: e.postProcessingStatus == null ? void 0 : e.postProcessingStatus,
+        postProcessingFailureReason: e.postProcessingFailureReason == null ? void 0 : e.postProcessingFailureReason,
+        childAssetTrackingDocuments: e.childAssetTrackingDocuments == null ? void 0 : e.childAssetTrackingDocuments.map(Xs),
+        childAssetType: e.childAssetType == null ? void 0 : e.childAssetType,
+        parentAssetTrackingDocumentId: e.parentAssetTrackingDocumentId == null ? void 0 : e.parentAssetTrackingDocumentId,
+        fileName: e.fileName,
+        fileType: e.fileType,
+        additionalUrls: e.additionalUrls == null ? void 0 : e.additionalUrls,
+        assetMetaInfo: e.assetMetaInfo == null ? void 0 : e.assetMetaInfo,
+        sizeInBytes: e.sizeInBytes == null ? void 0 : e.sizeInBytes,
+        createdDate: new Date(e.createdDate)
+    }
+}
+
+function Jf(e) {
+    return zf(e)
+}
+
+function zf(e, t) {
+    return e == null ? e : {
+        passphrase: e.passphrase
+    }
+}
+
+function jf(e) {
+    return e == null ? e : {
+        email: e.email
+    }
+}
+
+function Gf(e) {
+    return e == null ? e : {
+        logoutAllClients: e.logoutAllClients
+    }
+}
+
+function Vf(e) {
+    return Yf(e)
+}
+
+function Yf(e, t) {
+    return e == null ? e : {
+        passphrase: e.passphrase
+    }
+}
+
+function Qf(e) {
+    return Xf(e)
+}
+
+function Xf(e, t) {
+    return e == null ? e : {
+        vatNumber: e.vatNumber == null ? void 0 : e.vatNumber,
+        companyName: e.companyName == null ? void 0 : e.companyName,
+        firstName: e.firstName,
+        lastName: e.lastName,
+        phoneNumber: e.phoneNumber,
+        addressLine1: e.addressLine1,
+        addressLine2: e.addressLine2 == null ? void 0 : e.addressLine2,
+        postalCode: e.postalCode,
+        city: e.city,
+        usStateCodeAlpha2: e.usStateCodeAlpha2 == null ? void 0 : kf(e.usStateCodeAlpha2),
+        countryCodeAlpha2: Pf(e.countryCodeAlpha2)
+    }
+}
+
+function Zf(e) {
+    return e == null ? e : {
+        vatNumber: e.vatNumber,
+        companyName: e.companyName,
+        firstName: e.firstName,
+        lastName: e.lastName,
+        phoneNumber: e.phoneNumber,
+        addressLine1: e.addressLine1,
+        addressLine2: e.addressLine2,
+        postalCode: e.postalCode,
+        city: e.city,
+        usStateCodeAlpha2: _f(e.usStateCodeAlpha2),
+        countryCodeAlpha2: Ef(e.countryCodeAlpha2)
+    }
+}
+
+function ep(e) {
+    return e == null ? e : {
+        newEmail: e.newEmail
+    }
+}
+
+function tp(e) {
+    return rp(e)
+}
+
+function rp(e, t) {
+    return e == null ? e : {
+        newEmail: e.newEmail,
+        oldEmail: e.oldEmail
+    }
+}
+
+function np(e) {
+    return ip(e)
+}
+
+function ip(e, t) {
+    return e == null ? e : {
+        releaseDate: new Date(e.releaseDate),
+        amountLmwr: e.amountLmwr
+    }
+}
+const ap = {
+    Managed: "MANAGED"
+};
+
+function sp(e) {
+    return op(e)
+}
+
+function op(e, t) {
+    return e == null ? e : {
+        userId: e.userId,
+        email: e.email,
+        nick: e.nick,
+        name: e.name == null ? void 0 : e.name,
+        description: e.description == null ? void 0 : e.description,
+        authorities: e.authorities,
+        level: e.level,
+        verificationStatus: Sf(e.verificationStatus),
+        referralCode: e.referralCode,
+        kycPassed: e.kycPassed,
+        billingAddress: e.billingAddress == null ? void 0 : Qf(e.billingAddress),
+        accountSubscription: e.accountSubscription == null ? void 0 : $f(e.accountSubscription),
+        avatarAsset: e.avatarAsset == null ? void 0 : Xs(e.avatarAsset),
+        heroAsset: e.heroAsset == null ? void 0 : Xs(e.heroAsset),
+        twitterHandle: e.twitterHandle == null ? void 0 : e.twitterHandle,
+        instagramHandle: e.instagramHandle == null ? void 0 : e.instagramHandle,
+        lmwrReleaseSchedule: e.lmwrReleaseSchedule == null ? void 0 : e.lmwrReleaseSchedule.map(np),
+        paidSubscriptionPlanAllowed: e.paidSubscriptionPlanAllowed,
+        planSelectionShown: e.planSelectionShown,
+        allowUsdcWithdrawals: e.allowUsdcWithdrawals,
+        mintDestinationWalletAddress: e.mintDestinationWalletAddress == null ? void 0 : e.mintDestinationWalletAddress,
+        userEncryptionKeyType: e.userEncryptionKeyType,
+        totp2faEnabled: e.totp2faEnabled,
+        walletLoginEnabled: e.walletLoginEnabled
+    }
+}
+
+function cp(e) {
+    return e == null ? e : {
+        nick: e.nick,
+        name: e.name,
+        description: e.description,
+        email: e.email,
+        billing_address: Zf(e.billingAddress),
+        avatar_asset_id: e.avatarAssetId,
+        hero_asset_id: e.heroAssetId,
+        two_factor_code: e.twoFactorCode,
+        two_factor_code_new_email: e.twoFactorCodeNewEmail,
+        plan_selection_shown: e.planSelectionShown,
+        mint_destination_wallet_address: e.mintDestinationWalletAddress,
+        walletLoginEnabled: e.walletLoginEnabled
+    }
+}
+
+function up(e) {
+    return lp(e)
+}
+
+function lp(e, t) {
+    return e == null ? e : {
+        accessToken: e.access_token
+    }
+}
+class Pl extends bf {
+    async getPassphraseRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/users/self/passphrase",
+            method: "GET",
+            headers: n,
+            query: r
+        }, t);
+        return new Rn(i, s => Jf(s))
+    }
+    async getPassphrase(t) {
+        return await (await this.getPassphraseRaw(t)).value()
+    }
+    async getSelfRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/users/self",
+            method: "GET",
+            headers: n,
+            query: r
+        }, t);
+        return new Rn(i, s => sp(s))
+    }
+    async getSelf(t) {
+        return await (await this.getSelfRaw(t)).value()
+    }
+    async issueTwoFaTokenRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/users/self/2fa",
+            method: "POST",
+            headers: n,
+            query: r
+        }, t);
+        return new ji(i)
+    }
+    async issueTwoFaToken(t) {
+        await this.issueTwoFaTokenRaw(t)
+    }
+    async issueTwoFaTokenForEmailRaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/users/2fa",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: jf(t.issueTwoFaTokenForEmailRequest)
+        }, r);
+        return new ji(s)
+    }
+    async issueTwoFaTokenForEmail(t = {}, r) {
+        await this.issueTwoFaTokenForEmailRaw(t, r)
+    }
+    async logoutRaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/users/logout",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Gf(t.logoutRequest)
+        }, r);
+        return new ji(s)
+    }
+    async logout(t = {}, r) {
+        await this.logoutRaw(t, r)
+    }
+    async resetPassphraseRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/users/self/passphrase/reset",
+            method: "POST",
+            headers: n,
+            query: r
+        }, t);
+        return new Rn(i, s => Vf(s))
+    }
+    async resetPassphrase(t) {
+        return await (await this.resetPassphraseRaw(t)).value()
+    }
+    async updateEmailRaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/users/self/email",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: ep(t.userEmailUpdateRequest)
+        }, r);
+        return new Rn(s, c => tp(c))
+    }
+    async updateEmail(t = {}, r) {
+        return await (await this.updateEmailRaw(t, r)).value()
+    }
+    async updateUserRaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/users/self",
+            method: "PATCH",
+            headers: i,
+            query: n,
+            body: cp(t.userUpdateRequest)
+        }, r);
+        return new Rn(s, c => up(c))
+    }
+    async updateUser(t = {}, r) {
+        return await (await this.updateUserRaw(t, r)).value()
+    }
+    async userPingRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/users/ping",
+            method: "GET",
+            headers: n,
+            query: r
+        }, t);
+        return new ji(i)
+    }
+    async userPing(t) {
+        await this.userPingRaw(t)
+    }
+}
+class dp {
+    constructor(t, r) {
+        this.target = t, this.apiOptions = r
+    }
+    start() {
+        var r, n;
+        const t = async i => {
+            const {
+                data: s
+            } = i, c = this.apiOptions;
+            switch (s.type) {
+                case "msgChannelClientApiOptions": {
+                    this.target.postMessage({
+                        type: "msgChannelServerApiOptions",
+                        id: s.id,
+                        apiOptions: {
+                            basePath: c.basePath,
+                            retry: Array.isArray(c.retry) ? c.retry : void 0,
+                            timeout: c.timeout
+                        }
+                    });
+                    break
+                }
+                case "msgChannelClientApiOptionsInit": {
+                    const u = await mf(c.init, s.apiInput, s.apiInit);
+                    this.target.postMessage({
+                        type: "msgChannelServerApiOptionsInit",
+                        id: s.id,
+                        apiOptionsInit: {
+                            ...u,
+                            headers: hl(u.headers),
+                            signal: void 0
+                        }
+                    });
+                    break
+                }
+                case "msgChannelClientApiOptionsGetCsrfToken": {
+                    this.target.postMessage({
+                        type: "msgChannelServerApiOptionsGetCsrfToken",
+                        id: s.id,
+                        csrfToken: c.csrfFetcher && await c.csrfFetcher.getCsrfToken()
+                    });
+                    break
+                }
+                case "msgChannelClientApiOptionsInvalidateCsrfToken": {
+                    c.csrfFetcher && await c.csrfFetcher.invalidateCsrfToken(), this.target.postMessage({
+                        type: "msgChannelServerApiOptionsInvalidateCsrfToken",
+                        id: s.id
+                    });
+                    break
+                }
+                case "msgChannelClientApiOptionsFetchedCsrfToken": {
+                    this.target.postMessage({
+                        type: "msgChannelServerApiOptionsFetchedCsrfToken",
+                        id: s.id,
+                        csrfToken: c.csrfFetcher && await c.csrfFetcher.getFetchedCsrfToken() || ""
+                    });
+                    break
+                }
+                case "msgChannelClientApiOptionsGetAuthToken": {
+                    this.target.postMessage({
+                        type: "msgChannelServerApiOptionsGetAuthToken",
+                        id: s.id,
+                        authToken: c.authFetcher && await c.authFetcher.getAuthToken()
+                    });
+                    break
+                }
+                case "msgChannelClientApiOptionsInvalidateAuthToken": {
+                    c.authFetcher && await c.authFetcher.invalidateAuthToken(), this.target.postMessage({
+                        type: "msgChannelServerApiOptionsInvalidateAuthToken",
+                        id: s.id
+                    });
+                    break
+                }
+            }
+        };
+        return (n = (r = this.target).start) == null || n.call(r), this.target.addEventListener("message", t), () => {
+            this.target.removeEventListener("message", t)
+        }
+    }
+}
+const xs = 256,
+    Qc = ["encrypt", "decrypt"],
+    hp = {
+        ASYMMETRIC_PRIVATE_KEY: {
+            keyFormat: "jwk",
+            keyProperties: {
+                name: "ECDH",
+                namedCurve: "P-256"
+            },
+            keyUsages: ["deriveBits", "deriveKey"]
+        },
+        "SYMMETRIC_AES-GCM_KEY": {
+            keyFormat: "raw",
+            keyProperties: {
+                name: "AES-GCM",
+                length: xs
+            },
+            keyUsages: Qc
+        },
+        "SYMMETRIC_AES-CTR_KEY": {
+            keyFormat: "raw",
+            keyProperties: {
+                name: "AES-CTR",
+                length: xs
+            },
+            keyUsages: Qc
+        },
+        WRAPPING_KEY: {
+            keyFormat: "raw",
+            keyProperties: {
+                name: "AES-KW",
+                length: xs
+            },
+            keyUsages: ["wrapKey", "unwrapKey"]
+        },
+        WRAPPED_ASYMMETRIC_PRIVATE_KEY: {
+            keyFormat: "raw",
+            keyProperties: {
+                name: "AES-CTR"
+            },
+            keyUsages: ["wrapKey"]
+        }
+    },
+    Xc = new Map,
+    Zc = new Map;
+class Xe {
+    static getKeyProperties(t) {
+        return hp[t]
+    }
+    async createKeyWrappingKey() {
+        const t = Xe.getKeyProperties("WRAPPING_KEY");
+        return crypto.subtle.generateKey(t.keyProperties, !0, t.keyUsages)
+    }
+    async createEncryptionAesCryptoKey(t) {
+        const r = Xe.getKeyProperties(t);
+        return {
+            aesKeyType: t,
+            cryptoKey: await crypto.subtle.generateKey(r.keyProperties, !0, r.keyUsages)
+        }
+    }
+    async deriveEncryptionKeyFromAesKey(t, r) {
+        const n = Xe.getKeyProperties(t.aesKeyType),
+            i = await crypto.subtle.exportKey("raw", t.cryptoKey),
+            s = await crypto.subtle.importKey("raw", i, "HKDF", !1, ["deriveKey"]),
+            c = new TextEncoder;
+        return {
+            aesKeyType: t.aesKeyType,
+            cryptoKey: await crypto.subtle.deriveKey({
+                name: "HKDF",
+                hash: "SHA-256",
+                info: c.encode(r),
+                salt: c.encode("no-salt-because-it-needs-to-be-deterministic")
+            }, s, n.keyProperties, !0, n.keyUsages)
+        }
+    }
+    async serializeEncryptionAesCryptoKey({
+        aesKeyType: t,
+        cryptoKey: r
+    }) {
+        return {
+            aesKeyType: t,
+            jwk: await crypto.subtle.exportKey("jwk", r)
+        }
+    }
+    async deserializeEncryptionAesCryptoKey({
+        aesKeyType: t,
+        jwk: r
+    }) {
+        const n = Xe.getKeyProperties(t);
+        return {
+            aesKeyType: t,
+            cryptoKey: await crypto.subtle.importKey("jwk", r, n.keyProperties, !0, n.keyUsages)
+        }
+    }
+    randomSalt() {
+        return crypto.getRandomValues(new Uint8Array(16))
+    }
+    async wrapWithPassphrase(t, r, n) {
+        const i = await this.generateWrappingKeyFromPassphrase(t, r),
+            s = this.getWrappingFormat(n);
+        return crypto.subtle.wrapKey(s, n, i, "AES-KW")
+    }
+    async extractPrivateKeyAndWrapWithPassphrase(t, r, n) {
+        const i = await this.generateWrappingKeyFromPassphrase(t, r);
+        return this.extractPrivateKeyAndWrapWithWrappingKey(i, n)
+    }
+    async unwrapKeyWithPassphrase(t, r, n, i) {
+        const s = `${i}_${t}_${Ne(r)}_${Ne(n)}`,
+            c = Zc.get(s);
+        if (c) return c;
+        const u = await this.generateWrappingKeyFromPassphrase(t, r),
+            {
+                keyFormat: h,
+                keyProperties: v,
+                keyUsages: m
+            } = Xe.getKeyProperties(i),
+            y = await crypto.subtle.unwrapKey(h, n, u, "AES-KW", v, !0, m);
+        return Zc.set(s, y), y
+    }
+    async unwrapKeyWithWrappingKey(t, r, n) {
+        const {
+            keyFormat: i,
+            keyProperties: s,
+            keyUsages: c
+        } = Xe.getKeyProperties(n);
+        return crypto.subtle.unwrapKey(i, r, t, "AES-KW", s, !0, c)
+    }
+    wrapWithWrappingKey(t, r) {
+        return crypto.subtle.wrapKey(this.getWrappingFormat(r), r, t, "AES-KW")
+    }
+    async extractPrivateKeyAndWrapWithWrappingKey(t, r) {
+        const n = await this.extractPrivateKey(r),
+            i = await crypto.subtle.importKey("raw", wt(n), {
+                name: "AES-CTR"
+            }, !0, ["wrapKey"]);
+        return crypto.subtle.wrapKey("raw", i, t, "AES-KW")
+    }
+    async encryptAesGcm(t, r, n) {
+        const i = await crypto.subtle.encrypt({
+            name: "AES-GCM",
+            iv: n
+        }, t.cryptoKey, r);
+        return {
+            iv: n,
+            encryptedData: i
+        }
+    }
+    async encryptAesCtr(t, r, n, i) {
+        const s = this.getAesCtrNonce(n, i),
+            c = await crypto.subtle.encrypt({
+                name: "AES-CTR",
+                counter: s,
+                length: 40
+            }, t.cryptoKey, r),
+            u = i + Math.ceil(r.byteLength / 16);
+        return {
+            iv: n,
+            encryptedData: c,
+            newCounter: u
+        }
+    }
+    getAesCtrNonce(t, r) {
+        if (t.byteLength !== 11) throw new Error("IV must be 11 bytes");
+        if (r < 0 || r > 0xffffffffff || !Number.isInteger(r)) throw new Error("Counter must be a non-negative integer not exceeding 40 bits");
+        const n = new ArrayBuffer(16);
+        new Uint8Array(n).set(new Uint8Array(t), 0);
+        const s = new DataView(n, 11, 5);
+        return s.setUint32(0, Math.floor(r / 256), !1), s.setUint8(4, r % 256), n
+    }
+    decryptAesGcm(t, r, n) {
+        return n.byteLength === 0 ? new ArrayBuffer(0) : crypto.subtle.decrypt({
+            name: "AES-GCM",
+            iv: r
+        }, t.cryptoKey, n)
+    }
+    async decryptAesCtr(t, r, n, i) {
+        if (i.byteLength == 0) return {
+            decryptedData: new ArrayBuffer(0),
+            newCounter: n
+        };
+        const c = {
+                name: "AES-CTR",
+                counter: this.getAesCtrNonce(r, n),
+                length: 40
+            },
+            u = await crypto.subtle.decrypt(c, t.cryptoKey, i),
+            h = n + Math.ceil(i.byteLength / 16);
+        return {
+            decryptedData: u,
+            newCounter: h
+        }
+    }
+    async exportPrivateKey(t) {
+        return JSON.stringify(await crypto.subtle.exportKey("jwk", t))
+    }
+    async importPrivateKey(t) {
+        const {
+            keyProperties: r
+        } = Xe.getKeyProperties("ASYMMETRIC_PRIVATE_KEY");
+        return await crypto.subtle.importKey("jwk", t, r, !0, ["deriveKey", "deriveBits"])
+    }
+    async generateWrappingKeyFromPassphrase(t, r) {
+        const n = `${t}_${Ne(r)}`,
+            i = Xc.get(n);
+        if (i) return i;
+        const s = await crypto.subtle.importKey("raw", new TextEncoder().encode(t), {
+                name: "PBKDF2"
+            }, !1, ["deriveBits", "deriveKey"]),
+            c = Xe.getKeyProperties("WRAPPING_KEY"),
+            u = await crypto.subtle.deriveKey({
+                name: "PBKDF2",
+                iterations: 1e5,
+                hash: "SHA-256",
+                salt: r
+            }, s, c.keyProperties, !0, c.keyUsages);
+        return Xc.set(n, u), u
+    }
+    getWrappingFormat(t) {
+        switch (t.type) {
+            case "private":
+                return "jwk";
+            case "public":
+            case "secret":
+                return "raw";
+            default:
+                throw new Error("Unsupported")
+        }
+    }
+    async extractPrivateKey(t) {
+        if (t.type === "secret") return Ne(await crypto.subtle.exportKey("raw", t));
+        const n = (await crypto.subtle.exportKey("jwk", t)).d;
+        if (!n) throw Error("Could not extract private-key part");
+        return _l(n)
+    }
+}
+const ea = async e => {
+    const t = new Xe,
+        [r, n] = await Promise.all([t.serializeEncryptionAesCryptoKey(e.aesGcmCryptoKey), t.serializeEncryptionAesCryptoKey(e.aesCtrCryptoKey)]);
+    return {
+        aesGcmJwk: r,
+        aesCtrJwk: n
+    }
+};
+class fp {
+    constructor(t, r) {
+        this.target = t, this.options = r
+    }
+    start() {
+        var r, n;
+        const t = async i => {
+            var c, u, h, v;
+            const {
+                data: s
+            } = i;
+            switch (s.type) {
+                case "msgChannelClientDownloadContentItemDecryptionKeys": {
+                    const m = await this.options.getContentItemDecryptionKeys(s.contentItemId).catch(() => null);
+                    if (!m) return;
+                    this.target.postMessage({
+                        type: "msgChannelServerDownloadContentItemDecryptionKeys",
+                        id: s.id,
+                        contentItemId: s.contentItemId,
+                        decryptionKeysSerialized: await ea(m)
+                    });
+                    break
+                }
+                case "msgChannelClientDownloadMultipartOptions": {
+                    this.target.postMessage({
+                        type: "msgChannelServerDownloadMultipartOptions",
+                        id: s.id,
+                        multipartOptions: this.options.multipartOptions
+                    });
+                    break
+                }
+                case "msgChannelClientDownloadProgress": {
+                    (u = (c = this.options).onProgress) == null || u.call(c, s.progress);
+                    break
+                }
+                case "msgChannelClientDownloadContentItemProgress": {
+                    (v = (h = this.options).onContentItemProgress) == null || v.call(h, s.contentItemId, s.progress);
+                    break
+                }
+            }
+        };
+        return (n = (r = this.target).start) == null || n.call(r), this.target.addEventListener("message", t), () => {
+            this.target.removeEventListener("message", t)
+        }
+    }
+}
+const pp = 8e3,
+    mp = 2e3;
+class yp {
+    constructor(t, r, n, i) {
+        this.serviceWorker = t, this.downloadInfo = r, this.downloadOptions = n, this.onServiceWorkerUnresponsive = i, this.downloadUrlPromise = Oe();
+        const {
+            apiOptions: s,
+            multipartOptions: c,
+            getContentItemDecryptionKeys: u,
+            onProgress: h,
+            onContentItemProgress: v,
+            onStart: m,
+            onResult: y
+        } = n;
+        let w = null,
+            S = null;
+        const b = Date.now(),
+            P = new MessageChannel,
+            T = new MessageChannel,
+            F = () => {
+                this.cancel()
+            },
+            U = () => {
+                w !== null && (clearTimeout(w), w = null), S !== null && (clearTimeout(S), S = null)
+            },
+            M = (Se, ue) => {
+                S = setTimeout(() => {
+                    y == null || y(!1, "ServiceWorker is not responding, please try again."), i == null || i(Date.now() - b), this.cleanup()
+                }, mp), this.serviceWorker.postMessage({
+                    type: "downloadServiceWorkerDownloadKeepAlive",
+                    downloadId: Se,
+                    time: pp,
+                    port: ue
+                }, ue ? [ue] : [])
+            },
+            z = async Se => {
+                const {
+                    data: ue
+                } = Se;
+                switch (ue.type) {
+                    case "downloadServiceWorkerDownloadRegisterDownload": {
+                        this.downloadUrlPromise.resolve(ue.url);
+                        break
+                    }
+                    case "downloadServiceWorkerDownloadStart": {
+                        m == null || m(), addEventListener("beforeunload", F), M(ue.downloadId, T.port2);
+                        break
+                    }
+                    case "downloadServiceWorkerDownloadResult": {
+                        y == null || y(ue.canceled, ue.error), this.cleanup();
+                        break
+                    }
+                }
+            }, H = async Se => {
+                const {
+                    data: ue
+                } = Se;
+                switch (ue.type) {
+                    case "downloadServiceWorkerDownloadKeepAlive": {
+                        U(), w = setTimeout(() => {
+                            M(ue.downloadId)
+                        }, ue.time);
+                        break
+                    }
+                }
+            };
+        P.port1.start(), P.port2.start(), T.port1.start(), T.port2.start(), P.port1.addEventListener("message", z), T.port1.addEventListener("message", H);
+        const Q = new dp(P.port1, s),
+            W = new fp(P.port1, {
+                getContentItemDecryptionKeys: u,
+                onContentItemProgress: v,
+                onProgress: h,
+                multipartOptions: c
+            }),
+            ie = Q.start(),
+            de = W.start();
+        this.cleanup = () => {
+            removeEventListener("beforeunload", F), U(), ie(), de(), P.port1.removeEventListener("message", z), P.port1.close(), P.port2.close(), T.port1.removeEventListener("message", H), T.port1.close(), T.port2.close()
+        }, this.downloadMessageChannel = P, this.serviceWorker.postMessage({
+            type: "downloadServiceWorkerDownloadRegisterDownload",
+            port: P.port2,
+            downloadInfo: r
+        }, [P.port2])
+    }
+    getUrl() {
+        return this.downloadUrlPromise.promise
+    }
+    cancel() {
+        this.downloadMessageChannel.port1.postMessage({
+            type: "downloadServiceWorkerDownloadCancelDownload"
+        }), setTimeout(() => this.cleanup(), 1e3)
+    }
+}
+const vp = "/decrypt",
+    gp = e => {
+        const {
+            contentItem: t,
+            decryptionKeysSerialized: r,
+            downloadUrl: n,
+            previewItem: i
+        } = e || {}, {
+            mediaType: s
+        } = i ?? t, c = new URL(location.origin);
+        return c.pathname = vp, c.searchParams.set("downloadUrl", n), c.searchParams.set("mediaType", s), c.searchParams.set("decryptionKeys", Tf(r)), i && c.searchParams.set("preview", i.id), c.href
+    },
+    wp = ["downloadServiceWorkerKeepAliveFetch"],
+    bp = e => !e || typeof e != "object" || typeof e.type != "string" ? !1 : wp.includes(e.type),
+    Sp = 2e4,
+    Ka = class Ka {
+        constructor() {
+            this.serviceWorkerReadyPromiseWithResolvers = Oe(), this.streamSupportPromiseWithResolvers = Oe(), this.activeServiceWorker = null, this.initialized = !1
+        }
+        static getInstance() {
+            return this.instance || (this.instance = new Ka), this.instance
+        }
+        async createContentItemUrl(t) {
+            return await this.isSupportedAndReady() ? gp(t) : null
+        }
+        async createDownload(t, r) {
+            return !await this.isSupportedAndReady() || !this.activeServiceWorker ? null : new yp(this.activeServiceWorker, t, r, n => {
+                console.error(`Service Worker unresponsive after ${n/1e3} seconds`), this.activeServiceWorker = null
+            })
+        }
+        async isSupportedAndReady() {
+            if (!this.initialized) return !1;
+            await this.serviceWorkerReadyPromiseWithResolvers.promise;
+            const t = await this.streamSupportPromiseWithResolvers.promise;
+            return !!this.activeServiceWorker && t
+        }
+        init(t) {
+            this.initialized || (this.initialized = !0, Promise.resolve(t).then(r => {
+                if (!r.ok) {
+                    this.serviceWorkerReadyPromiseWithResolvers.resolve();
+                    return
+                }
+                try {
+                    let n = null;
+                    const i = () => {
+                            let c = !1;
+                            const u = new AbortController,
+                                h = m => {
+                                    const {
+                                        data: y
+                                    } = m;
+                                    if (!(y && typeof y.source == "string") && bp(y)) switch (y.type) {
+                                        case "downloadServiceWorkerKeepAliveFetch": {
+                                            if (c) return;
+                                            (async () => {
+                                                for (c = !0; c;) {
+                                                    const w = await fetch(y.url, {
+                                                        signal: u.signal
+                                                    }).catch(() => null);
+                                                    if (!w || w.status !== 204) {
+                                                        c = !1;
+                                                        break
+                                                    }
+                                                    await new Promise(S => {
+                                                        setTimeout(() => S(), Sp)
+                                                    })
+                                                }
+                                            })();
+                                            break
+                                        }
+                                    }
+                                },
+                                v = navigator.serviceWorker.controller;
+                            return v && v.scriptURL.endsWith(r.value.scriptURL) ? (this.activeServiceWorker = v, navigator.serviceWorker.addEventListener("message", h)) : this.activeServiceWorker = null, this.serviceWorkerReadyPromiseWithResolvers.resolve(), u
+                        },
+                        s = () => {
+                            n == null || n.abort(), n = i()
+                        };
+                    navigator.serviceWorker.ready.then(s), navigator.serviceWorker.addEventListener("controllerchange", s)
+                } catch {
+                    this.serviceWorkerReadyPromiseWithResolvers.resolve()
+                }
+            }).catch(() => {
+                this.serviceWorkerReadyPromiseWithResolvers.resolve()
+            }), _o(Ff, {
+                retry: Ta({
+                    maxDelay: 2e3
+                })
+            }).then(r => {
+                this.streamSupportPromiseWithResolvers.resolve(r.ok && r.value.body instanceof ReadableStream)
+            }))
+        }
+    };
+Ka.instance = void 0;
+let Zs = Ka;
+
+function Ep(e, t) {
+    if (Ys(e) != "object" || !e) return e;
+    var r = e[Symbol.toPrimitive];
+    if (r !== void 0) {
+        var n = r.call(e, t);
+        if (Ys(n) != "object") return n;
+        throw new TypeError("@@toPrimitive must return a primitive value.")
+    }
+    return String(e)
+}
+
+function _p(e) {
+    var t = Ep(e, "string");
+    return Ys(t) == "symbol" ? t : t + ""
+}
+
+function Pp(e, t) {
+    for (var r = 0; r < t.length; r++) {
+        var n = t[r];
+        n.enumerable = n.enumerable || !1, n.configurable = !0, "value" in n && (n.writable = !0), Object.defineProperty(e, _p(n.key), n)
+    }
+}
+
+function cr(e, t, r) {
+    return t && Pp(e.prototype, t), Object.defineProperty(e, "prototype", {
+        writable: !1
+    }), e
+}
+
+function Aa(e) {
+    return e[e.length - 1]
+}
+
+function an(e) {
+    return Array.isArray(e) ? e.slice(0) : [e]
+}
+
+function kp(e, t) {
+    e = e.slice(0);
+    for (var r = []; e.length;) {
+        var n = e.splice(0, t);
+        r.push(n)
+    }
+    return r
+}
+
+function la(e) {
+    return Array.isArray(e)
+}
+
+function Cp(e) {
+    return e != null
+}
+
+function Os(e, t) {
+    var r = 0,
+        n = -1;
+    for (var i of e) {
+        n = n + 1;
+        var s = t(i, n);
+        if (s) r = r + 1;
+        else break
+    }
+    return r
+}
+
+function Or(e, t) {
+    var r = t.length;
+    if (r !== 0) {
+        var n = e.length;
+        e.length = n + t.length;
+        for (var i = 0; i < r; ++i) e[n + i] = t[i]
+    }
+}
+
+function Ip(e) {
+    return e.filter(function(t, r, n) {
+        return n.indexOf(t) === r
+    })
+}
+
+function ir(e) {
+    for (var t = "", r = 0; r < e.length; r++) {
+        var n = e[r];
+        if (n === "-") return parseInt(t, 10);
+        t += n
+    }
+    throw new Error("malformatted revision: " + e)
+}
+
+function ar(e, t) {
+    var r = t ? ir(t._rev) + 1 : 1;
+    return r + "-" + e
+}
+
+function kl(e) {
+    var t = e.split("."),
+        r = t.length;
+    return r === 1 ? n => n[e] : n => {
+        for (var i = n, s = 0; s < r; ++s) {
+            var c = t[s];
+            if (i = i[c], typeof i > "u") return i
+        }
+        return i
+    }
+}
+
+function De(e) {
+    return Object.assign({}, e)
+}
+
+function Rp(e) {
+    return Object.keys(e)[0]
+}
+
+function da(e, t = !1) {
+    if (!e) return e;
+    if (!t && Array.isArray(e)) return e.sort((n, i) => typeof n == "string" && typeof i == "string" ? n.localeCompare(i) : typeof n == "object" ? 1 : -1).map(n => da(n, t));
+    if (typeof e == "object" && !Array.isArray(e)) {
+        var r = {};
+        return Object.keys(e).sort((n, i) => n.localeCompare(i)).forEach(n => {
+            r[n] = da(e[n], t)
+        }), r
+    }
+    return e
+}
+
+function eo(e) {
+    if (!e || e === null || typeof e != "object") return e;
+    if (Array.isArray(e)) {
+        for (var t = new Array(e.length), r = t.length; r--;) t[r] = eo(e[r]);
+        return t
+    }
+    var n = {};
+    for (var i in e) n[i] = eo(e[i]);
+    return n
+}
+var Ft = eo;
+
+function Bt(e, t, r) {
+    return Object.defineProperty(e, t, {
+        get: function() {
+            return r
+        }
+    }), r
+}
+var Po = 1;
+
+function li() {
+    return {
+        lwt: Po
+    }
+}
+
+function Lt() {
+    return ""
+}
+
+function Dp(e) {
+    return Object.assign({}, e, {
+        _meta: void 0,
+        _deleted: void 0,
+        _rev: void 0
+    })
+}
+
+function Kp(e, t, r) {
+    if (t.length !== r.length) return !1;
+    for (var n = 0, i = t.length; n < i;) {
+        var s = t[n],
+            c = r[n];
+        if (n++, s[e] !== c[e] || s._rev !== c._rev || s._meta.lwt !== c._meta.lwt) return !1
+    }
+    return !0
+}
+
+function zn(e, t) {
+    return zn = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function(r, n) {
+        return r.__proto__ = n, r
+    }, zn(e, t)
+}
+
+function ko(e, t) {
+    e.prototype = Object.create(t.prototype), e.prototype.constructor = e, zn(e, t)
+}
+
+function to(e) {
+    return to = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function(t) {
+        return t.__proto__ || Object.getPrototypeOf(t)
+    }, to(e)
+}
+
+function xp(e) {
+    try {
+        return Function.toString.call(e).indexOf("[native code]") !== -1
+    } catch {
+        return typeof e == "function"
+    }
+}
+
+function Cl() {
+    try {
+        var e = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function() {}))
+    } catch {}
+    return (Cl = function() {
+        return !!e
+    })()
+}
+
+function Op(e, t, r) {
+    if (Cl()) return Reflect.construct.apply(null, arguments);
+    var n = [null];
+    n.push.apply(n, t);
+    var i = new(e.bind.apply(e, n));
+    return r && zn(i, r.prototype), i
+}
+
+function ha(e) {
+    var t = typeof Map == "function" ? new Map : void 0;
+    return ha = function(n) {
+        if (n === null || !xp(n)) return n;
+        if (typeof n != "function") throw new TypeError("Super expression must either be null or a function");
+        if (t !== void 0) {
+            if (t.has(n)) return t.get(n);
+            t.set(n, i)
+        }
+
+        function i() {
+            return Op(n, arguments, to(this).constructor)
+        }
+        return i.prototype = Object.create(n.prototype, {
+            constructor: {
+                value: i,
+                enumerable: !1,
+                writable: !0,
+                configurable: !0
+            }
+        }), zn(i, n)
+    }, ha(e)
+}
+var Ae = {
+    isDevMode() {
+        return !1
+    },
+    deepFreezeWhenDevMode(e) {
+        return e
+    },
+    tunnelErrorMessage(e) {
+        return `
+        RxDB Error-Code: ` + e + `.
+        Hint: Error messages are not included in RxDB core to reduce build size.
+        To show the full error messages and to ensure that you do not make any mistakes when using RxDB,
+        use the dev-mode plugin when you are in development mode: https://rxdb.info/dev-mode.html?console=error
+        `
+    }
+};
+
+function Tp(e) {
+    var t = "";
+    return Object.keys(e).length === 0 || (t += "-".repeat(20) + `
+`, t += `Parameters:
+`, t += Object.keys(e).map(r => {
+        var n = "[object Object]";
+        try {
+            r === "errors" ? n = e[r].map(i => JSON.stringify(i, Object.getOwnPropertyNames(i))) : n = JSON.stringify(e[r], function(i, s) {
+                return s === void 0 ? null : s
+            }, 2)
+        } catch {}
+        return r + ": " + n
+    }).join(`
+`), t += `
+`), t
+}
+
+function Il(e, t, r) {
+    return `
+` + e + `
+` + Tp(r)
+}
+var ro = function(e) {
+        function t(n, i, s = {}) {
+            var c, u = Il(i, n, s);
+            return c = e.call(this, u) || this, c.code = n, c.message = u, c.url = Co(n), c.parameters = s, c.rxdb = !0, c
+        }
+        ko(t, e);
+        var r = t.prototype;
+        return r.toString = function() {
+            return this.message
+        }, cr(t, [{
+            key: "name",
+            get: function() {
+                return "RxError (" + this.code + ")"
+            }
+        }, {
+            key: "typeError",
+            get: function() {
+                return !1
+            }
+        }])
+    }(ha(Error)),
+    Ap = function(e) {
+        function t(n, i, s = {}) {
+            var c, u = Il(i, n, s);
+            return c = e.call(this, u) || this, c.code = n, c.message = u, c.url = Co(n), c.parameters = s, c.rxdb = !0, c
+        }
+        ko(t, e);
+        var r = t.prototype;
+        return r.toString = function() {
+            return this.message
+        }, cr(t, [{
+            key: "name",
+            get: function() {
+                return "RxTypeError (" + this.code + ")"
+            }
+        }, {
+            key: "typeError",
+            get: function() {
+                return !0
+            }
+        }])
+    }(ha(TypeError));
+
+function Co(e) {
+    return "https://rxdb.info/errors.html?console=errors#" + e
+}
+
+function Rl(e) {
+    return `
+Find out more about this error here: ` + Co(e) + ` 
+`
+}
+
+function ee(e, t) {
+    return new ro(e, Ae.tunnelErrorMessage(e) + Rl(e), t)
+}
+
+function fa(e, t) {
+    return new Ap(e, Ae.tunnelErrorMessage(e) + Rl(e), t)
+}
+
+function Na(e) {
+    return e && e.status === 409 ? e : !1
+}
+var Np = {
+    409: "document write conflict",
+    422: "schema validation error",
+    510: "attachment data missing"
+};
+
+function Dl(e) {
+    return ee("COL20", {
+        name: Np[e.status],
+        document: e.documentId,
+        writeError: e
+    })
+}
+var Gi;
+
+function Bp() {
+    var e;
+    if (Gi) return Gi;
+    if (typeof crypto > "u" || typeof crypto.subtle > "u" || typeof crypto.subtle.digest != "function") throw ee("UT8", {
+        args: {
+            typeof_crypto: typeof crypto,
+            typeof_crypto_subtle: typeof(crypto == null ? void 0 : crypto.subtle),
+            typeof_crypto_subtle_digest: typeof((e = crypto == null ? void 0 : crypto.subtle) == null ? void 0 : e.digest)
+        }
+    });
+    return Gi = crypto.subtle.digest.bind(crypto.subtle), Gi
+}
+async function Mp(e) {
+    var t = new TextEncoder().encode(e),
+        r = await Bp()("SHA-256", t),
+        n = Array.prototype.map.call(new Uint8Array(r), i => ("00" + i.toString(16)).slice(-2)).join("");
+    return n
+}
+var Kl = Mp;
+
+function Fp() {
+    return new Promise(e => setTimeout(e, 0))
+}
+
+function jn(e = 0) {
+    return new Promise(t => setTimeout(t, e))
+}
+
+function Lp(e) {
+    return e && typeof e.then == "function" ? e : Promise.resolve(e)
+}
+var di = Promise.resolve(!0),
+    Ut = Promise.resolve(!1),
+    Up = Promise.resolve(null),
+    Ze = Promise.resolve();
+
+function un(e = 1e4) {
+    return typeof requestIdleCallback == "function" ? new Promise(t => {
+        requestIdleCallback(() => t(), {
+            timeout: e
+        })
+    }) : jn(0)
+}
+var Ts = Ze;
+
+function Wp(e = void 0) {
+    return Ts = Ts.then(() => un(e)), Ts
+}
+
+function $p(e, t) {
+    return e.reduce((r, n) => r.then(n), Promise.resolve(t))
+}
+var qp = /\./g,
+    eu = "abcdefghijklmnopqrstuvwxyz";
+
+function ln(e = 10) {
+    for (var t = "", r = 0; r < e; r++) t += eu.charAt(Math.floor(Math.random() * eu.length));
+    return t
+}
+
+function xl(e) {
+    e += "";
+    var t = e.charAt(0).toUpperCase();
+    return t + e.substr(1)
+}
+
+function An(e) {
+    for (; e.charAt(0) === ".";) e = e.substr(1);
+    for (; e.slice(-1) === ".";) e = e.slice(0, -1);
+    return e
+}
+
+function Gn(e, t) {
+    if (e === t) return !0;
+    if (e && t && typeof e == "object" && typeof t == "object") {
+        if (e.constructor !== t.constructor) return !1;
+        var r, n;
+        if (Array.isArray(e)) {
+            if (r = e.length, r !== t.length) return !1;
+            for (n = r; n-- !== 0;)
+                if (!Gn(e[n], t[n])) return !1;
+            return !0
+        }
+        if (e.constructor === RegExp) return e.source === t.source && e.flags === t.flags;
+        if (e.valueOf !== Object.prototype.valueOf) return e.valueOf() === t.valueOf();
+        if (e.toString !== Object.prototype.toString) return e.toString() === t.toString();
+        var i = Object.keys(e);
+        if (r = i.length, r !== Object.keys(t).length) return !1;
+        for (n = r; n-- !== 0;)
+            if (!Object.prototype.hasOwnProperty.call(t, i[n])) return !1;
+        for (n = r; n-- !== 0;) {
+            var s = i[n];
+            if (!Gn(e[s], t[s])) return !1
+        }
+        return !0
+    }
+    return e !== e && t !== t
+}
+var no = e => {
+        var t = typeof e;
+        return e !== null && (t === "object" || t === "function")
+    },
+    As = new Set(["__proto__", "prototype", "constructor"]),
+    Hp = new Set("0123456789");
+
+function Ol(e) {
+    var t = [],
+        r = "",
+        n = "start",
+        i = !1;
+    for (var s of e) switch (s) {
+        case "\\": {
+            if (n === "index") throw new Error("Invalid character in an index");
+            if (n === "indexEnd") throw new Error("Invalid character after an index");
+            i && (r += s), n = "property", i = !i;
+            break
+        }
+        case ".": {
+            if (n === "index") throw new Error("Invalid character in an index");
+            if (n === "indexEnd") {
+                n = "property";
+                break
+            }
+            if (i) {
+                i = !1, r += s;
+                break
+            }
+            if (As.has(r)) return [];
+            t.push(r), r = "", n = "property";
+            break
+        }
+        case "[": {
+            if (n === "index") throw new Error("Invalid character in an index");
+            if (n === "indexEnd") {
+                n = "index";
+                break
+            }
+            if (i) {
+                i = !1, r += s;
+                break
+            }
+            if (n === "property") {
+                if (As.has(r)) return [];
+                t.push(r), r = ""
+            }
+            n = "index";
+            break
+        }
+        case "]": {
+            if (n === "index") {
+                t.push(Number.parseInt(r, 10)), r = "", n = "indexEnd";
+                break
+            }
+            if (n === "indexEnd") throw new Error("Invalid character after an index")
+        }
+        default: {
+            if (n === "index" && !Hp.has(s)) throw new Error("Invalid character in an index");
+            if (n === "indexEnd") throw new Error("Invalid character after an index");
+            n === "start" && (n = "property"), i && (i = !1, r += "\\"), r += s
+        }
+    }
+    switch (i && (r += "\\"), n) {
+        case "property": {
+            if (As.has(r)) return [];
+            t.push(r);
+            break
+        }
+        case "index":
+            throw new Error("Index was not closed");
+        case "start": {
+            t.push("");
+            break
+        }
+    }
+    return t
+}
+
+function Tl(e, t) {
+    if (typeof t != "number" && Array.isArray(e)) {
+        var r = Number.parseInt(t, 10);
+        return Number.isInteger(r) && e[r] === e[t]
+    }
+    return !1
+}
+
+function Jp(e, t) {
+    if (Tl(e, t)) throw new Error("Cannot use string index")
+}
+
+function sr(e, t, r) {
+    if (Array.isArray(t) && (t = t.join(".")), !t.includes(".") && !t.includes("[")) return e[t];
+    if (!no(e) || typeof t != "string") return r === void 0 ? e : r;
+    var n = Ol(t);
+    if (n.length === 0) return r;
+    for (var i = 0; i < n.length; i++) {
+        var s = n[i];
+        if (Tl(e, s) ? e = i === n.length - 1 ? void 0 : null : e = e[s], e == null) {
+            if (i !== n.length - 1) return r;
+            break
+        }
+    }
+    return e === void 0 ? r : e
+}
+
+function Al(e, t, r) {
+    if (Array.isArray(t) && (t = t.join(".")), !no(e) || typeof t != "string") return e;
+    for (var n = e, i = Ol(t), s = 0; s < i.length; s++) {
+        var c = i[s];
+        Jp(e, c), s === i.length - 1 ? e[c] = r : no(e[c]) || (e[c] = typeof i[s + 1] == "number" ? [] : {}), e = e[c]
+    }
+    return n
+}
+
+function Tr(e, t) {
+    var r = e.get(t);
+    if (typeof r > "u") throw new Error("missing value from map " + t);
+    return r
+}
+
+function ut(e, t, r, n) {
+    var i = e.get(t);
+    return typeof i > "u" && (i = r(), e.set(t, i)), i
+}
+
+function Ie(e) {
+    var t = e.split("-"),
+        r = "RxDB";
+    return t.forEach(n => {
+        r += xl(n)
+    }), r += "Plugin", new Error(`You are using a function which must be overwritten by a plugin.
+        You should either prevent the usage of this function or add the plugin via:
+            import { ` + r + " } from 'rxdb/plugins/" + e + `';
+            addRxPlugin(` + r + `);
+        `)
+}
+
+function tu(e) {
+    var t = {
+        name: e.name,
+        message: e.message,
+        rxdb: e.rxdb,
+        parameters: e.parameters,
+        extensions: e.extensions,
+        code: e.code,
+        url: e.url,
+        stack: e.stack ? e.stack.replace(/\n/g, ` 
+ `) : void 0
+    };
+    return t
+}
+var Ns = 0;
+
+function tt() {
+    var e = Date.now();
+    e = e + .01, e <= Ns && (e = Ns + .01);
+    var t = parseFloat(e.toFixed(2));
+    return Ns = t, t
+}
+
+function te(e, t) {
+    if (!e) throw t || (t = ""), new Error("ensureNotFalsy() is falsy: " + t);
+    return e
+}
+var Io = {
+        bufferSize: 1,
+        refCount: !0
+    },
+    Ro = "16.15.0",
+    ta = {},
+    zp = "6da4936d1425ff3a5c44c02342c6daf791d266be3ae8479b8ec59e261df41b93",
+    ru = 16,
+    Bs = Ut,
+    nu = !1;
+async function Nl() {
+    return nu || (nu = !0, Bs = (async () => !!(ta.premium && typeof ta.premium == "string" && await Kl(ta.premium) === zp))()), Bs
+}
+var Vn = {
+    preAddRxPlugin: [],
+    preCreateRxDatabase: [],
+    createRxDatabase: [],
+    preCreateRxCollection: [],
+    createRxCollection: [],
+    createRxState: [],
+    postCloseRxCollection: [],
+    postRemoveRxCollection: [],
+    preCreateRxSchema: [],
+    createRxSchema: [],
+    prePrepareRxQuery: [],
+    preCreateRxQuery: [],
+    prePrepareQuery: [],
+    createRxDocument: [],
+    postCreateRxDocument: [],
+    preCreateRxStorageInstance: [],
+    preStorageWrite: [],
+    preMigrateDocument: [],
+    postMigrateDocument: [],
+    preCloseRxDatabase: [],
+    postRemoveRxDatabase: [],
+    postCleanup: [],
+    preReplicationMasterWrite: [],
+    preReplicationMasterWriteDocumentsHandle: []
+};
+
+function it(e, t) {
+    Vn[e].length > 0 && Vn[e].forEach(r => r(t))
+}
+async function Wt(e, t) {
+    for (var r of Vn[e]) await r(t)
+}
+
+function $t(e, t) {
+    var r = t;
+    r = r.replace(qp, ".properties."), r = "properties." + r, r = An(r);
+    var n = sr(e, r);
+    return n
+}
+
+function jp(e, t, r) {
+    if (typeof t.primaryKey == "string") return r;
+    var n = ur(t, r),
+        i = r[e];
+    if (i && i !== n) throw ee("DOC19", {
+        args: {
+            documentData: r,
+            existingPrimary: i,
+            newPrimary: n
+        },
+        schema: t
+    });
+    return r[e] = n, r
+}
+
+function rt(e) {
+    return typeof e == "string" ? e : e.key
+}
+
+function Gp(e) {
+    var t = rt(e.primaryKey),
+        r = $t(e, t);
+    return te(r.maxLength)
+}
+
+function ur(e, t) {
+    if (typeof e.primaryKey == "string") return t[e.primaryKey];
+    var r = e.primaryKey;
+    return r.fields.map(n => {
+        var i = sr(t, n);
+        if (typeof i > "u") throw ee("DOC18", {
+            args: {
+                field: n,
+                documentData: t
+            }
+        });
+        return i
+    }).join(r.separator)
+}
+
+function Vp(e) {
+    var t = da(e, !0);
+    return t
+}
+
+function Yp(e) {
+    return ["_deleted", e]
+}
+
+function Ba(e) {
+    e = De(e);
+    var t = rt(e.primaryKey);
+    e.properties = De(e.properties), e.additionalProperties = !1, Object.prototype.hasOwnProperty.call(e, "keyCompression") || (e.keyCompression = !1), e.indexes = e.indexes ? e.indexes.slice(0) : [], e.required = e.required ? e.required.slice(0) : [], e.encrypted = e.encrypted ? e.encrypted.slice(0) : [], e.properties._rev = {
+        type: "string",
+        minLength: 1
+    }, e.properties._attachments = {
+        type: "object"
+    }, e.properties._deleted = {
+        type: "boolean"
+    }, e.properties._meta = Xp, e.required = e.required ? e.required.slice(0) : [], e.required.push("_deleted"), e.required.push("_rev"), e.required.push("_meta"), e.required.push("_attachments");
+    var r = Bl(e);
+    Or(e.required, r), e.required = e.required.filter(s => !s.includes(".")).filter((s, c, u) => u.indexOf(s) === c), e.version = e.version || 0;
+    var n = e.indexes.map(s => {
+        var c = la(s) ? s.slice(0) : [s];
+        return c.includes(t) || c.push(t), c[0] !== "_deleted" && c.unshift("_deleted"), c
+    });
+    n.length === 0 && n.push(Yp(t)), n.push(["_meta.lwt", t]), e.internalIndexes && e.internalIndexes.map(s => {
+        n.push(s)
+    });
+    var i = new Set;
+    return n.filter(s => {
+        var c = s.join(",");
+        return i.has(c) ? !1 : (i.add(c), !0)
+    }), e.indexes = n, e
+}
+var Qp = 1e15,
+    Xp = {
+        type: "object",
+        properties: {
+            lwt: {
+                type: "number",
+                minimum: Po,
+                maximum: Qp,
+                multipleOf: .01
+            }
+        },
+        additionalProperties: !0,
+        required: ["lwt"]
+    };
+
+function Bl(e) {
+    var t = Object.keys(e.properties).filter(n => e.properties[n].final),
+        r = rt(e.primaryKey);
+    return t.push(r), typeof e.primaryKey != "string" && e.primaryKey.fields.forEach(n => t.push(n)), t
+}
+
+function Zp(e, t) {
+    for (var r = Object.keys(e.defaultValues), n = 0; n < r.length; ++n) {
+        var i = r[n];
+        (!Object.prototype.hasOwnProperty.call(t, i) || typeof t[i] > "u") && (t[i] = e.defaultValues[i])
+    }
+    return t
+}
+var Ml = function() {
+    function e(r, n) {
+        if (this.jsonSchema = r, this.hashFunction = n, this.indexes = em(this.jsonSchema), this.primaryPath = rt(this.jsonSchema.primaryKey), !r.properties[this.primaryPath].maxLength) throw ee("SC39", {
+            schema: r
+        });
+        this.finalFields = Bl(this.jsonSchema)
+    }
+    var t = e.prototype;
+    return t.validateChange = function(n, i) {
+        this.finalFields.forEach(s => {
+            if (!Gn(n[s], i[s])) throw ee("DOC9", {
+                dataBefore: n,
+                dataAfter: i,
+                fieldName: s,
+                schema: this.jsonSchema
+            })
+        })
+    }, t.getDocumentPrototype = function() {
+        var n = {},
+            i = $t(this.jsonSchema, "");
+        return Object.keys(i).forEach(s => {
+            var c = s;
+            n.__defineGetter__(s, function() {
+                if (!(!this.get || typeof this.get != "function")) {
+                    var u = this.get(c);
+                    return u
+                }
+            }), Object.defineProperty(n, s + "$", {
+                get: function() {
+                    return this.get$(c)
+                },
+                enumerable: !1,
+                configurable: !1
+            }), Object.defineProperty(n, s + "$$", {
+                get: function() {
+                    return this.get$$(c)
+                },
+                enumerable: !1,
+                configurable: !1
+            }), Object.defineProperty(n, s + "_", {
+                get: function() {
+                    return this.populate(c)
+                },
+                enumerable: !1,
+                configurable: !1
+            })
+        }), Bt(this, "getDocumentPrototype", () => n), n
+    }, t.getPrimaryOfDocumentData = function(n) {
+        return ur(this.jsonSchema, n)
+    }, cr(e, [{
+        key: "version",
+        get: function() {
+            return this.jsonSchema.version
+        }
+    }, {
+        key: "defaultValues",
+        get: function() {
+            var r = {};
+            return Object.entries(this.jsonSchema.properties).filter(([, n]) => Object.prototype.hasOwnProperty.call(n, "default")).forEach(([n, i]) => r[n] = i.default), Bt(this, "defaultValues", r)
+        }
+    }, {
+        key: "hash",
+        get: function() {
+            return Bt(this, "hash", this.hashFunction(JSON.stringify(this.jsonSchema)))
+        }
+    }])
+}();
+
+function em(e) {
+    return (e.indexes || []).map(t => la(t) ? t : [t])
+}
+
+function tm(e, t, r = !0) {
+    r && it("preCreateRxSchema", e);
+    var n = Ba(e);
+    n = Vp(n), Ae.deepFreezeWhenDevMode(n);
+    var i = new Ml(n, t);
+    return it("createRxSchema", i), i
+}
+
+function Fl(e) {
+    return e.documentData ? e.documentData : e.previousDocumentData
+}
+
+function rm(e) {
+    switch (e.operation) {
+        case "INSERT":
+            return {
+                operation: e.operation, id: e.documentId, doc: e.documentData, previous: null
+            };
+        case "UPDATE":
+            return {
+                operation: e.operation, id: e.documentId, doc: Ae.deepFreezeWhenDevMode(e.documentData), previous: e.previousDocumentData ? e.previousDocumentData : "UNKNOWN"
+            };
+        case "DELETE":
+            return {
+                operation: e.operation, id: e.documentId, doc: null, previous: e.previousDocumentData
+            }
+    }
+}
+var nm = new Map;
+
+function Ll(e) {
+    return ut(nm, e, () => {
+        for (var t = new Array(e.events.length), r = e.events, n = e.collectionName, i = e.isLocal, s = Ae.deepFreezeWhenDevMode, c = 0; c < r.length; c++) {
+            var u = r[c];
+            t[c] = {
+                documentId: u.documentId,
+                collectionName: n,
+                isLocal: i,
+                operation: u.operation,
+                documentData: s(u.documentData),
+                previousDocumentData: s(u.previousDocumentData)
+            }
+        }
+        return t
+    })
+}
+var bt = "￿",
+    St = Number.MIN_SAFE_INTEGER;
+
+function im(e, t) {
+    var r = t.selector,
+        n = e.indexes ? e.indexes.slice(0) : [];
+    t.index && (n = [t.index]);
+    var i = !!t.sort.find(m => Object.values(m)[0] === "desc"),
+        s = new Set;
+    Object.keys(r).forEach(m => {
+        var y = $t(e, m);
+        y && y.type === "boolean" && Object.prototype.hasOwnProperty.call(r[m], "$eq") && s.add(m)
+    });
+    var c = t.sort.map(m => Object.keys(m)[0]),
+        u = c.filter(m => !s.has(m)).join(","),
+        h = -1,
+        v;
+    if (n.forEach(m => {
+            var y = !0,
+                w = !0,
+                S = m.map(U => {
+                    var M = r[U],
+                        z = M ? Object.keys(M) : [],
+                        H = {};
+                    if (!M || !z.length) {
+                        var Q = w ? St : bt;
+                        H = {
+                            startKey: Q,
+                            endKey: y ? bt : St,
+                            inclusiveStart: !0,
+                            inclusiveEnd: !0
+                        }
+                    } else z.forEach(W => {
+                        if (Do.has(W)) {
+                            var ie = M[W],
+                                de = cm(W, ie);
+                            H = Object.assign(H, de)
+                        }
+                    });
+                    return typeof H.startKey > "u" && (H.startKey = St), typeof H.endKey > "u" && (H.endKey = bt), typeof H.inclusiveStart > "u" && (H.inclusiveStart = !0), typeof H.inclusiveEnd > "u" && (H.inclusiveEnd = !0), w && !H.inclusiveStart && (w = !1), y && !H.inclusiveEnd && (y = !1), H
+                }),
+                b = S.map(U => U.startKey),
+                P = S.map(U => U.endKey),
+                T = {
+                    index: m,
+                    startKeys: b,
+                    endKeys: P,
+                    inclusiveEnd: y,
+                    inclusiveStart: w,
+                    sortSatisfiedByIndex: !i && u === m.filter(U => !s.has(U)).join(","),
+                    selectorSatisfiedByIndex: om(m, t.selector, b, P)
+                },
+                F = um(e, t, T);
+            (F >= h || t.index) && (h = F, v = T)
+        }), !v) throw ee("SNH", {
+        query: t
+    });
+    return v
+}
+var Do = new Set(["$eq", "$gt", "$gte", "$lt", "$lte"]),
+    am = new Set(["$eq", "$gt", "$gte"]),
+    sm = new Set(["$eq", "$lt", "$lte"]);
+
+function om(e, t, r, n) {
+    var i = Object.entries(t),
+        s = i.find(([W, ie]) => {
+            if (!e.includes(W)) return !0;
+            var de = Object.entries(ie).find(([Se, ue]) => !Do.has(Se));
+            return de
+        });
+    if (s || t.$and || t.$or) return !1;
+    var c = [],
+        u = new Set;
+    for (var [h, v] of Object.entries(t)) {
+        if (!e.includes(h)) return !1;
+        var m = Object.keys(v).filter(W => am.has(W));
+        if (m.length > 1) return !1;
+        var y = m[0];
+        if (y && u.add(h), y !== "$eq") {
+            if (c.length > 0) return !1;
+            c.push(y)
+        }
+    }
+    var w = [],
+        S = new Set;
+    for (var [b, P] of Object.entries(t)) {
+        if (!e.includes(b)) return !1;
+        var T = Object.keys(P).filter(W => sm.has(W));
+        if (T.length > 1) return !1;
+        var F = T[0];
+        if (F && S.add(b), F !== "$eq") {
+            if (w.length > 0) return !1;
+            w.push(F)
+        }
+    }
+    var U = 0;
+    for (var M of e) {
+        for (var z of [u, S]) {
+            if (!z.has(M) && z.size > 0) return !1;
+            z.delete(M)
+        }
+        var H = r[U],
+            Q = n[U];
+        if (H !== Q && u.size > 0 && S.size > 0) return !1;
+        U++
+    }
+    return !0
+}
+
+function cm(e, t) {
+    switch (e) {
+        case "$eq":
+            return {
+                startKey: t, endKey: t, inclusiveEnd: !0, inclusiveStart: !0
+            };
+        case "$lte":
+            return {
+                endKey: t, inclusiveEnd: !0
+            };
+        case "$gte":
+            return {
+                startKey: t, inclusiveStart: !0
+            };
+        case "$lt":
+            return {
+                endKey: t, inclusiveEnd: !1
+            };
+        case "$gt":
+            return {
+                startKey: t, inclusiveStart: !1
+            };
+        default:
+            throw new Error("SNH")
+    }
+}
+
+function um(e, t, r) {
+    var n = 0,
+        i = m => {
+            m > 0 && (n = n + m)
+        },
+        s = 10,
+        c = Os(r.startKeys, m => m !== St && m !== bt);
+    i(c * s);
+    var u = Os(r.startKeys, m => m !== bt && m !== St);
+    i(u * s);
+    var h = Os(r.startKeys, (m, y) => m === r.endKeys[y]);
+    i(h * s * 1.5);
+    var v = r.sortSatisfiedByIndex ? 5 : 0;
+    return i(v), n
+}
+class Ma extends Error {}
+const Yn = Symbol("missing"),
+    Ul = Object.freeze(new Error("mingo: cycle detected while processing object/array")),
+    Fa = e => {
+        const t = ra(e);
+        let r = 0,
+            n = t.length;
+        for (; n;) r = (r << 5) - r ^ t.charCodeAt(--n);
+        return r >>> 0
+    },
+    tr = e => typeof e != "object" && typeof e != "function" || e === null,
+    Wl = e => tr(e) || Xn(e) || Cr(e),
+    $l = {
+        undefined: 1,
+        null: 2,
+        number: 3,
+        string: 4,
+        symbol: 5,
+        object: 6,
+        array: 7,
+        arraybuffer: 8,
+        boolean: 9,
+        date: 10,
+        regexp: 11,
+        function: 12
+    },
+    or = (e, t) => {
+        e === Yn && (e = void 0), t === Yn && (t = void 0);
+        const [r, n] = [e, t].map(i => $l[Qn(i)] || 0);
+        return r !== n ? r - n : nr(e, t) ? 0 : e < t ? -1 : e > t ? 1 : 0
+    };
+var si, Ot, _r;
+const cc = class cc extends Map {
+    constructor() {
+        super();
+        Le(this, si, Fa);
+        Le(this, Ot, new Map);
+        Le(this, _r, r => {
+            const n = Y(this, si).call(this, r);
+            return [(Y(this, Ot).get(n) || []).find(i => nr(i, r)), n]
+        })
+    }
+    static init(r) {
+        const n = new cc;
+        return r && Ue(n, si, r), n
+    }
+    clear() {
+        super.clear(), Y(this, Ot).clear()
+    }
+    delete(r) {
+        if (tr(r)) return super.delete(r);
+        const [n, i] = Y(this, _r).call(this, r);
+        return super.delete(n) ? (Y(this, Ot).set(i, Y(this, Ot).get(i).filter(s => !nr(s, n))), !0) : !1
+    }
+    get(r) {
+        if (tr(r)) return super.get(r);
+        const [n, i] = Y(this, _r).call(this, r);
+        return super.get(n)
+    }
+    has(r) {
+        if (tr(r)) return super.has(r);
+        const [n, i] = Y(this, _r).call(this, r);
+        return super.has(n)
+    }
+    set(r, n) {
+        if (tr(r)) return super.set(r, n);
+        const [i, s] = Y(this, _r).call(this, r);
+        if (super.has(i)) super.set(i, n);
+        else {
+            super.set(r, n);
+            const c = Y(this, Ot).get(s) || [];
+            c.push(r), Y(this, Ot).set(s, c)
+        }
+        return this
+    }
+    get size() {
+        return super.size
+    }
+};
+si = new WeakMap, Ot = new WeakMap, _r = new WeakMap;
+let pa = cc;
+
+function ze(e, t) {
+    if (!e) throw new Ma(t)
+}
+const lm = Object.keys($l).reduce((e, t) => (e["[object " + t[0].toUpperCase() + t.substring(1) + "]"] = t, e), {});
+
+function Qn(e) {
+    var r, n;
+    const t = Object.prototype.toString.call(e);
+    return t === "[object Object]" ? ((n = (r = e == null ? void 0 : e.constructor) == null ? void 0 : r.name) == null ? void 0 : n.toLowerCase()) || "object" : lm[t] || t.substring(8, t.length - 1).toLowerCase()
+}
+const Zr = e => typeof e == "boolean",
+    Et = e => typeof e == "string",
+    dm = e => typeof e == "symbol",
+    ct = e => !isNaN(e) && typeof e == "number",
+    ke = Array.isArray;
+
+function et(e) {
+    if (!e) return !1;
+    const t = Object.getPrototypeOf(e);
+    return (t === Object.prototype || t === null) && Qn(e) === "object"
+}
+const ql = e => !tr(e),
+    Xn = e => e instanceof Date,
+    Cr = e => e instanceof RegExp,
+    Ko = e => typeof e == "function",
+    lt = e => e == null,
+    hm = (e, t = !0) => !!e || t && e === "",
+    xo = e => lt(e) || Et(e) && !e || ke(e) && e.length === 0 || et(e) && Object.keys(e).length === 0,
+    hi = e => ke(e) ? e : [e],
+    sn = (e, t) => !!e && Object.prototype.hasOwnProperty.call(e, t),
+    fm = e => typeof ArrayBuffer < "u" && ArrayBuffer.isView(e),
+    Zn = (e, t) => {
+        if (lt(e) || Zr(e) || ct(e) || Et(e)) return e;
+        if (Xn(e)) return new Date(e);
+        if (Cr(e)) return new RegExp(e);
+        if (fm(e)) {
+            const r = e.constructor;
+            return new r(e)
+        }
+        if (t instanceof Set || (t = new Set), t.has(e)) throw Ul;
+        t.add(e);
+        try {
+            if (ke(e)) {
+                const r = new Array(e.length);
+                for (let n = 0; n < e.length; n++) r[n] = Zn(e[n], t);
+                return r
+            }
+            if (et(e)) {
+                const r = {};
+                for (const n of Object.keys(e)) r[n] = Zn(e[n], t);
+                return r
+            }
+        } finally {
+            t.delete(e)
+        }
+        return e
+    },
+    iu = e => e === Yn;
+
+function io(e, t) {
+    if (iu(e) || lt(e)) return t;
+    if (iu(t) || lt(t)) return e;
+    if (tr(e) || tr(t)) return t;
+    ke(e) && ke(t) && ze(e.length === t.length, "arrays must be of equal length to merge.");
+    for (const r of Object.keys(t)) e[r] = io(e[r], t[r]);
+    return e
+}
+
+function pm(e, t = Fa) {
+    const r = [pa.init(t), pa.init(t)];
+    if (e.length === 0) return [];
+    if (e.some(n => n.length === 0)) return [];
+    if (e.length === 1) return [...e];
+    e[e.length - 1].forEach(n => r[0].set(n, !0));
+    for (let n = e.length - 2; n > -1; n--) {
+        if (e[n].forEach(i => {
+                r[0].has(i) && r[1].set(i, !0)
+            }), r[1].size === 0) return [];
+        r.reverse(), r[1].clear()
+    }
+    return Array.from(r[0].keys())
+}
+
+function Hl(e, t = 1) {
+    const r = new Array;
+
+    function n(i, s) {
+        for (let c = 0, u = i.length; c < u; c++) ke(i[c]) && (s > 0 || s < 0) ? n(i[c], Math.max(-1, s - 1)) : r.push(i[c])
+    }
+    return n(e, t), r
+}
+
+function mm(e) {
+    const t = {};
+    for (; e;) {
+        for (const r of Object.getOwnPropertyNames(e)) r in t || (t[r] = e[r]);
+        e = Object.getPrototypeOf(e)
+    }
+    return t
+}
+
+function Jl(e) {
+    for (; e;) {
+        if (Object.getOwnPropertyNames(e).includes("toString")) return e.toString !== Object.prototype.toString;
+        e = Object.getPrototypeOf(e)
+    }
+    return !1
+}
+
+function nr(e, t) {
+    if (e === t || Object.is(e, t)) return !0;
+    if (e === null || t === null || typeof e != typeof t || typeof e != "object" || e.constructor !== t.constructor) return !1;
+    if (e instanceof Date) return +e == +t;
+    if (e instanceof RegExp) return e.toString() === t.toString();
+    const r = e.constructor;
+    if (r === Array || r === Object) {
+        const n = Object.keys(e).sort(),
+            i = Object.keys(t).sort();
+        if (n.length !== i.length) return !1;
+        for (let s = 0, c = n[s]; s < n.length; c = n[++s])
+            if (c !== i[s] || !nr(e[c], t[c])) return !1;
+        return !0
+    }
+    return Jl(e) && e.toString() === t.toString()
+}
+const ra = (e, t) => {
+    if (e === null) return "null";
+    if (e === void 0) return "undefined";
+    if (Et(e) || ct(e) || Zr(e)) return JSON.stringify(e);
+    if (Xn(e)) return e.toISOString();
+    if (Cr(e) || dm(e) || Ko(e)) return e.toString();
+    if (t instanceof Set || (t = new Set), t.has(e)) throw Ul;
+    try {
+        if (t.add(e), ke(e)) return "[" + e.map(n => ra(n, t)).join(",") + "]";
+        if (et(e)) return "{" + Object.keys(e).sort().map(i => `${i}:${ra(e[i],t)}`).join() + "}";
+        const r = Jl(e) ? e.toString() : ra(mm(e), t);
+        return Qn(e) + "(" + r + ")"
+    } finally {
+        t.delete(e)
+    }
+};
+
+function ym(e, t) {
+    return lt(e) ? null : (t = t || Fa, t(e))
+}
+
+function vm(e, t, r = Fa) {
+    if (e.length < 1) return new Map;
+    const n = new Map,
+        i = new Map;
+    for (let s = 0; s < e.length; s++) {
+        const c = e[s],
+            u = t(c, s),
+            h = ym(u, r);
+        if (h === null) i.has(null) ? i.get(null).push(c) : i.set(null, [c]);
+        else {
+            const v = n.has(h) ? n.get(h).find(m => nr(m, u)) : null;
+            lt(v) ? (i.set(u, [c]), n.has(h) ? n.get(h).push(u) : n.set(h, [u])) : i.get(v).push(c)
+        }
+    }
+    return i
+}
+
+function ao(e, t) {
+    return ql(e) ? e[t] : void 0
+}
+
+function gm(e, t) {
+    if (t < 1) return e;
+    for (; t-- && e.length === 1;) e = e[0];
+    return e
+}
+
+function Ar(e, t, r) {
+    let n = 0;
+
+    function i(c, u) {
+        let h = c;
+        for (let v = 0; v < u.length; v++) {
+            const m = u[v];
+            if (/^\d+$/.exec(m) === null && ke(h)) {
+                if (v === 0 && n > 0) break;
+                n += 1;
+                const w = u.slice(v);
+                h = h.reduce((S, b) => {
+                    const P = i(b, w);
+                    return P !== void 0 && S.push(P), S
+                }, []);
+                break
+            } else h = ao(h, m);
+            if (h === void 0) break
+        }
+        return h
+    }
+    const s = Wl(e) ? e : i(e, t.split("."));
+    return ke(s) && (r != null && r.unwrapArray) ? gm(s, n) : s
+}
+
+function Bn(e, t, r) {
+    const n = t.indexOf("."),
+        i = n == -1 ? t : t.substring(0, n),
+        s = t.substring(n + 1),
+        c = n != -1;
+    if (ke(e)) {
+        const v = /^\d+$/.test(i),
+            m = v && (r != null && r.preserveIndex) ? [...e] : [];
+        if (v) {
+            const y = parseInt(i);
+            let w = ao(e, y);
+            c && (w = Bn(w, s, r)), r != null && r.preserveIndex ? m[y] = w : m.push(w)
+        } else
+            for (const y of e) {
+                const w = Bn(y, t, r);
+                r != null && r.preserveMissing ? m.push(w ?? Yn) : (w != null || r != null && r.preserveIndex) && m.push(w)
+            }
+        return m
+    }
+    const u = r != null && r.preserveKeys ? {
+        ...e
+    } : {};
+    let h = ao(e, i);
+    if (c && (h = Bn(h, s, r)), h !== void 0) return u[i] = h, u
+}
+
+function so(e) {
+    if (ke(e))
+        for (let t = e.length - 1; t >= 0; t--) e[t] === Yn ? e.splice(t, 1) : so(e[t]);
+    else if (et(e))
+        for (const t in e) sn(e, t) && so(e[t])
+}
+const au = /^\d+$/;
+
+function ma(e, t, r, n) {
+    const i = t.split("."),
+        s = i[0],
+        c = i.slice(1).join(".");
+    if (i.length === 1)(et(e) || ke(e) && au.test(s)) && r(e, s);
+    else {
+        n != null && n.buildGraph && lt(e[s]) && (e[s] = {});
+        const u = e[s];
+        if (!u) return;
+        const h = !!(i.length > 1 && au.test(i[1]));
+        ke(u) && (n != null && n.descendArray) && !h ? u.forEach(v => ma(v, c, r, n)) : ma(u, c, r, n)
+    }
+}
+
+function wm(e, t, r) {
+    ma(e, t, (n, i) => {
+        n[i] = Ko(r) ? r(n[i]) : r
+    }, {
+        buildGraph: !0
+    })
+}
+
+function su(e, t, r) {
+    ma(e, t, (n, i) => {
+        if (ke(n)) {
+            if (/^\d+$/.test(i)) n.splice(parseInt(i), 1);
+            else if (r && r.descendArray)
+                for (const s of n) et(s) && delete s[i]
+        } else et(n) && delete n[i]
+    }, r)
+}
+const bm = /^\$[a-zA-Z0-9_]+$/;
+
+function Nr(e) {
+    return bm.test(e)
+}
+
+function zl(e) {
+    if (Wl(e)) return Cr(e) ? {
+        $regex: e
+    } : {
+        $eq: e
+    };
+    if (ql(e)) {
+        if (!Object.keys(e).some(Nr)) return {
+            $eq: e
+        };
+        if (sn(e, "$regex")) {
+            const t = {
+                ...e
+            };
+            return t.$regex = new RegExp(e.$regex, e.$options), delete t.$options, t
+        }
+    }
+    return e
+}
+var oo = (e => (e[e.CLONE_OFF = 0] = "CLONE_OFF", e[e.CLONE_INPUT = 1] = "CLONE_INPUT", e[e.CLONE_OUTPUT = 2] = "CLONE_OUTPUT", e[e.CLONE_ALL = 3] = "CLONE_ALL", e))(oo || {}),
+    Je, oi, Tt;
+const qn = class qn {
+    constructor(t, r, n) {
+        Le(this, Je);
+        Le(this, oi);
+        Le(this, Tt);
+        Ue(this, Je, t), this.update(r, n)
+    }
+    static init(t, r, n) {
+        var i;
+        return t instanceof qn ? new qn(Y(t, Je), t.root ?? r, {
+            ...Y(t, Tt),
+            ...n,
+            variables: Object.assign({}, (i = Y(t, Tt)) == null ? void 0 : i.variables, n == null ? void 0 : n.variables)
+        }) : new qn(t, r, n)
+    }
+    update(t, r) {
+        var i;
+        Ue(this, oi, t);
+        const n = Object.assign({}, (i = Y(this, Tt)) == null ? void 0 : i.variables, r == null ? void 0 : r.variables);
+        return Object.keys(n).length ? Ue(this, Tt, {
+            ...r,
+            variables: n
+        }) : Ue(this, Tt, r ?? {}), this
+    }
+    getOptions() {
+        return Object.freeze({
+            ...Y(this, Je),
+            context: on.from(Y(this, Je).context)
+        })
+    }
+    get root() {
+        return Y(this, oi)
+    }
+    get local() {
+        return Y(this, Tt)
+    }
+    get idKey() {
+        return Y(this, Je).idKey
+    }
+    get collation() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.collation
+    }
+    get processingMode() {
+        var t;
+        return ((t = Y(this, Je)) == null ? void 0 : t.processingMode) || 0
+    }
+    get useStrictMode() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.useStrictMode
+    }
+    get scriptEnabled() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.scriptEnabled
+    }
+    get useGlobalContext() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.useGlobalContext
+    }
+    get hashFunction() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.hashFunction
+    }
+    get collectionResolver() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.collectionResolver
+    }
+    get jsonSchemaValidator() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.jsonSchemaValidator
+    }
+    get variables() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.variables
+    }
+    get context() {
+        var t;
+        return (t = Y(this, Je)) == null ? void 0 : t.context
+    }
+};
+Je = new WeakMap, oi = new WeakMap, Tt = new WeakMap;
+let ei = qn;
+
+function Sm(e) {
+    return e instanceof ei ? e.getOptions() : Object.freeze({
+        idKey: "_id",
+        scriptEnabled: !0,
+        useStrictMode: !0,
+        useGlobalContext: !0,
+        processingMode: 0,
+        ...e,
+        context: e != null && e.context ? on.from(e == null ? void 0 : e.context) : on.init()
+    })
+}
+var Xt;
+const xa = class xa {
+    constructor() {
+        Le(this, Xt, new Map)
+    }
+    static init() {
+        return new xa
+    }
+    static from(t) {
+        const r = xa.init();
+        return lt(t) || Y(t, Xt).forEach((n, i) => r.addOperators(i, n)), r
+    }
+    addOperators(t, r) {
+        Y(this, Xt).has(t) || Y(this, Xt).set(t, {});
+        for (const [n, i] of Object.entries(r)) this.getOperator(t, n) || (Y(this, Xt).get(t)[n] = i);
+        return this
+    }
+    getOperator(t, r) {
+        return (Y(this, Xt).get(t) ?? {})[r] ?? null
+    }
+    addAccumulatorOps(t) {
+        return this.addOperators("accumulator", t)
+    }
+    addExpressionOps(t) {
+        return this.addOperators("expression", t)
+    }
+    addQueryOps(t) {
+        return this.addOperators("query", t)
+    }
+    addPipelineOps(t) {
+        return this.addOperators("pipeline", t)
+    }
+    addProjectionOps(t) {
+        return this.addOperators("projection", t)
+    }
+    addWindowOps(t) {
+        return this.addOperators("window", t)
+    }
+};
+Xt = new WeakMap;
+let on = xa;
+const Sr = on.init();
+
+function ou(e, t) {
+    for (const [r, n] of Object.entries(t)) {
+        ze(Ko(n) && Nr(r), `'${r}' is not a valid operator`);
+        const i = ti(e, r, null);
+        ze(!i || n === i, `${r} already exists for '${e}' operators. Cannot change operator function once registered.`)
+    }
+    switch (e) {
+        case "accumulator":
+            Sr.addAccumulatorOps(t);
+            break;
+        case "expression":
+            Sr.addExpressionOps(t);
+            break;
+        case "pipeline":
+            Sr.addPipelineOps(t);
+            break;
+        case "projection":
+            Sr.addProjectionOps(t);
+            break;
+        case "query":
+            Sr.addQueryOps(t);
+            break;
+        case "window":
+            Sr.addWindowOps(t);
+            break
+    }
+}
+
+function ti(e, t, r) {
+    const {
+        context: n,
+        useGlobalContext: i
+    } = r || {}, s = n ? n.getOperator(e, t) : null;
+    return !s && i ? Sr.getOperator(e, t) : s
+}
+
+function Gr(e, t, r, n) {
+    const i = ei.init(n, e);
+    return r && Nr(r) ? jl(e, t, r, i) : ya(e, t, i)
+}
+const Em = ["$$ROOT", "$$CURRENT", "$$REMOVE", "$$NOW"];
+
+function ya(e, t, r) {
+    var n;
+    if (Et(t) && t.length > 0 && t[0] === "$") {
+        if (_m.includes(t)) return t;
+        let i = r.root;
+        const s = t.split(".");
+        if (Em.includes(s[0])) {
+            switch (s[0]) {
+                case "$$ROOT":
+                    break;
+                case "$$CURRENT":
+                    i = e;
+                    break;
+                case "$$REMOVE":
+                    i = void 0;
+                    break;
+                case "$$NOW":
+                    i = new Date;
+                    break
+            }
+            t = t.slice(s[0].length + 1)
+        } else if (s[0].slice(0, 2) === "$$") {
+            i = Object.assign({}, r.variables, {
+                this: e
+            }, (n = r == null ? void 0 : r.local) == null ? void 0 : n.variables);
+            const c = s[0].slice(2);
+            ze(sn(i, c), `Use of undefined variable: ${c}`), t = t.slice(2)
+        } else t = t.slice(1);
+        return t === "" ? i : Ar(i, t)
+    }
+    if (ke(t)) return t.map(i => ya(e, i, r));
+    if (et(t)) {
+        const i = {},
+            s = Object.entries(t);
+        for (const [c, u] of s) {
+            if (Nr(c)) return ze(s.length == 1, "expression must have single operator."), jl(e, u, c, r);
+            i[c] = ya(e, u, r)
+        }
+        return i
+    }
+    return t
+}
+
+function jl(e, t, r, n) {
+    const i = ti("expression", r, n);
+    if (i) return i(e, t, n);
+    const s = ti("accumulator", r, n);
+    return ze(!!s, `accumulator '${r}' is not registered.`), ke(e) || (e = ya(e, t, n), t = null), ze(ke(e), `arguments must resolve to array for ${r}.`), s(e, t, n)
+}
+const _m = ["$$KEEP", "$$PRUNE", "$$DESCEND"];
+
+function ri(e) {
+    return e instanceof cu ? e : new cu(e)
+}
+
+function Pm(...e) {
+    let t = 0;
+    return ri(() => {
+        for (; t < e.length;) {
+            const r = e[t].next();
+            if (!r.done) return r;
+            t++
+        }
+        return {
+            done: !0
+        }
+    })
+}
+
+function km(e) {
+    return !!e && typeof e == "object" && (e == null ? void 0 : e.next) instanceof Function
+}
+
+function Cm(e, t) {
+    const r = e.slice(t + 1);
+    e.splice(t), Array.prototype.push.apply(e, r)
+}
+const co = new Error;
+
+function Im(e, t, r) {
+    let n = !1,
+        i = -1,
+        s = 0;
+    return function(c) {
+        try {
+            e: for (; !n;) {
+                let u = e();
+                i++;
+                let h = -1;
+                const v = t.length;
+                let m = !1;
+                for (; ++h < v;) {
+                    const y = t[h];
+                    switch (y.action) {
+                        case 0:
+                            u = y.func(u, i);
+                            break;
+                        case 1:
+                            if (!y.func(u, i)) continue e;
+                            break;
+                        case 2:
+                            --y.count, y.count || (m = !0);
+                            break;
+                        case 3:
+                            --y.count, y.count || Cm(t, h);
+                            continue e;
+                        default:
+                            break e
+                    }
+                }
+                if (n = m, c) r[s++] = u;
+                else return {
+                    value: u,
+                    done: !1
+                }
+            }
+        }
+        catch (u) {
+            if (u !== co) throw u
+        }
+        return n = !0, {
+            done: n
+        }
+    }
+}
+var Pr, en, tn;
+class cu {
+    constructor(t) {
+        Le(this, Pr);
+        Le(this, en);
+        Le(this, tn);
+        Ue(this, Pr, []), Ue(this, en, []), this.isDone = !1;
+        let r;
+        if (t instanceof Function && (t = {
+                next: t
+            }), km(t)) {
+            const n = t;
+            r = () => {
+                const i = n.next();
+                if (i.done) throw co;
+                return i.value
+            }
+        } else if (ke(t)) {
+            const n = t,
+                i = n.length;
+            let s = 0;
+            r = () => {
+                if (s < i) return n[s++];
+                throw co
+            }
+        } else if (!(t instanceof Function)) throw new Ma("Lazy must be initialized with an array, generator, or function.");
+        Ue(this, tn, Im(r, Y(this, Pr), Y(this, en)))
+    }
+    push(t, r) {
+        return typeof r == "function" ? Y(this, Pr).push({
+            action: t,
+            func: r
+        }) : typeof r == "number" && Y(this, Pr).push({
+            action: t,
+            count: r
+        }), this
+    }
+    next() {
+        return Y(this, tn).call(this)
+    }
+    map(t) {
+        return this.push(0, t)
+    }
+    filter(t) {
+        return this.push(1, t)
+    }
+    take(t) {
+        return t > 0 ? this.push(2, t) : this
+    }
+    drop(t) {
+        return t > 0 ? this.push(3, t) : this
+    }
+    transform(t) {
+        const r = this;
+        let n;
+        return ri(() => (n || (n = ri(t(r.value()))), n.next()))
+    }
+    value() {
+        return this.isDone || (this.isDone = Y(this, tn).call(this, !0).done), Y(this, en)
+    }
+    each(t) {
+        for (;;) {
+            const r = this.next();
+            if (r.done) break;
+            if (t(r.value) === !1) return !1
+        }
+        return !0
+    }
+    reduce(t, r) {
+        let n = this.next();
+        for (r === void 0 && !n.done && (r = n.value, n = this.next()); !n.done;) r = t(r, n.value), n = this.next();
+        return r
+    }
+    size() {
+        return this.reduce((t, r) => ++t, 0)
+    } [Symbol.iterator]() {
+        return this
+    }
+}
+Pr = new WeakMap, en = new WeakMap, tn = new WeakMap;
+const Rm = (e, t, r) => e.take(t),
+    Gl = (e, t, r) => xo(t) ? e : (Yl(t, r), e.map(Vl(t, ei.init(r))));
+
+function Vl(e, t, r = !0) {
+    const n = t.idKey,
+        i = Object.keys(e),
+        s = new Array,
+        c = new Array,
+        u = {};
+    for (const S of i) {
+        const b = e[S];
+        if (ct(b) || Zr(b)) b ? c.push(S) : s.push(S);
+        else if (ke(b)) u[S] = P => b.map(T => Gr(P, T, null, t.update(P)) ?? null);
+        else if (et(b)) {
+            const P = Object.keys(b),
+                T = P.length == 1 ? P[0] : "",
+                F = ti("projection", T, t);
+            F ? T === "$slice" && !hi(b[T]).every(ct) ? u[S] = M => Gr(M, b, S, t.update(M)) : u[S] = M => F(M, b[T], S, t.update(M)) : Nr(T) ? u[S] = U => Gr(U, b[T], T, t) : (Yl(b, t), u[S] = U => {
+                if (!sn(U, S)) return Gr(U, b, null, t);
+                r && t.update(U);
+                const M = Ar(U, S),
+                    z = Vl(b, t, !1);
+                return ke(M) ? M.map(z) : et(M) ? z(M) : z(U)
+            })
+        } else u[S] = Et(b) && b[0] === "$" ? P => Gr(P, b, S, t) : P => b
+    }
+    const h = Object.keys(u),
+        v = s.includes(n);
+    if (r && v && s.length === 1 && !c.length && !h.length) return S => {
+        const b = {
+            ...S
+        };
+        return delete b[n], b
+    };
+    const y = r && !v && !c.includes(n),
+        w = {
+            preserveMissing: !0
+        };
+    return S => {
+        const b = {};
+        if (s.length && !c.length) {
+            io(b, S);
+            for (const P of s) su(b, P, {
+                descendArray: !0
+            })
+        }
+        for (const P of c) {
+            const T = Bn(S, P, w) ?? {};
+            io(b, T)
+        }
+        c.length && so(b);
+        for (const P of h) {
+            const T = u[P](S);
+            T === void 0 ? su(b, P, {
+                descendArray: !0
+            }) : wm(b, P, T)
+        }
+        return y && sn(S, n) && (b[n] = Ar(S, n)), b
+    }
+}
+
+function Yl(e, t) {
+    let r = !1,
+        n = !1;
+    for (const [i, s] of Object.entries(e)) ze(!i.startsWith("$"), "Field names may not start with '$'."), ze(!i.endsWith(".$"), "Positional projection operator '$' is not supported."), i !== (t == null ? void 0 : t.idKey) && (s === 0 || s === !1 ? r = !0 : (s === 1 || s === !0) && (n = !0), ze(!(r && n), "Projection cannot have a mix of inclusion and exclusion."))
+}
+const Dm = (e, t, r) => e.drop(t),
+    Ql = (e, t, r) => {
+        if (xo(t) || !et(t)) return e;
+        let n = or;
+        const i = r.collation;
+        return et(i) && Et(i.locale) && (n = xm(i)), e.transform(s => {
+            const c = Object.keys(t);
+            for (const u of c.reverse()) {
+                const h = vm(s, y => Ar(y, u), r.hashFunction),
+                    v = Array.from(h.keys()).sort(n);
+                t[u] === -1 && v.reverse();
+                let m = 0;
+                for (const y of v)
+                    for (const w of h.get(y)) s[m++] = w;
+                ze(m == s.length, "bug: counter must match collection size.")
+            }
+            return s
+        })
+    },
+    Km = {
+        1: "base",
+        2: "accent",
+        3: "variant"
+    };
+
+function xm(e) {
+    const t = {
+        sensitivity: Km[e.strength || 3],
+        caseFirst: e.caseFirst === "off" ? "false" : e.caseFirst || "false",
+        numeric: e.numericOrdering || !1,
+        ignorePunctuation: e.alternate === "shifted"
+    };
+    (e.caseLevel || !1) === !0 && (t.sensitivity === "base" && (t.sensitivity = "case"), t.sensitivity === "accent" && (t.sensitivity = "variant"));
+    const r = new Intl.Collator(e.locale, t);
+    return (n, i) => {
+        if (!Et(n) || !Et(i)) return or(n, i);
+        const s = r.compare(n, i);
+        return s < 0 ? -1 : s > 0 ? 1 : 0
+    }
+}
+const Om = {
+    $sort: Ql,
+    $skip: Dm,
+    $limit: Rm
+};
+var ci, ui, rn, At, Zt, ot, Nt;
+class Tm {
+    constructor(t, r, n, i) {
+        Le(this, ci);
+        Le(this, ui);
+        Le(this, rn);
+        Le(this, At);
+        Le(this, Zt, {});
+        Le(this, ot, null);
+        Le(this, Nt, []);
+        Ue(this, ci, t), Ue(this, ui, r), Ue(this, rn, n), Ue(this, At, i)
+    }
+    fetch() {
+        if (Y(this, ot)) return Y(this, ot);
+        Ue(this, ot, ri(Y(this, ci)).filter(Y(this, ui)));
+        const t = Y(this, At).processingMode;
+        t & oo.CLONE_INPUT && Y(this, ot).map(Zn);
+        for (const r of ["$sort", "$skip", "$limit"]) sn(Y(this, Zt), r) && Ue(this, ot, Om[r](Y(this, ot), Y(this, Zt)[r], Y(this, At)));
+        return Object.keys(Y(this, rn)).length && Ue(this, ot, Gl(Y(this, ot), Y(this, rn), Y(this, At))), t & oo.CLONE_OUTPUT && Y(this, ot).map(Zn), Y(this, ot)
+    }
+    fetchAll() {
+        const t = ri([...Y(this, Nt)]);
+        return Ue(this, Nt, []), Pm(t, this.fetch())
+    }
+    all() {
+        return this.fetchAll().value()
+    }
+    count() {
+        return this.all().length
+    }
+    skip(t) {
+        return Y(this, Zt).$skip = t, this
+    }
+    limit(t) {
+        return Y(this, Zt).$limit = t, this
+    }
+    sort(t) {
+        return Y(this, Zt).$sort = t, this
+    }
+    collation(t) {
+        return Ue(this, At, {
+            ...Y(this, At),
+            collation: t
+        }), this
+    }
+    next() {
+        if (Y(this, Nt).length > 0) return Y(this, Nt).pop();
+        const t = this.fetch().next();
+        if (!t.done) return t.value
+    }
+    hasNext() {
+        if (Y(this, Nt).length > 0) return !0;
+        const t = this.fetch().next();
+        return t.done ? !1 : (Y(this, Nt).push(t.value), !0)
+    }
+    map(t) {
+        return this.all().map(t)
+    }
+    forEach(t) {
+        this.all().forEach(t)
+    } [Symbol.iterator]() {
+        return this.fetchAll()
+    }
+}
+ci = new WeakMap, ui = new WeakMap, rn = new WeakMap, At = new WeakMap, Zt = new WeakMap, ot = new WeakMap, Nt = new WeakMap;
+const Am = new Set(Array.from(["$and", "$or", "$nor", "$expr", "$jsonSchema"]));
+var nn, er, kr;
+class fi {
+    constructor(t, r) {
+        Le(this, nn);
+        Le(this, er);
+        Le(this, kr);
+        Ue(this, kr, Zn(t)), Ue(this, er, Sm(r)), Ue(this, nn, []), this.compile()
+    }
+    compile() {
+        ze(et(Y(this, kr)), `query criteria must be an object: ${JSON.stringify(Y(this,kr))}`);
+        const t = {};
+        for (const [r, n] of Object.entries(Y(this, kr))) {
+            if (r === "$where") ze(Y(this, er).scriptEnabled, "$where operator requires 'scriptEnabled' option to be true."), Object.assign(t, {
+                field: r,
+                expr: n
+            });
+            else if (Am.has(r)) this.processOperator(r, r, n);
+            else {
+                ze(!Nr(r), `unknown top level operator: ${r}`);
+                for (const [i, s] of Object.entries(zl(n))) this.processOperator(r, i, s)
+            }
+            t.field && this.processOperator(t.field, t.field, t.expr)
+        }
+    }
+    processOperator(t, r, n) {
+        const i = ti("query", r, Y(this, er));
+        ze(!!i, `unknown query operator ${r}`), Y(this, nn).push(i(t, n, Y(this, er)))
+    }
+    test(t) {
+        return Y(this, nn).every(r => r(t))
+    }
+    find(t, r) {
+        return new Tm(t, n => this.test(n), r || {}, Y(this, er))
+    }
+    remove(t) {
+        return t.reduce((r, n) => (this.test(n) || r.push(n), r), [])
+    }
+}
+nn = new WeakMap, er = new WeakMap, kr = new WeakMap;
+const Nm = ["monday", "mon", "tuesday", "tue", "wednesday", "wed", "thursday", "thu", "friday", "fri", "saturday", "sat", "sunday", "sun"];
+new Set(Nm);
+
+function dt(e) {
+    return (r, n, i) => {
+        const s = {
+                unwrapArray: !0
+            },
+            c = Math.max(1, r.split(".").length - 1);
+        return u => {
+            const h = Ar(u, r, s);
+            return e(h, n, {
+                ...i,
+                depth: c
+            })
+        }
+    }
+}
+
+function Xl(e, t, r) {
+    return nr(e, t) || lt(e) && lt(t) ? !0 : ke(e) ? e.some(n => nr(n, t)) || Hl(e, r == null ? void 0 : r.depth).some(n => nr(n, t)) : !1
+}
+
+function Bm(e, t, r) {
+    return !Xl(e, t, r)
+}
+
+function Zl(e, t, r) {
+    return lt(e) ? t.some(n => n === null) : pm([hi(e), t], r == null ? void 0 : r.hashFunction).length > 0
+}
+
+function Mm(e, t, r) {
+    return !Zl(e, t, r)
+}
+
+function Fm(e, t, r) {
+    return La(e, t, (n, i) => or(n, i) < 0)
+}
+
+function Lm(e, t, r) {
+    return La(e, t, (n, i) => or(n, i) <= 0)
+}
+
+function Um(e, t, r) {
+    return La(e, t, (n, i) => or(n, i) > 0)
+}
+
+function Wm(e, t, r) {
+    return La(e, t, (n, i) => or(n, i) >= 0)
+}
+
+function $m(e, t, r) {
+    return hi(e).some(n => t.length === 2 && n % t[0] === t[1])
+}
+
+function qm(e, t, r) {
+    const n = hi(e),
+        i = s => Et(s) && hm(t.exec(s), r == null ? void 0 : r.useStrictMode);
+    return n.some(i) || Hl(n, 1).some(i)
+}
+
+function Hm(e, t, r) {
+    return Array.isArray(e) && e.length === t
+}
+
+function Jm(e) {
+    return Nr(e) && ["$and", "$or", "$nor"].indexOf(e) === -1
+}
+
+function zm(e, t, r) {
+    if (ke(e) && !xo(e)) {
+        let n = c => c,
+            i = t;
+        Object.keys(t).every(Jm) && (i = {
+            temp: t
+        }, n = c => ({
+            temp: c
+        }));
+        const s = new fi(i, r);
+        for (let c = 0, u = e.length; c < u; c++)
+            if (s.test(n(e[c]))) return !0
+    }
+    return !1
+}
+const uu = e => e === null,
+    jm = {
+        array: ke,
+        boolean: Zr,
+        bool: Zr,
+        date: Xn,
+        number: ct,
+        int: ct,
+        long: ct,
+        double: ct,
+        decimal: ct,
+        null: uu,
+        object: et,
+        regexp: Cr,
+        regex: Cr,
+        string: Et,
+        undefined: lt,
+        function: e => {
+            throw new Ma("unsupported type key `function`.")
+        },
+        1: ct,
+        2: Et,
+        3: et,
+        4: ke,
+        6: lt,
+        8: Zr,
+        9: Xn,
+        10: uu,
+        11: Cr,
+        16: ct,
+        18: ct,
+        19: ct
+    };
+
+function lu(e, t, r) {
+    const n = jm[t];
+    return n ? n(e) : !1
+}
+
+function Gm(e, t, r) {
+    return ke(t) ? t.findIndex(n => lu(e, n)) >= 0 : lu(e, t)
+}
+
+function La(e, t, r) {
+    return hi(e).some(n => Qn(n) === Qn(t) && r(n, t))
+}
+const du = (e, t) => {
+    const r = {};
+    return e.split("").forEach((n, i) => r[n] = t * (i + 1)), r
+};
+({
+    ...du("ABCDEFGHIKLM", 1),
+    ...du("NOPQRSTUVWXY", -1)
+});
+const hu = {
+    undefined: null,
+    null: null,
+    NaN: NaN,
+    Infinity: new Error,
+    "-Infinity": new Error
+};
+
+function ht(e, t = hu) {
+    const r = Object.assign({}, hu, t),
+        n = new Set(Object.keys(r));
+    return (i, s, c) => {
+        const u = Gr(i, s, null, c);
+        if (n.has(`${u}`)) {
+            const h = r[`${u}`];
+            if (h instanceof Error) throw new Ma(`cannot apply $${e.name} to -inf, value must in (-inf,inf)`);
+            return h
+        }
+        return e(u)
+    }
+}
+ht(Math.acos, {
+    Infinity: 1 / 0,
+    0: new Error
+});
+ht(Math.acosh, {
+    Infinity: 1 / 0,
+    0: new Error
+});
+ht(Math.asin);
+ht(Math.asinh, {
+    Infinity: 1 / 0,
+    "-Infinity": -1 / 0
+});
+ht(Math.atan);
+ht(Math.atanh, {
+    1: 1 / 0,
+    "-1": -1 / 0
+});
+ht(Math.cos);
+ht(Math.cosh, {
+    "-Infinity": 1 / 0,
+    Infinity: 1 / 0
+});
+const Vm = Math.PI / 180;
+ht(e => e * Vm, {
+    Infinity: 1 / 0,
+    "-Infinity": 1 / 0
+});
+const Ym = 180 / Math.PI;
+ht(e => e * Ym, {
+    Infinity: 1 / 0,
+    "-Infinity": -1 / 0
+});
+ht(Math.sin);
+ht(Math.sinh, {
+    "-Infinity": -1 / 0,
+    Infinity: 1 / 0
+});
+ht(Math.tan);
+const Qm = (e, t, r) => {
+        ze(ke(t), "Invalid expression: $and expects value to be an Array.");
+        const n = t.map(i => new fi(i, r));
+        return i => n.every(s => s.test(i))
+    },
+    ed = (e, t, r) => {
+        ze(ke(t), "Invalid expression. $or expects value to be an Array");
+        const n = t.map(i => new fi(i, r));
+        return i => n.some(s => s.test(i))
+    },
+    Xm = (e, t, r) => {
+        ze(ke(t), "Invalid expression. $nor expects value to be an array.");
+        const n = ed("$or", t, r);
+        return i => !n(i)
+    },
+    Zm = (e, t, r) => {
+        const n = {};
+        n[e] = zl(t);
+        const i = new fi(n, r);
+        return s => !i.test(s)
+    },
+    ey = dt(Xl),
+    ty = dt(Um),
+    ry = dt(Wm),
+    ny = dt(Zl),
+    iy = dt(Fm),
+    ay = dt(Lm),
+    sy = dt(Bm),
+    oy = dt(Mm),
+    cy = dt($m),
+    uy = dt(qm),
+    ly = dt(zm),
+    dy = dt(Hm),
+    hy = (e, t, r) => {
+        const n = e.includes("."),
+            i = !!t;
+        return !n || e.match(/\.\d+$/) ? s => Ar(s, e) !== void 0 === i : s => {
+            const c = Bn(s, e, {
+                    preserveIndex: !0
+                }),
+                u = Ar(c, e.substring(0, e.lastIndexOf(".")));
+            return ke(u) ? u.some(h => h !== void 0) === i : u !== void 0 === i
+        }
+    },
+    fy = dt(Gm);
+var fu = !1;
+
+function py(e) {
+    return fu || (ou("pipeline", {
+        $sort: Ql,
+        $project: Gl
+    }), ou("query", {
+        $and: Qm,
+        $eq: ey,
+        $elemMatch: ly,
+        $exists: hy,
+        $gt: ty,
+        $gte: ry,
+        $in: ny,
+        $lt: iy,
+        $lte: ay,
+        $ne: sy,
+        $nin: oy,
+        $mod: cy,
+        $nor: Xm,
+        $not: Zm,
+        $or: ed,
+        $regex: uy,
+        $size: dy,
+        $type: fy
+    }), fu = !0), new fi(e)
+}
+
+function Mn(e, t) {
+    var r = rt(e.primaryKey);
+    t = De(t);
+    var n = Ft(t);
+    if (typeof n.skip != "number" && (n.skip = 0), n.selector ? (n.selector = n.selector, Object.entries(n.selector).forEach(([y, w]) => {
+            (typeof w != "object" || w === null) && (n.selector[y] = {
+                $eq: w
+            })
+        })) : n.selector = {}, n.index) {
+        var i = an(n.index);
+        i.includes(r) || i.push(r), n.index = i
+    }
+    if (n.sort) {
+        var m = n.sort.find(y => Rp(y) === r);
+        m || (n.sort = n.sort.slice(0), n.sort.push({
+            [r]: "asc"
+        }))
+    } else if (n.index) n.sort = n.index.map(y => ({
+        [y]: "asc"
+    }));
+    else {
+        if (e.indexes) {
+            var s = new Set;
+            Object.entries(n.selector).forEach(([y, w]) => {
+                var S = !1;
+                typeof w == "object" && w !== null ? S = !!Object.keys(w).find(b => Do.has(b)) : S = !0, S && s.add(y)
+            });
+            var c = -1,
+                u;
+            e.indexes.forEach(y => {
+                var w = la(y) ? y : [y],
+                    S = w.findIndex(b => !s.has(b));
+                S > 0 && S > c && (c = S, u = w)
+            }), u && (n.sort = u.map(y => ({
+                [y]: "asc"
+            })))
+        }
+        if (!n.sort)
+            if (e.indexes && e.indexes.length > 0) {
+                var h = e.indexes[0],
+                    v = la(h) ? h : [h];
+                n.sort = v.map(y => ({
+                    [y]: "asc"
+                }))
+            } else n.sort = [{
+                [r]: "asc"
+            }]
+    }
+    return n
+}
+
+function Ua(e, t) {
+    if (!t.sort) throw ee("SNH", {
+        query: t
+    });
+    var r = [];
+    t.sort.forEach(i => {
+        var s = Object.keys(i)[0],
+            c = Object.values(i)[0];
+        r.push({
+            key: s,
+            direction: c,
+            getValueFn: kl(s)
+        })
+    });
+    var n = (i, s) => {
+        for (var c = 0; c < r.length; ++c) {
+            var u = r[c],
+                h = u.getValueFn(i),
+                v = u.getValueFn(s);
+            if (h !== v) {
+                var m = u.direction === "asc" ? or(h, v) : or(v, h);
+                return m
+            }
+        }
+    };
+    return n
+}
+
+function pi(e, t) {
+    if (!t.sort) throw ee("SNH", {
+        query: t
+    });
+    var r = py(t.selector),
+        n = i => r.test(i);
+    return n
+}
+async function Kn(e, t) {
+    var r = await e.exec();
+    if (!r) return null;
+    if (Array.isArray(r)) return Promise.all(r.map(i => t(i)));
+    if (r instanceof Map) return Promise.all([...r.values()].map(i => t(i)));
+    var n = await t(r);
+    return n
+}
+
+function Oo(e, t) {
+    if (!t.sort) throw ee("SNH", {
+        query: t
+    });
+    var r = im(e, t);
+    return {
+        query: t,
+        queryPlan: r
+    }
+}
+var my = "_rxdb_internal";
+async function Wa(e, t) {
+    var r = await e.findDocumentsById([t], !1),
+        n = r[0];
+    if (n) return n
+}
+async function $a(e, t, r) {
+    var n = await e.bulkWrite([t], r);
+    if (n.error.length > 0) {
+        var i = n.error[0];
+        throw i
+    } else {
+        var s = rt(e.schema.primaryKey),
+            c = vt(s, [t], n),
+            u = c[0];
+        return u
+    }
+}
+
+function ni(e) {
+    return Object.assign({}, ...e)
+}
+
+function va(e, t, r, n) {
+    if (n) throw n.status === 409 ? ee("CONFLICT", {
+        collection: e.name,
+        id: t,
+        writeError: n,
+        data: r
+    }) : n.status === 422 ? ee("VD2", {
+        collection: e.name,
+        id: t,
+        writeError: n,
+        data: r
+    }) : n
+}
+
+function To(e, t, r, n, i, s, c) {
+    for (var u = !!e.schema.attachments, h = [], v = [], m = [], y = ln(10), w = {
+            id: y,
+            events: [],
+            checkpoint: null,
+            context: i
+        }, S = w.events, b = [], P = [], T = [], F = r.size > 0, U, M = n.length, z = function() {
+            var Q = n[H],
+                W = Q.document,
+                ie = Q.previous,
+                de = W[t],
+                Se = W._deleted,
+                ue = ie && ie._deleted,
+                re = void 0;
+            F && (re = r.get(de));
+            var oe;
+            if (re) {
+                var $e = re._rev;
+                if (!ie || ie && $e !== ie._rev) {
+                    var Be = {
+                        isError: !0,
+                        status: 409,
+                        documentId: de,
+                        writeRow: Q,
+                        documentInDb: re
+                    };
+                    return m.push(Be), 1
+                }
+                var fe = u ? Ms(Q) : Q;
+                u && (Se ? ie && Object.keys(ie._attachments).forEach(ge => {
+                    P.push({
+                        documentId: de,
+                        attachmentId: ge,
+                        digest: te(ie)._attachments[ge].digest
+                    })
+                }) : (Object.entries(W._attachments).find(([ge, We]) => {
+                    var ft = ie ? ie._attachments[ge] : void 0;
+                    return !ft && !We.data && (oe = {
+                        documentId: de,
+                        documentInDb: re,
+                        isError: !0,
+                        status: 510,
+                        writeRow: Q,
+                        attachmentId: ge
+                    }), !0
+                }), oe || Object.entries(W._attachments).forEach(([ge, We]) => {
+                    var ft = ie ? ie._attachments[ge] : void 0;
+                    if (!ft) b.push({
+                        documentId: de,
+                        attachmentId: ge,
+                        attachmentData: We,
+                        digest: We.digest
+                    });
+                    else {
+                        var Ht = fe.document._attachments[ge].digest;
+                        We.data && ft.digest !== Ht && T.push({
+                            documentId: de,
+                            attachmentId: ge,
+                            attachmentData: We,
+                            digest: We.digest
+                        })
+                    }
+                }))), oe ? m.push(oe) : (u ? v.push(Ms(fe)) : v.push(fe), U = fe);
+                var ve = null,
+                    ne = null,
+                    we = null;
+                if (ue && !Se) we = "INSERT", ve = u ? Ct(W) : W;
+                else if (ie && !ue && !Se) we = "UPDATE", ve = u ? Ct(W) : W, ne = ie;
+                else if (Se) we = "DELETE", ve = te(W), ne = ie;
+                else throw ee("SNH", {
+                    args: {
+                        writeRow: Q
+                    }
+                });
+                var _e = {
+                    documentId: de,
+                    documentData: ve,
+                    previousDocumentData: ne,
+                    operation: we
+                };
+                S.push(_e)
+            } else {
+                var ye = !!Se;
+                if (u && Object.entries(W._attachments).forEach(([ge, We]) => {
+                        We.data ? b.push({
+                            documentId: de,
+                            attachmentId: ge,
+                            attachmentData: We,
+                            digest: We.digest
+                        }) : (oe = {
+                            documentId: de,
+                            isError: !0,
+                            status: 510,
+                            writeRow: Q,
+                            attachmentId: ge
+                        }, m.push(oe))
+                    }), oe || (u ? h.push(Ms(Q)) : h.push(Q), U = Q), !ye) {
+                    var Pe = {
+                        documentId: de,
+                        operation: "INSERT",
+                        documentData: u ? Ct(W) : W,
+                        previousDocumentData: u && ie ? Ct(ie) : ie
+                    };
+                    S.push(Pe)
+                }
+            }
+        }, H = 0; H < M; H++) z();
+    return {
+        bulkInsertDocs: h,
+        bulkUpdateDocs: v,
+        newestRow: U,
+        errors: m,
+        eventBulk: w,
+        attachmentsAdd: b,
+        attachmentsRemove: P,
+        attachmentsUpdate: T
+    }
+}
+
+function Ms(e) {
+    return {
+        previous: e.previous,
+        document: Ct(e.document)
+    }
+}
+
+function yy(e) {
+    return atob(e).length
+}
+
+function vy(e) {
+    var t = e.data;
+    if (!t) return e;
+    var r = {
+        length: yy(t),
+        digest: e.digest,
+        type: e.type
+    };
+    return r
+}
+
+function Ct(e) {
+    if (!e._attachments || Object.keys(e._attachments).length === 0) return e;
+    var t = De(e);
+    return t._attachments = {}, Object.entries(e._attachments).forEach(([r, n]) => {
+        t._attachments[r] = vy(n)
+    }), t
+}
+
+function mi(e) {
+    return Object.assign({}, e, {
+        _meta: De(e._meta)
+    })
+}
+
+function Ao(e, t, r) {
+    Ae.deepFreezeWhenDevMode(r);
+    var n = rt(t.schema.primaryKey),
+        i = {
+            originalStorageInstance: t,
+            schema: t.schema,
+            internals: t.internals,
+            collectionName: t.collectionName,
+            databaseName: t.databaseName,
+            options: t.options,
+            async bulkWrite(s, c) {
+                for (var u = e.token, h = new Array(s.length), v = tt(), m = 0; m < s.length; m++) {
+                    var y = s[m],
+                        w = mi(y.document);
+                    w._meta.lwt = v;
+                    var S = y.previous;
+                    w._rev = ar(u, S), h[m] = {
+                        document: w,
+                        previous: S
+                    }
+                }
+                it("preStorageWrite", {
+                    storageInstance: this.originalStorageInstance,
+                    rows: h
+                });
+                var b = await e.lockedRun(() => t.bulkWrite(h, c)),
+                    P = {
+                        error: []
+                    };
+                rd.set(P, h);
+                var T = b.error.length === 0 ? [] : b.error.filter(Q => Q.status === 409 && !Q.writeRow.previous && !Q.writeRow.document._deleted && te(Q.documentInDb)._deleted ? !0 : (P.error.push(Q), !1));
+                if (T.length > 0) {
+                    var F = new Set,
+                        U = T.map(Q => (F.add(Q.documentId), {
+                            previous: Q.documentInDb,
+                            document: Object.assign({}, Q.writeRow.document, {
+                                _rev: ar(e.token, Q.documentInDb)
+                            })
+                        })),
+                        M = await e.lockedRun(() => t.bulkWrite(U, c));
+                    Or(P.error, M.error);
+                    var z = vt(n, h, P, F),
+                        H = vt(n, U, M);
+                    return Or(z, H), P
+                }
+                return P
+            },
+            query(s) {
+                return e.lockedRun(() => t.query(s))
+            },
+            count(s) {
+                return e.lockedRun(() => t.count(s))
+            },
+            findDocumentsById(s, c) {
+                return e.lockedRun(() => t.findDocumentsById(s, c))
+            },
+            getAttachmentData(s, c, u) {
+                return e.lockedRun(() => t.getAttachmentData(s, c, u))
+            },
+            getChangedDocumentsSince: t.getChangedDocumentsSince ? (s, c) => e.lockedRun(() => t.getChangedDocumentsSince(te(s), c)) : void 0,
+            cleanup(s) {
+                return e.lockedRun(() => t.cleanup(s))
+            },
+            remove() {
+                return e.storageInstances.delete(i), e.lockedRun(() => t.remove())
+            },
+            close() {
+                return e.storageInstances.delete(i), e.lockedRun(() => t.close())
+            },
+            changeStream() {
+                return t.changeStream()
+            }
+        };
+    return e.storageInstances.add(i), i
+}
+
+function No(e) {
+    if (e.schema.keyCompression) throw ee("UT5", {
+        args: {
+            params: e
+        }
+    });
+    if (td(e.schema)) throw ee("UT6", {
+        args: {
+            params: e
+        }
+    });
+    if (e.schema.attachments && e.schema.attachments.compression) throw ee("UT7", {
+        args: {
+            params: e
+        }
+    })
+}
+
+function td(e) {
+    return !!(e.encrypted && e.encrypted.length > 0 || e.attachments && e.attachments.encrypted)
+}
+
+function gy(e, t, r) {
+    var n = rt(e.schema.primaryKey),
+        i = r ? r.lwt : Po,
+        s = r ? r.id : "";
+    return Mn(e.schema, {
+        selector: {
+            $or: [{
+                "_meta.lwt": {
+                    $gt: i
+                }
+            }, {
+                "_meta.lwt": {
+                    $eq: i
+                },
+                [n]: {
+                    $gt: r ? s : ""
+                }
+            }],
+            "_meta.lwt": {
+                $gte: i
+            }
+        },
+        sort: [{
+            "_meta.lwt": "asc"
+        }, {
+            [n]: "asc"
+        }],
+        skip: 0,
+        limit: t
+    })
+}
+async function wy(e, t, r) {
+    if (e.getChangedDocumentsSince) return e.getChangedDocumentsSince(t, r);
+    var n = rt(e.schema.primaryKey),
+        i = Oo(e.schema, gy(e, t, r)),
+        s = await e.query(i),
+        c = s.documents,
+        u = Aa(c);
+    return {
+        documents: c,
+        checkpoint: u ? {
+            id: u[n],
+            lwt: u._meta.lwt
+        } : r || {
+            id: "",
+            lwt: 0
+        }
+    }
+}
+var rd = new WeakMap,
+    by = new WeakMap;
+
+function vt(e, t, r, n) {
+    return ut(by, r, () => {
+        var i = [],
+            s = rd.get(r);
+        if (s || (s = t), r.error.length > 0 || n) {
+            for (var c = n || new Set, u = 0; u < r.error.length; u++) {
+                var h = r.error[u];
+                c.add(h.documentId)
+            }
+            for (var v = 0; v < s.length; v++) {
+                var m = s[v].document;
+                c.has(m[e]) || i.push(Ct(m))
+            }
+        } else {
+            i.length = t.length - r.error.length;
+            for (var y = 0; y < s.length; y++) {
+                var w = s[y].document;
+                i[y] = Ct(w)
+            }
+        }
+        return i
+    })
+}
+var nd = function() {
+    function e(r, n, i, s) {
+        this.queueByDocId = new Map, this.isRunning = !1, this.storageInstance = r, this.primaryPath = n, this.preWrite = i, this.postWrite = s
+    }
+    var t = e.prototype;
+    return t.addWrite = function(n, i) {
+        var s = n[this.primaryPath],
+            c = ut(this.queueByDocId, s, () => []),
+            u = new Promise((h, v) => {
+                var m = {
+                    lastKnownDocumentState: n,
+                    modifier: i,
+                    resolve: h,
+                    reject: v
+                };
+                te(c).push(m), this.triggerRun()
+            });
+        return u
+    }, t.triggerRun = async function() {
+        if (!(this.isRunning === !0 || this.queueByDocId.size === 0)) {
+            this.isRunning = !0;
+            var n = [],
+                i = this.queueByDocId;
+            this.queueByDocId = new Map, await Promise.all(Array.from(i.entries()).map(async ([c, u]) => {
+                var h = Sy(u.map(y => y.lastKnownDocumentState)),
+                    v = h;
+                for (var m of u) try {
+                    v = await m.modifier(Ft(v))
+                } catch (y) {
+                    m.reject(y), m.reject = () => {}, m.resolve = () => {}
+                }
+                try {
+                    await this.preWrite(v, h)
+                } catch (y) {
+                    u.forEach(w => w.reject(y));
+                    return
+                }
+                n.push({
+                    previous: h,
+                    document: v
+                })
+            }));
+            var s = n.length > 0 ? await this.storageInstance.bulkWrite(n, "incremental-write") : {
+                error: []
+            };
+            return await Promise.all(vt(this.primaryPath, n, s).map(c => {
+                var u = c[this.primaryPath];
+                this.postWrite(c);
+                var h = Tr(i, u);
+                h.forEach(v => v.resolve(c))
+            })), s.error.forEach(c => {
+                var u = c.documentId,
+                    h = Tr(i, u),
+                    v = Na(c);
+                if (v) {
+                    var m = ut(this.queueByDocId, u, () => []);
+                    h.reverse().forEach(w => {
+                        w.lastKnownDocumentState = te(v.documentInDb), te(m).unshift(w)
+                    })
+                } else {
+                    var y = Dl(c);
+                    h.forEach(w => w.reject(y))
+                }
+            }), this.isRunning = !1, this.triggerRun()
+        }
+    }, e
+}();
+
+function pu(e) {
+    var t = async r => {
+        var n = Dp(r);
+        n._deleted = r._deleted;
+        var i = await e(n),
+            s = Object.assign({}, i, {
+                _meta: r._meta,
+                _attachments: r._attachments,
+                _rev: r._rev,
+                _deleted: typeof i._deleted < "u" ? i._deleted : r._deleted
+            });
+        return typeof s._deleted > "u" && (s._deleted = !1), s
+    };
+    return t
+}
+
+function Sy(e) {
+    var t = e[0],
+        r = ir(t._rev);
+    return e.forEach(n => {
+        var i = ir(n._rev);
+        i > r && (t = n, r = i)
+    }), t
+}
+var qa = {
+    get primaryPath() {
+        var e = this;
+        if (e.isInstanceOfRxDocument) return e.collection.schema.primaryPath
+    },
+    get primary() {
+        var e = this;
+        if (e.isInstanceOfRxDocument) return e._data[e.primaryPath]
+    },
+    get revision() {
+        var e = this;
+        if (e.isInstanceOfRxDocument) return e._data._rev
+    },
+    get deleted$() {
+        var e = this;
+        if (e.isInstanceOfRxDocument) return e.$.pipe(Ye(t => t._data._deleted))
+    },
+    get deleted$$() {
+        var e = this,
+            t = e.collection.database.getReactivityFactory();
+        return t.fromObservable(e.deleted$, e.getLatest().deleted, e.collection.database)
+    },
+    get deleted() {
+        var e = this;
+        if (e.isInstanceOfRxDocument) return e._data._deleted
+    },
+    getLatest() {
+        var e = this.collection._docCache.getLatestDocumentData(this.primary);
+        return this.collection._docCache.getCachedRxDocument(e)
+    },
+    get $() {
+        var e = this,
+            t = this.primary;
+        return e.collection.eventBulks$.pipe(Te(r => !r.isLocal), Ye(r => r.events.find(n => n.documentId === t)), Te(r => !!r), Ye(r => Fl(te(r))), Oa(e.collection._docCache.getLatestDocumentData(t)), Hn((r, n) => r._rev === n._rev), Ye(r => this.collection._docCache.getCachedRxDocument(r)), Eo(Io))
+    },
+    get $$() {
+        var e = this,
+            t = e.collection.database.getReactivityFactory();
+        return t.fromObservable(e.$, e.getLatest()._data, e.collection.database)
+    },
+    get$(e) {
+        if (Ae.isDevMode()) {
+            if (e.includes(".item.")) throw ee("DOC1", {
+                path: e
+            });
+            if (e === this.primaryPath) throw ee("DOC2");
+            if (this.collection.schema.finalFields.includes(e)) throw ee("DOC3", {
+                path: e
+            });
+            var t = $t(this.collection.schema.jsonSchema, e);
+            if (!t) throw ee("DOC4", {
+                path: e
+            })
+        }
+        return this.$.pipe(Ye(r => sr(r, e)), Hn())
+    },
+    get$$(e) {
+        var t = this.get$(e),
+            r = this.collection.database.getReactivityFactory();
+        return r.fromObservable(t, this.getLatest().get(e), this.collection.database)
+    },
+    populate(e) {
+        var t = $t(this.collection.schema.jsonSchema, e),
+            r = this.get(e);
+        if (!r) return Up;
+        if (!t) throw ee("DOC5", {
+            path: e
+        });
+        if (!t.ref) throw ee("DOC6", {
+            path: e,
+            schemaObj: t
+        });
+        var n = this.collection.database.collections[t.ref];
+        if (!n) throw ee("DOC7", {
+            ref: t.ref,
+            path: e,
+            schemaObj: t
+        });
+        return t.type === "array" ? n.findByIds(r).exec().then(i => {
+            var s = i.values();
+            return Array.from(s)
+        }) : n.findOne(r).exec()
+    },
+    get(e) {
+        return sd(this, e)
+    },
+    toJSON(e = !1) {
+        if (e) return Ae.deepFreezeWhenDevMode(this._data);
+        var t = De(this._data);
+        return delete t._rev, delete t._attachments, delete t._deleted, delete t._meta, Ae.deepFreezeWhenDevMode(t)
+    },
+    toMutableJSON(e = !1) {
+        return Ft(this.toJSON(e))
+    },
+    update(e) {
+        throw Ie("update")
+    },
+    incrementalUpdate(e) {
+        throw Ie("update")
+    },
+    updateCRDT(e) {
+        throw Ie("crdt")
+    },
+    putAttachment() {
+        throw Ie("attachments")
+    },
+    putAttachmentBase64() {
+        throw Ie("attachments")
+    },
+    getAttachment() {
+        throw Ie("attachments")
+    },
+    allAttachments() {
+        throw Ie("attachments")
+    },
+    get allAttachments$() {
+        throw Ie("attachments")
+    },
+    async modify(e, t) {
+        var r = this._data,
+            n = await pu(e)(r);
+        return this._saveData(n, r)
+    },
+    incrementalModify(e, t) {
+        return this.collection.incrementalWriteQueue.addWrite(this._data, pu(e)).then(r => this.collection._docCache.getCachedRxDocument(r))
+    },
+    patch(e) {
+        var t = this._data,
+            r = Ft(t);
+        return Object.entries(e).forEach(([n, i]) => {
+            r[n] = i
+        }), this._saveData(r, t)
+    },
+    incrementalPatch(e) {
+        return this.incrementalModify(t => (Object.entries(e).forEach(([r, n]) => {
+            t[r] = n
+        }), t))
+    },
+    async _saveData(e, t) {
+        if (e = De(e), this._data._deleted) throw ee("DOC11", {
+            id: this.primary,
+            document: this
+        });
+        await ad(this.collection, e, t);
+        var r = [{
+                previous: t,
+                document: e
+            }],
+            n = await this.collection.storageInstance.bulkWrite(r, "rx-document-save-data"),
+            i = n.error[0];
+        return va(this.collection, this.primary, e, i), await this.collection._runHooks("post", "save", e, this), this.collection._docCache.getCachedRxDocument(vt(this.collection.schema.primaryPath, r, n)[0])
+    },
+    async remove() {
+        if (this.deleted) return Promise.reject(ee("DOC13", {
+            document: this,
+            id: this.primary
+        }));
+        var e = await this.collection.bulkRemove([this]);
+        if (e.error.length > 0) {
+            var t = e.error[0];
+            va(this.collection, this.primary, this._data, t)
+        }
+        return e.success[0]
+    },
+    incrementalRemove() {
+        return this.incrementalModify(async e => (await this.collection._runHooks("pre", "remove", e, this), e._deleted = !0, e)).then(async e => (await this.collection._runHooks("post", "remove", e._data, e), e))
+    },
+    close() {
+        throw ee("DOC14")
+    }
+};
+
+function id(e = qa) {
+    var t = function(n, i) {
+        this.collection = n, this._data = i, this._propertyCache = new Map, this.isInstanceOfRxDocument = !0
+    };
+    return t.prototype = e, t
+}
+
+function Ey(e, t, r) {
+    var n = new e(t, r);
+    return it("createRxDocument", n), n
+}
+
+function ad(e, t, r) {
+    return t._meta = Object.assign({}, r._meta, t._meta), Ae.isDevMode() && e.schema.validateChange(r, t), e._runHooks("pre", "save", t, r)
+}
+
+function sd(e, t) {
+    return ut(e._propertyCache, t, () => {
+        var r = sr(e._data, t);
+        if (typeof r != "object" || r === null || Array.isArray(r)) return Ae.deepFreezeWhenDevMode(r);
+        var n = new Proxy(De(r), {
+            get(i, s) {
+                if (typeof s != "string") return i[s];
+                var c = s.charAt(s.length - 1);
+                if (c === "$")
+                    if (s.endsWith("$$")) {
+                        var u = s.slice(0, -2);
+                        return e.get$$(An(t + "." + u))
+                    } else {
+                        var h = s.slice(0, -1);
+                        return e.get$(An(t + "." + h))
+                    }
+                else if (c === "_") {
+                    var v = s.slice(0, -1);
+                    return e.populate(An(t + "." + v))
+                } else {
+                    var m = i[s];
+                    return typeof m == "number" || typeof m == "string" || typeof m == "boolean" ? m : sd(e, An(t + "." + s))
+                }
+            }
+        });
+        return n
+    })
+}
+
+function Bo(e) {
+    return e[e.length - 1]
+}
+
+function _y(e) {
+    const t = typeof e;
+    return e !== null && (t === "object" || t === "function")
+}
+
+function mu(e, t, r) {
+    if (Array.isArray(t) && (t = t.join(".")), !_y(e) || typeof t != "string") return e;
+    const n = t.split(".");
+    if (n.length === 0) return r;
+    for (let i = 0; i < n.length; i++) {
+        const s = n[i];
+        if (Py(e, s) ? e = i === n.length - 1 ? void 0 : null : e = e[s], e == null) {
+            if (i !== n.length - 1) return r;
+            break
+        }
+    }
+    return e === void 0 ? r : e
+}
+
+function Py(e, t) {
+    if (typeof t != "number" && Array.isArray(e)) {
+        const r = Number.parseInt(t, 10);
+        return Number.isInteger(r) && e[r] === e[t]
+    }
+    return !1
+}
+const od = e => !!e.queryParams.limit,
+    ky = e => e.queryParams.limit === 1,
+    Cy = e => !!(e.queryParams.skip && e.queryParams.skip > 0),
+    Iy = e => e.changeEvent.operation === "DELETE",
+    Ry = e => e.changeEvent.operation === "INSERT",
+    Dy = e => e.changeEvent.operation === "UPDATE",
+    Ky = e => od(e) && e.previousResults.length >= e.queryParams.limit,
+    xy = e => {
+        const t = e.queryParams.sortFields,
+            r = e.changeEvent.previous,
+            n = e.changeEvent.doc;
+        if (!n) return !1;
+        if (!r) return !0;
+        for (let i = 0; i < t.length; i++) {
+            const s = t[i],
+                c = mu(r, s),
+                u = mu(n, s);
+            if (c !== u) return !0
+        }
+        return !1
+    },
+    Oy = e => {
+        const t = e.changeEvent.id;
+        if (e.keyDocumentMap) return e.keyDocumentMap.has(t);
+        {
+            const r = e.queryParams.primaryKey,
+                n = e.previousResults;
+            for (let i = 0; i < n.length; i++)
+                if (n[i][r] === t) return !0;
+            return !1
+        }
+    },
+    Ty = e => {
+        const t = e.previousResults[0];
+        return !!(t && t[e.queryParams.primaryKey] === e.changeEvent.id)
+    },
+    Ay = e => {
+        const t = Bo(e.previousResults);
+        return !!(t && t[e.queryParams.primaryKey] === e.changeEvent.id)
+    },
+    Ny = e => {
+        const t = e.changeEvent.previous;
+        if (!t) return !1;
+        const r = e.previousResults[0];
+        return r ? r[e.queryParams.primaryKey] === e.changeEvent.id ? !0 : e.queryParams.sortComparator(t, r) < 0 : !1
+    },
+    By = e => {
+        const t = e.changeEvent.previous;
+        if (!t) return !1;
+        const r = Bo(e.previousResults);
+        return r ? r[e.queryParams.primaryKey] === e.changeEvent.id ? !0 : e.queryParams.sortComparator(t, r) > 0 : !1
+    },
+    My = e => {
+        const t = e.changeEvent.doc;
+        if (!t) return !1;
+        const r = e.previousResults[0];
+        return r ? r[e.queryParams.primaryKey] === e.changeEvent.id ? !0 : e.queryParams.sortComparator(t, r) < 0 : !1
+    },
+    Fy = e => {
+        const t = e.changeEvent.doc;
+        if (!t) return !1;
+        const r = Bo(e.previousResults);
+        return r ? r[e.queryParams.primaryKey] === e.changeEvent.id ? !0 : e.queryParams.sortComparator(t, r) > 0 : !1
+    },
+    Ly = e => {
+        const t = e.changeEvent.previous;
+        return t ? e.queryParams.queryMatcher(t) : !1
+    },
+    Uy = e => {
+        const t = e.changeEvent.doc;
+        return t ? e.queryParams.queryMatcher(t) : !1
+    },
+    Wy = e => e.previousResults.length === 0,
+    $y = {
+        0: Ry,
+        1: Dy,
+        2: Iy,
+        3: od,
+        4: ky,
+        5: Cy,
+        6: Wy,
+        7: Ky,
+        8: Ty,
+        9: Ay,
+        10: xy,
+        11: Oy,
+        12: Ny,
+        13: By,
+        14: My,
+        15: Fy,
+        16: Ly,
+        17: Uy
+    };
+
+function cd(e, t, r, n) {
+    var i = e.length,
+        s = i - 1,
+        c = 0;
+    if (i === 0) return e.push(t), 0;
+    for (var u; n <= s;) c = n + (s - n >> 1), u = e[c], r(u, t) <= 0 ? n = c + 1 : s = c - 1;
+    return r(u, t) <= 0 && c++, e.splice(c, 0, t), c
+}
+const qy = e => {},
+    Mo = e => {
+        e.previousResults.unshift(e.changeEvent.doc), e.keyDocumentMap && e.keyDocumentMap.set(e.changeEvent.id, e.changeEvent.doc)
+    },
+    Fo = e => {
+        e.previousResults.push(e.changeEvent.doc), e.keyDocumentMap && e.keyDocumentMap.set(e.changeEvent.id, e.changeEvent.doc)
+    },
+    Lo = e => {
+        const t = e.previousResults.shift();
+        e.keyDocumentMap && t && e.keyDocumentMap.delete(t[e.queryParams.primaryKey])
+    },
+    Uo = e => {
+        const t = e.previousResults.pop();
+        e.keyDocumentMap && t && e.keyDocumentMap.delete(t[e.queryParams.primaryKey])
+    },
+    Hy = e => {
+        Lo(e), Fo(e)
+    },
+    Jy = e => {
+        Uo(e), Mo(e)
+    },
+    zy = e => {
+        Lo(e), Mo(e)
+    },
+    jy = e => {
+        Uo(e), Fo(e)
+    },
+    ud = e => {
+        e.keyDocumentMap && e.keyDocumentMap.delete(e.changeEvent.id);
+        const t = e.queryParams.primaryKey,
+            r = e.previousResults;
+        for (let n = 0; n < r.length; n++)
+            if (r[n][t] === e.changeEvent.id) {
+                r.splice(n, 1);
+                break
+            }
+    },
+    Gy = e => {
+        const t = e.changeEvent.doc,
+            r = e.queryParams.primaryKey,
+            n = e.previousResults;
+        for (let i = 0; i < n.length; i++)
+            if (n[i][r] === e.changeEvent.id) {
+                n[i] = t, e.keyDocumentMap && e.keyDocumentMap.set(e.changeEvent.id, t);
+                break
+            }
+    },
+    Vy = e => {
+        const t = {
+            _id: "wrongHuman" + new Date().getTime()
+        };
+        e.previousResults.length = 0, e.previousResults.push(t), e.keyDocumentMap && (e.keyDocumentMap.clear(), e.keyDocumentMap.set(t._id, t))
+    },
+    ld = e => {
+        const t = e.changeEvent.id,
+            r = e.changeEvent.doc;
+        if (e.keyDocumentMap) {
+            if (e.keyDocumentMap.has(t)) return;
+            e.keyDocumentMap.set(t, r)
+        } else if (e.previousResults.find(i => i[e.queryParams.primaryKey] === t)) return;
+        cd(e.previousResults, r, e.queryParams.sortComparator, 0)
+    },
+    Yy = e => {
+        ud(e), ld(e)
+    },
+    Qy = e => {
+        throw new Error("Action runFullQueryAgain must be implemented by yourself")
+    },
+    Xy = e => {
+        throw new Error("Action unknownAction should never be called")
+    },
+    Zy = ["doNothing", "insertFirst", "insertLast", "removeFirstItem", "removeLastItem", "removeFirstInsertLast", "removeLastInsertFirst", "removeFirstInsertFirst", "removeLastInsertLast", "removeExisting", "replaceExisting", "alwaysWrong", "insertAtSortPosition", "removeExistingAndInsertAtSortPosition", "runFullQueryAgain", "unknownAction"],
+    ev = {
+        doNothing: qy,
+        insertFirst: Mo,
+        insertLast: Fo,
+        removeFirstItem: Lo,
+        removeLastItem: Uo,
+        removeFirstInsertLast: Hy,
+        removeLastInsertFirst: Jy,
+        removeFirstInsertFirst: zy,
+        removeLastInsertLast: jy,
+        removeExisting: ud,
+        replaceExisting: Gy,
+        alwaysWrong: Vy,
+        insertAtSortPosition: ld,
+        removeExistingAndInsertAtSortPosition: Yy,
+        runFullQueryAgain: Qy,
+        unknownAction: Xy
+    },
+    tv = 40;
+
+function Fs(e) {
+    return e.charCodeAt(0) - tv
+}
+
+function rv(e) {
+    return e ? "1" : "0"
+}
+
+function yu(e, t) {
+    const r = [];
+    for (let n = 0, i = e.length; n < i; n += t) r.push(e.substring(n, n + t));
+    return r
+}
+
+function nv(e) {
+    const t = new Map,
+        n = 2 + parseInt(e.charAt(0) + e.charAt(1), 10) * 2,
+        i = e.substring(2, n),
+        s = yu(i, 2);
+    for (let P = 0; P < s.length; P++) {
+        const T = s[P],
+            F = T.charAt(0),
+            U = Fs(T.charAt(1));
+        t.set(F, U)
+    }
+    const c = e.substring(n, e.length - 3),
+        u = yu(c, 4);
+    for (let P = 0; P < u.length; P++) {
+        const T = u[P],
+            F = T.charAt(0),
+            U = T.charAt(1),
+            M = T.charAt(2),
+            z = Fs(T.charAt(3));
+        if (!t.has(U)) throw new Error("missing node with id " + U);
+        if (!t.has(M)) throw new Error("missing node with id " + M);
+        const H = t.get(U),
+            Q = t.get(M),
+            W = {
+                l: z,
+                0: H,
+                1: Q
+            };
+        t.set(F, W)
+    }
+    const h = e.slice(-3),
+        v = h.charAt(0),
+        m = h.charAt(1),
+        y = Fs(h.charAt(2)),
+        w = t.get(v),
+        S = t.get(m);
+    return {
+        l: y,
+        0: w,
+        1: S
+    }
+}
+
+function iv(e, t, r) {
+    let n = e,
+        i = e.l;
+    for (;;) {
+        const s = t[i](r),
+            c = rv(s);
+        if (n = n[c], typeof n == "number" || typeof n == "string") return n;
+        i = n.l
+    }
+}
+const av = "14a1b,c+d2e5f0g/h.i4j*k-l)m(n6oeh6pnm6qen6ril6snh6tin6ubo9vce9wmh9xns9yne9zmi9{cm9|ad9}cp9~aq9ae9¡bf9¢bq9£cg9¤ck9¥cn9¦nd9§np9¨nq9©nf9ªng9«nm9¬nk9­mr9®ms9¯mt9°mj9±mk9²ml9³mn9´mc8µ³{8¶¯}8·°¤8¸³§8¹mn8º³«8»³m8¼m´4½z²4¾³w4¿zµ4À¯¶4Á°·4Â³º4Ã³¸4Äm¹4Åv¤7Æyn7ÇÀÁ7È~7É¥¤7ÊÃÄ7Ë¨n7Ìº¹7Í­°7Î®m7Ï¯°7Ð±m7Ñ³m7Ò¼m5ÓÄm5Ô¹m5Õ½°5Ö¾m5×¿°5ØÇÏ5ÙÂm5ÚÊÑ5Û±m5Üºm5ÝÌÑ5ÞÕÍ2ß|2à¡u2á£Å2âÖÎ2ã¦Æ2ä©x2åªÆ2æ×Ø2ç|È2è¡¢2é£É2ê¤¥2ëÙÚ2ì¦Ë2í©n2îªn2ïÛÐ2ðÜÝ2ñ¬n2òÒÓ/óan/ôbn/õcn/öÞâ/÷ßã/øàä/ùáå/úæë/ûçì/üèí/ýéî/þÍÎ/ÿÏÑ/ĀòÔ,ācn,Ăöï,ă¤ñ,Ąúð,ąêñ,ĆþÐ,ćÿÑ,Ĉac0ĉbc0Ċóõ0ċôā0Čßá0čà¤0Ďçé0ďèê0Đ÷ù0đøă0Ēûý0ēüą0ĔmÒ-ĕmĀ-ĖÞæ-ėČĎ-Ęčď-ęĂĄ-ĚĐĒ-ěđē-Ĝ²»-ĝÍÏ-ĞĆć-ğ²³-ĠĔĈ3ġĕĊ3ĢĖė3ģęĚ3ĤĢĝ(ĥĜğ(ĦģĞ(ħĠġ+Ĩĉċ+ĩĤĦ+ĪĘě+īħĨ1ĬĩĪ1ĭĬī*Įĥm*ĭĮ.";
+let Ls;
+
+function sv() {
+    return Ls || (Ls = nv(av)), Ls
+}
+const ov = e => iv(sv(), $y, e);
+
+function cv(e) {
+    const t = ov(e);
+    return Zy[t]
+}
+
+function uv(e, t, r, n, i) {
+    const s = ev[e];
+    return s({
+        queryParams: t,
+        changeEvent: r,
+        previousResults: n,
+        keyDocumentMap: i
+    }), n
+}
+
+function lv(e, t) {
+    return !t.sort || t.sort.length === 0 ? [e] : t.sort.map(r => Object.keys(r)[0])
+}
+var dv = new WeakMap;
+
+function hv(e) {
+    return ut(dv, e, () => {
+        var t = e.collection,
+            r = Mn(t.storageInstance.schema, Ft(e.mangoQuery)),
+            n = t.schema.primaryPath,
+            i = Ua(t.schema.jsonSchema, r),
+            s = (v, m) => {
+                var y = {
+                    docA: v,
+                    docB: m
+                };
+                return i(y.docA, y.docB)
+            },
+            c = pi(t.schema.jsonSchema, r),
+            u = v => {
+                var m = {
+                    doc: v
+                };
+                return c(m.doc)
+            },
+            h = {
+                primaryKey: e.collection.schema.primaryPath,
+                skip: r.skip,
+                limit: r.limit,
+                sortFields: lv(n, r),
+                sortComparator: s,
+                queryMatcher: u
+            };
+        return h
+    })
+}
+
+function fv(e, t) {
+    if (!e.collection.database.eventReduce) return {
+        runFullQueryAgain: !0
+    };
+    for (var r = hv(e), n = te(e._result).docsData.slice(0), i = te(e._result).docsDataMap, s = !1, c = [], u = 0; u < t.length; u++) {
+        var h = t[u],
+            v = rm(h);
+        v && c.push(v)
+    }
+    var m = c.find(y => {
+        var w = {
+                queryParams: r,
+                changeEvent: y,
+                previousResults: n,
+                keyDocumentMap: i
+            },
+            S = cv(w);
+        if (S === "runFullQueryAgain") return !0;
+        if (S !== "doNothing") return s = !0, uv(S, r, y, n, i), !1
+    });
+    return m ? {
+        runFullQueryAgain: !0
+    } : {
+        runFullQueryAgain: !1,
+        changed: s,
+        newResults: n
+    }
+}
+var pv = function() {
+    function e() {
+        this._map = new Map
+    }
+    var t = e.prototype;
+    return t.getByQuery = function(n) {
+        var i = n.toString(),
+            s = ut(this._map, i, () => n);
+        return s
+    }, e
+}();
+
+function mv() {
+    return new pv
+}
+
+function vu(e, t) {
+    t.uncached = !0;
+    var r = t.toString();
+    e._map.delete(r)
+}
+
+function yv(e) {
+    return e.refCount$.observers.length
+}
+var vv = 100,
+    gv = 30 * 1e3,
+    wv = (e, t) => (r, n) => {
+        if (!(n._map.size < e)) {
+            var i = tt() - t,
+                s = [],
+                c = Array.from(n._map.values());
+            for (var u of c)
+                if (!(yv(u) > 0)) {
+                    if (u._lastEnsureEqual === 0 && u._creationTime < i) {
+                        vu(n, u);
+                        continue
+                    }
+                    s.push(u)
+                } var h = s.length - e;
+            if (!(h <= 0)) {
+                var v = s.sort((y, w) => y._lastEnsureEqual - w._lastEnsureEqual),
+                    m = v.slice(0, h);
+                m.forEach(y => vu(n, y))
+            }
+        }
+    },
+    dd = wv(vv, gv),
+    Us = new WeakSet;
+
+function bv(e) {
+    Us.has(e) || (Us.add(e), Fp().then(() => Wp(200)).then(() => {
+        e.closed || e.cacheReplacementPolicy(e, e._queryCache), Us.delete(e)
+    }))
+}
+var hd = function() {
+    function e(r, n, i) {
+        this.cacheItemByDocId = new Map, this.tasks = new Set, this.registry = typeof FinalizationRegistry == "function" ? new FinalizationRegistry(s => {
+            var c = s.docId,
+                u = this.cacheItemByDocId.get(c);
+            u && (u[0].delete(s.revisionHeight + s.lwt + ""), u[0].size === 0 && this.cacheItemByDocId.delete(c))
+        }) : void 0, this.primaryPath = r, this.changes$ = n, this.documentCreator = i, n.subscribe(s => {
+            this.tasks.add(() => {
+                for (var c = this.cacheItemByDocId, u = 0; u < s.length; u++) {
+                    var h = s[u],
+                        v = c.get(h.documentId);
+                    if (v) {
+                        var m = h.documentData;
+                        m || (m = h.previousDocumentData), v[1] = m
+                    }
+                }
+            }), this.tasks.size <= 1 && un().then(() => {
+                this.processTasks()
+            })
+        })
+    }
+    var t = e.prototype;
+    return t.processTasks = function() {
+        if (this.tasks.size !== 0) {
+            var n = Array.from(this.tasks);
+            n.forEach(i => i()), this.tasks.clear()
+        }
+    }, t.getLatestDocumentData = function(n) {
+        this.processTasks();
+        var i = Tr(this.cacheItemByDocId, n);
+        return i[1]
+    }, t.getLatestDocumentDataIfExists = function(n) {
+        this.processTasks();
+        var i = this.cacheItemByDocId.get(n);
+        if (i) return i[1]
+    }, cr(e, [{
+        key: "getCachedRxDocuments",
+        get: function() {
+            var r = gu(this);
+            return Bt(this, "getCachedRxDocuments", r)
+        }
+    }, {
+        key: "getCachedRxDocument",
+        get: function() {
+            var r = gu(this);
+            return Bt(this, "getCachedRxDocument", n => r([n])[0])
+        }
+    }])
+}();
+
+function gu(e) {
+    var t = e.primaryPath,
+        r = e.cacheItemByDocId,
+        n = e.registry,
+        i = Ae.deepFreezeWhenDevMode,
+        s = e.documentCreator,
+        c = u => {
+            for (var h = new Array(u.length), v = [], m = 0; m < u.length; m++) {
+                var y = u[m],
+                    w = y[t],
+                    S = ir(y._rev),
+                    b = void 0,
+                    P = void 0,
+                    T = r.get(w);
+                T ? (b = T[0], P = b.get(S + y._meta.lwt + "")) : (b = new Map, T = [b, y], r.set(w, T));
+                var F = P ? P.deref() : void 0;
+                F || (y = i(y), F = s(y), b.set(S + y._meta.lwt + "", Ev(F)), n && v.push(F)), h[m] = F
+            }
+            return v.length > 0 && n && (e.tasks.add(() => {
+                for (var U = 0; U < v.length; U++) {
+                    var M = v[U];
+                    n.register(M, {
+                        docId: M.primary,
+                        revisionHeight: ir(M.revision),
+                        lwt: M._data._meta.lwt
+                    })
+                }
+            }), e.tasks.size <= 1 && un().then(() => {
+                e.processTasks()
+            })), h
+        };
+    return c
+}
+
+function uo(e, t) {
+    var r = e.getCachedRxDocuments;
+    return r(t)
+}
+var Sv = typeof WeakRef == "function",
+    Ev = Sv ? _v : Pv;
+
+function _v(e) {
+    return new WeakRef(e)
+}
+
+function Pv(e) {
+    return {
+        deref() {
+            return e
+        }
+    }
+}
+var wu = function() {
+        function e(r, n, i) {
+            this.time = tt(), this.query = r, this.count = i, this.documents = uo(this.query.collection._docCache, n)
+        }
+        var t = e.prototype;
+        return t.getValue = function(n) {
+            var i = this.query.op;
+            if (i === "count") return this.count;
+            if (i === "findOne") {
+                var s = this.documents.length === 0 ? null : this.documents[0];
+                if (!s && n) throw ee("QU10", {
+                    collection: this.query.collection.name,
+                    query: this.query.mangoQuery,
+                    op: i
+                });
+                return s
+            } else return i === "findByIds" ? this.docsMap : this.documents.slice(0)
+        }, cr(e, [{
+            key: "docsData",
+            get: function() {
+                return Bt(this, "docsData", this.documents.map(r => r._data))
+            }
+        }, {
+            key: "docsDataMap",
+            get: function() {
+                var r = new Map;
+                return this.documents.forEach(n => {
+                    r.set(n.primary, n._data)
+                }), Bt(this, "docsDataMap", r)
+            }
+        }, {
+            key: "docsMap",
+            get: function() {
+                for (var r = new Map, n = this.documents, i = 0; i < n.length; i++) {
+                    var s = n[i];
+                    r.set(s.primary, s)
+                }
+                return Bt(this, "docsMap", r)
+            }
+        }])
+    }(),
+    kv = 0,
+    Cv = function() {
+        return ++kv
+    },
+    fd = function() {
+        function e(r, n, i, s = {}) {
+            this.id = Cv(), this._execOverDatabaseCount = 0, this._creationTime = tt(), this._lastEnsureEqual = 0, this.uncached = !1, this.refCount$ = new Kt(null), this._result = null, this._latestChangeEvent = -1, this._ensureEqualQueue = Ut, this.op = r, this.mangoQuery = n, this.collection = i, this.other = s, n || (this.mangoQuery = na()), this.isFindOneByIdQuery = Kv(this.collection.schema.primaryPath, n)
+        }
+        var t = e.prototype;
+        return t._setResultData = function(n) {
+            if (typeof n > "u") throw ee("QU18", {
+                database: this.collection.database.name,
+                collection: this.collection.name
+            });
+            if (typeof n == "number") {
+                this._result = new wu(this, [], n);
+                return
+            } else n instanceof Map && (n = Array.from(n.values()));
+            var i = new wu(this, n, n.length);
+            this._result = i
+        }, t._execOverDatabase = async function() {
+            if (this._execOverDatabaseCount = this._execOverDatabaseCount + 1, this.op === "count") {
+                var n = this.getPreparedQuery(),
+                    i = await this.collection.storageInstance.count(n);
+                if (i.mode === "slow" && !this.collection.database.allowSlowCount) throw ee("QU14", {
+                    collection: this.collection,
+                    queryObj: this.mangoQuery
+                });
+                return i.count
+            }
+            if (this.op === "findByIds") {
+                var s = te(this.mangoQuery.selector)[this.collection.schema.primaryPath].$in,
+                    c = new Map,
+                    u = [];
+                if (s.forEach(m => {
+                        var y = this.collection._docCache.getLatestDocumentDataIfExists(m);
+                        if (y) {
+                            if (!y._deleted) {
+                                var w = this.collection._docCache.getCachedRxDocument(y);
+                                c.set(m, w)
+                            }
+                        } else u.push(m)
+                    }), u.length > 0) {
+                    var h = await this.collection.storageInstance.findDocumentsById(u, !1);
+                    h.forEach(m => {
+                        var y = this.collection._docCache.getCachedRxDocument(m);
+                        c.set(y.primary, y)
+                    })
+                }
+                return c
+            }
+            var v = Dv(this);
+            return v.then(m => m)
+        }, t.exec = async function(n) {
+            if (n && this.op !== "findOne") throw ee("QU9", {
+                collection: this.collection.name,
+                query: this.mangoQuery,
+                op: this.op
+            });
+            await bu(this);
+            var i = te(this._result);
+            return i.getValue(n)
+        }, t.toString = function() {
+            var n = da({
+                    op: this.op,
+                    query: Mn(this.collection.schema.jsonSchema, this.mangoQuery),
+                    other: this.other
+                }, !0),
+                i = JSON.stringify(n);
+            return this.toString = () => i, i
+        }, t.getPreparedQuery = function() {
+            var n = {
+                rxQuery: this,
+                mangoQuery: Mn(this.collection.schema.jsonSchema, this.mangoQuery)
+            };
+            n.mangoQuery.selector._deleted = {
+                $eq: !1
+            }, n.mangoQuery.index && n.mangoQuery.index.unshift("_deleted"), it("prePrepareQuery", n);
+            var i = Oo(this.collection.schema.jsonSchema, n.mangoQuery);
+            return this.getPreparedQuery = () => i, i
+        }, t.doesDocumentDataMatch = function(n) {
+            return n._deleted ? !1 : this.queryMatcher(n)
+        }, t.remove = async function() {
+            var n = await this.exec();
+            if (Array.isArray(n)) {
+                var i = await this.collection.bulkRemove(n);
+                if (i.error.length > 0) throw Dl(i.error[0]);
+                return i.success
+            } else return n.remove()
+        }, t.incrementalRemove = function() {
+            return Kn(this.asRxQuery, n => n.incrementalRemove())
+        }, t.update = function(n) {
+            throw Ie("update")
+        }, t.patch = function(n) {
+            return Kn(this.asRxQuery, i => i.patch(n))
+        }, t.incrementalPatch = function(n) {
+            return Kn(this.asRxQuery, i => i.incrementalPatch(n))
+        }, t.modify = function(n) {
+            return Kn(this.asRxQuery, i => i.modify(n))
+        }, t.incrementalModify = function(n) {
+            return Kn(this.asRxQuery, i => i.incrementalModify(n))
+        }, t.where = function(n) {
+            throw Ie("query-builder")
+        }, t.sort = function(n) {
+            throw Ie("query-builder")
+        }, t.skip = function(n) {
+            throw Ie("query-builder")
+        }, t.limit = function(n) {
+            throw Ie("query-builder")
+        }, cr(e, [{
+            key: "$",
+            get: function() {
+                if (!this._$) {
+                    var r = this.collection.eventBulks$.pipe(Te(n => !n.isLocal), Oa(null), Dr(() => bu(this)), Ye(() => this._result), Eo(Io), Hn((n, i) => !!(n && n.time === te(i).time)), Te(n => !!n), Ye(n => te(n).getValue()));
+                    this._$ = lf(r, this.refCount$.pipe(Te(() => !1)))
+                }
+                return this._$
+            }
+        }, {
+            key: "$$",
+            get: function() {
+                var r = this.collection.database.getReactivityFactory();
+                return r.fromObservable(this.$, void 0, this.collection.database)
+            }
+        }, {
+            key: "queryMatcher",
+            get: function() {
+                var r = this.collection.schema.jsonSchema,
+                    n = Mn(this.collection.schema.jsonSchema, this.mangoQuery);
+                return Bt(this, "queryMatcher", pi(r, n))
+            }
+        }, {
+            key: "asRxQuery",
+            get: function() {
+                return this
+            }
+        }])
+    }();
+
+function na() {
+    return {
+        selector: {}
+    }
+}
+
+function Iv(e) {
+    return e.collection._queryCache.getByQuery(e)
+}
+
+function xn(e, t, r, n) {
+    it("preCreateRxQuery", {
+        op: e,
+        queryObj: t,
+        collection: r,
+        other: n
+    });
+    var i = new fd(e, t, r, n);
+    return i = Iv(i), bv(r), i
+}
+
+function pd(e) {
+    var t = e.asRxQuery.collection._changeEventBuffer.getCounter();
+    return e._latestChangeEvent >= t
+}
+async function bu(e) {
+    return e.collection.awaitBeforeReads.size > 0 && await Promise.all(Array.from(e.collection.awaitBeforeReads).map(t => t())), e.collection.database.closed || pd(e) ? !1 : (e._ensureEqualQueue = e._ensureEqualQueue.then(() => Rv(e)), e._ensureEqualQueue)
+}
+
+function Rv(e) {
+    if (e._lastEnsureEqual = tt(), e.collection.database.closed || pd(e)) return Ut;
+    var t = !1,
+        r = !1;
+    if (e._latestChangeEvent === -1 && (r = !0), !r) {
+        var n = e.asRxQuery.collection._changeEventBuffer.getFrom(e._latestChangeEvent + 1);
+        if (n === null) r = !0;
+        else {
+            e._latestChangeEvent = e.asRxQuery.collection._changeEventBuffer.getCounter();
+            var i = e.asRxQuery.collection._changeEventBuffer.reduceByLastOfDoc(n);
+            if (e.op === "count") {
+                var s = te(e._result).count,
+                    c = s;
+                i.forEach(h => {
+                    var v = h.previousDocumentData && e.doesDocumentDataMatch(h.previousDocumentData),
+                        m = e.doesDocumentDataMatch(h.documentData);
+                    !v && m && c++, v && !m && c--
+                }), c !== s && (t = !0, e._setResultData(c))
+            } else {
+                var u = fv(e, i);
+                u.runFullQueryAgain ? r = !0 : u.changed && (t = !0, e._setResultData(u.newResults))
+            }
+        }
+    }
+    return r ? e._execOverDatabase().then(h => (e._latestChangeEvent = e.collection._changeEventBuffer.getCounter(), typeof h == "number" ? ((!e._result || h !== e._result.count) && (t = !0, e._setResultData(h)), t) : ((!e._result || !Kp(e.collection.schema.primaryPath, h, e._result.docsData)) && (t = !0, e._setResultData(h)), t))) : Promise.resolve(t)
+}
+async function Dv(e) {
+    var t = [],
+        r = e.collection;
+    if (e.isFindOneByIdQuery)
+        if (Array.isArray(e.isFindOneByIdQuery)) {
+            var n = e.isFindOneByIdQuery;
+            if (n = n.filter(m => {
+                    var y = e.collection._docCache.getLatestDocumentDataIfExists(m);
+                    return y ? (y._deleted || t.push(y), !1) : !0
+                }), n.length > 0) {
+                var i = await r.storageInstance.findDocumentsById(n, !1);
+                Or(t, i)
+            }
+        } else {
+            var s = e.isFindOneByIdQuery,
+                c = e.collection._docCache.getLatestDocumentDataIfExists(s);
+            if (!c) {
+                var u = await r.storageInstance.findDocumentsById([s], !1);
+                u[0] && (c = u[0])
+            }
+            c && !c._deleted && t.push(c)
+        }
+    else {
+        var h = e.getPreparedQuery(),
+            v = await r.storageInstance.query(h);
+        t = v.documents
+    }
+    return t
+}
+
+function Kv(e, t) {
+    if (!t.skip && t.selector && Object.keys(t.selector).length === 1 && t.selector[e]) {
+        var r = t.selector[e];
+        if (typeof r == "string") return r;
+        if (Object.keys(r).length === 1 && typeof r.$eq == "string" || Object.keys(r).length === 1 && Array.isArray(r.$eq) && !r.$eq.find(n => typeof n != "string")) return r.$eq
+    }
+    return !1
+}
+var Ir = "collection",
+    Wo = "storage-token",
+    xv = "rx-migration-status",
+    Ov = "rx-pipeline-checkpoint",
+    Tv = "RxInternalDocument",
+    $o = Ba({
+        version: 0,
+        title: Tv,
+        primaryKey: {
+            key: "id",
+            fields: ["context", "key"],
+            separator: "|"
+        },
+        type: "object",
+        properties: {
+            id: {
+                type: "string",
+                maxLength: 200
+            },
+            key: {
+                type: "string"
+            },
+            context: {
+                type: "string",
+                enum: [Ir, Wo, xv, Ov, "OTHER"]
+            },
+            data: {
+                type: "object",
+                additionalProperties: !0
+            }
+        },
+        indexes: [],
+        required: ["key", "context", "data"],
+        additionalProperties: !1,
+        sharding: {
+            shards: 1,
+            mode: "collection"
+        }
+    });
+
+function ii(e, t) {
+    return ur($o, {
+        key: e,
+        context: t
+    })
+}
+async function md(e) {
+    var t = Oo(e.schema, {
+            selector: {
+                context: Ir,
+                _deleted: {
+                    $eq: !1
+                }
+            },
+            sort: [{
+                id: "asc"
+            }],
+            skip: 0
+        }),
+        r = await e.query(t),
+        n = r.documents;
+    return n
+}
+var yd = "storageToken",
+    Av = ii(yd, Wo);
+async function Nv(e) {
+    var t = ln(10),
+        r = e.password ? await e.hashFunction(JSON.stringify(e.password)) : void 0,
+        n = {
+            id: Av,
+            context: Wo,
+            key: yd,
+            data: {
+                rxdbVersion: e.rxdbVersion,
+                token: t,
+                instanceToken: e.token,
+                passwordHash: r
+            },
+            _deleted: !1,
+            _meta: li(),
+            _rev: Lt(),
+            _attachments: {}
+        },
+        i = [{
+            document: n
+        }],
+        s = await e.internalStore.bulkWrite(i, "internal-add-storage-token");
+    if (!s.error[0]) return vt("id", i, s)[0];
+    var c = te(s.error[0]);
+    if (c.isError && Na(c)) {
+        var u = c;
+        if (!Bv(u.documentInDb.data.rxdbVersion, e.rxdbVersion)) throw ee("DM5", {
+            args: {
+                database: e.name,
+                databaseStateVersion: u.documentInDb.data.rxdbVersion,
+                codeVersion: e.rxdbVersion
+            }
+        });
+        if (r && r !== u.documentInDb.data.passwordHash) throw ee("DB1", {
+            passwordHash: r,
+            existingPasswordHash: u.documentInDb.data.passwordHash
+        });
+        var h = u.documentInDb;
+        return te(h)
+    }
+    throw c
+}
+
+function Bv(e, t) {
+    if (!e) return !1;
+    var r = e.split(".")[0],
+        n = t.split(".")[0];
+    return r === "15" && n === "16" ? !0 : r === n
+}
+async function Mv(e, t, r) {
+    if (e.schema.version !== r.version) throw ee("SNH", {
+        schema: r,
+        version: e.schema.version,
+        name: e.name,
+        collection: e,
+        args: {
+            storageCollectionName: t
+        }
+    });
+    for (var n = ga(e.name, e.schema.jsonSchema), i = ii(n, Ir);;) {
+        var s = await Wa(e.database.internalStore, i),
+            c = Ft(te(s)),
+            u = c.data.connectedStorages.find(h => h.collectionName === t && h.schema.version === r.version);
+        if (u) return;
+        c.data.connectedStorages.push({
+            collectionName: t,
+            schema: r
+        });
+        try {
+            await $a(e.database.internalStore, {
+                previous: te(s),
+                document: c
+            }, "add-connected-storage-to-collection")
+        } catch (h) {
+            if (!Na(h)) throw h
+        }
+    }
+}
+async function Fv(e, t, r) {
+    if (e.schema.version !== r.version) throw ee("SNH", {
+        schema: r,
+        version: e.schema.version,
+        name: e.name,
+        collection: e,
+        args: {
+            storageCollectionName: t
+        }
+    });
+    for (var n = ga(e.name, e.schema.jsonSchema), i = ii(n, Ir);;) {
+        var s = await Wa(e.database.internalStore, i),
+            c = Ft(te(s)),
+            u = c.data.connectedStorages.find(h => h.collectionName === t && h.schema.version === r.version);
+        if (!u) return;
+        c.data.connectedStorages = c.data.connectedStorages.filter(h => h.collectionName !== t);
+        try {
+            await $a(e.database.internalStore, {
+                previous: te(s),
+                document: c
+            }, "remove-connected-storage-from-collection")
+        } catch (h) {
+            if (!Na(h)) throw h
+        }
+    }
+}
+
+function ga(e, t) {
+    return e + "-" + t.version
+}
+
+function Vi(e, t) {
+    return t = De(t), t = Zp(e, t), typeof e.jsonSchema.primaryKey != "string" && (t = jp(e.primaryPath, e.jsonSchema, t)), t._meta = li(), Object.prototype.hasOwnProperty.call(t, "_deleted") || (t._deleted = !1), Object.prototype.hasOwnProperty.call(t, "_attachments") || (t._attachments = {}), Object.prototype.hasOwnProperty.call(t, "_rev") || (t._rev = Lt()), t
+}
+async function Lv(e, t) {
+    t.multiInstance = e.multiInstance;
+    var r = await e.storage.createStorageInstance(t);
+    return r
+}
+async function vd(e, t, r, n, i, s, c, u) {
+    var h = await md(t),
+        v = h.filter(S => S.data.name === i),
+        m = [];
+    v.forEach(S => {
+        m.push({
+            collectionName: S.data.name,
+            schema: S.data.schema,
+            isCollection: !0
+        }), S.data.connectedStorages.forEach(b => m.push({
+            collectionName: b.collectionName,
+            isCollection: !1,
+            schema: b.schema
+        }))
+    });
+    var y = new Set;
+    if (m = m.filter(S => {
+            var b = S.collectionName + "||" + S.schema.version;
+            return y.has(b) ? !1 : (y.add(b), !0)
+        }), await Promise.all(m.map(async S => {
+            var b = await e.createStorageInstance({
+                collectionName: S.collectionName,
+                databaseInstanceToken: r,
+                databaseName: n,
+                multiInstance: s,
+                options: {},
+                schema: S.schema,
+                password: c,
+                devMode: Ae.isDevMode()
+            });
+            await b.remove(), S.isCollection && await Wt("postRemoveRxCollection", {
+                storage: e,
+                databaseName: n,
+                collectionName: i
+            })
+        })), u) {
+        var w = v.map(S => {
+            var b = mi(S);
+            return b._deleted = !0, b._meta.lwt = tt(), b._rev = ar(r, S), {
+                previous: S,
+                document: b
+            }
+        });
+        await t.bulkWrite(w, "rx-database-remove-collection-all")
+    }
+}
+
+function mt(e) {
+    if (e.closed) throw ee("COL21", {
+        collection: e.name,
+        version: e.schema.version
+    })
+}
+var Uv = function() {
+    function e(r) {
+        this.subs = [], this.counter = 0, this.eventCounterMap = new WeakMap, this.buffer = [], this.limit = 100, this.tasks = new Set, this.collection = r, this.subs.push(this.collection.eventBulks$.pipe(Te(n => !n.isLocal)).subscribe(n => {
+            this.tasks.add(() => this._handleChangeEvents(n.events)), this.tasks.size <= 1 && un().then(() => {
+                this.processTasks()
+            })
+        }))
+    }
+    var t = e.prototype;
+    return t.processTasks = function() {
+        if (this.tasks.size !== 0) {
+            var n = Array.from(this.tasks);
+            n.forEach(i => i()), this.tasks.clear()
+        }
+    }, t._handleChangeEvents = function(n) {
+        var i = this.counter;
+        this.counter = this.counter + n.length, n.length > this.limit ? this.buffer = n.slice(n.length * -1) : (Or(this.buffer, n), this.buffer = this.buffer.slice(this.limit * -1));
+        for (var s = i + 1, c = this.eventCounterMap, u = 0; u < n.length; u++) {
+            var h = n[u];
+            c.set(h, s + u)
+        }
+    }, t.getCounter = function() {
+        return this.processTasks(), this.counter
+    }, t.getBuffer = function() {
+        return this.processTasks(), this.buffer
+    }, t.getArrayIndexByPointer = function(n) {
+        this.processTasks();
+        var i = this.buffer[0],
+            s = this.eventCounterMap.get(i);
+        if (n < s) return null;
+        var c = n - s;
+        return c
+    }, t.getFrom = function(n) {
+        this.processTasks();
+        var i = [],
+            s = this.getArrayIndexByPointer(n);
+        if (s === null) return null;
+        for (;;) {
+            var c = this.buffer[s];
+            if (s++, c) i.push(c);
+            else return i
+        }
+    }, t.runFrom = function(n, i) {
+        this.processTasks();
+        var s = this.getFrom(n);
+        if (s === null) throw new Error("out of bounds");
+        s.forEach(c => i(c))
+    }, t.reduceByLastOfDoc = function(n) {
+        return this.processTasks(), n.slice(0)
+    }, t.close = function() {
+        this.tasks.clear(), this.subs.forEach(n => n.unsubscribe())
+    }, e
+}();
+
+function Wv(e) {
+    return new Uv(e)
+}
+var $v = new WeakMap;
+
+function qv(e) {
+    var t = e.schema.getDocumentPrototype(),
+        r = zv(e),
+        n = qa,
+        i = {};
+    return [t, r, n].forEach(s => {
+        var c = Object.getOwnPropertyNames(s);
+        c.forEach(u => {
+            var h = Object.getOwnPropertyDescriptor(s, u),
+                v = !0;
+            (u.startsWith("_") || u.endsWith("_") || u.startsWith("$") || u.endsWith("$")) && (v = !1), typeof h.value == "function" ? Object.defineProperty(i, u, {
+                get() {
+                    return h.value.bind(this)
+                },
+                enumerable: v,
+                configurable: !1
+            }) : (h.enumerable = v, h.configurable = !1, h.writable && (h.writable = !1), Object.defineProperty(i, u, h))
+        })
+    }), i
+}
+
+function Hv(e) {
+    return ut($v, e, () => id(qv(e)))
+}
+
+function Jv(e, t, r) {
+    var n = Ey(t, e, Ae.deepFreezeWhenDevMode(r));
+    return e._runHooksSync("post", "create", r, n), it("postCreateRxDocument", n), n
+}
+
+function zv(e) {
+    var t = {};
+    return Object.entries(e.methods).forEach(([r, n]) => {
+        t[r] = n
+    }), t
+}
+var gd = {
+        isEqual(e, t) {
+            return Gn(Ct(e), Ct(t))
+        },
+        resolve(e) {
+            return e.realMasterState
+        }
+    },
+    wd = ["pre", "post"],
+    bd = ["insert", "save", "remove", "create"],
+    Su = !1,
+    Vr = new Set,
+    Sd = function() {
+        function e(r, n, i, s, c = {}, u = {}, h = {}, v = {}, m = {}, y = dd, w = {}, S = gd) {
+            this.storageInstance = {}, this.timeouts = new Set, this.incrementalWriteQueue = {}, this.awaitBeforeReads = new Set, this._incrementalUpsertQueues = new Map, this.synced = !1, this.hooks = {}, this._subs = [], this._docCache = {}, this._queryCache = mv(), this.$ = {}, this.checkpoint$ = {}, this._changeEventBuffer = {}, this.eventBulks$ = {}, this.onClose = [], this.closed = !1, this.onRemove = [], this.database = r, this.name = n, this.schema = i, this.internalStorageInstance = s, this.instanceCreationOptions = c, this.migrationStrategies = u, this.methods = h, this.attachments = v, this.options = m, this.cacheReplacementPolicy = y, this.statics = w, this.conflictHandler = S, jv(this.asRxCollection), r && (this.eventBulks$ = r.eventBulks$.pipe(Te(b => b.collectionName === this.name))), this.database && Vr.add(this)
+        }
+        var t = e.prototype;
+        return t.prepare = async function() {
+            if (!await Nl()) {
+                for (var n = 0; n < 10 && Vr.size > ru;) n++, await this.promiseWait(30);
+                if (Vr.size > ru) throw ee("COL23", {
+                    database: this.database.name,
+                    collection: this.name,
+                    args: {
+                        existing: Array.from(Vr.values()).map(h => ({
+                            db: h.database ? h.database.name : "",
+                            c: h.name
+                        }))
+                    }
+                })
+            }
+            this.storageInstance = Ao(this.database, this.internalStorageInstance, this.schema.jsonSchema), this.incrementalWriteQueue = new nd(this.storageInstance, this.schema.primaryPath, (h, v) => ad(this, h, v), h => this._runHooks("post", "save", h)), this.$ = this.eventBulks$.pipe(Dr(h => Ll(h))), this.checkpoint$ = this.eventBulks$.pipe(Ye(h => h.checkpoint)), this._changeEventBuffer = Wv(this.asRxCollection);
+            var i;
+            this._docCache = new hd(this.schema.primaryPath, this.eventBulks$.pipe(Te(h => !h.isLocal), Ye(h => h.events)), h => (i || (i = Hv(this.asRxCollection)), Jv(this.asRxCollection, i, h)));
+            var s = this.database.internalStore.changeStream().pipe(Te(h => {
+                var v = this.name + "-" + this.schema.version,
+                    m = h.events.find(y => y.documentData.context === "collection" && y.documentData.key === v && y.operation === "DELETE");
+                return !!m
+            })).subscribe(async () => {
+                await this.close(), await Promise.all(this.onRemove.map(h => h()))
+            });
+            this._subs.push(s);
+            var c = await this.database.storageToken,
+                u = this.storageInstance.changeStream().subscribe(h => {
+                    var v = {
+                        id: h.id,
+                        isLocal: !1,
+                        internal: !1,
+                        collectionName: this.name,
+                        storageToken: c,
+                        events: h.events,
+                        databaseToken: this.database.token,
+                        checkpoint: h.checkpoint,
+                        context: h.context
+                    };
+                    this.database.$emit(v)
+                });
+            return this._subs.push(u), Ze
+        }, t.cleanup = function(n) {
+            throw mt(this), Ie("cleanup")
+        }, t.migrationNeeded = function() {
+            throw Ie("migration-schema")
+        }, t.getMigrationState = function() {
+            throw Ie("migration-schema")
+        }, t.startMigration = function(n = 10) {
+            return mt(this), this.getMigrationState().startMigration(n)
+        }, t.migratePromise = function(n = 10) {
+            return this.getMigrationState().migratePromise(n)
+        }, t.insert = async function(n) {
+            mt(this);
+            var i = await this.bulkInsert([n]),
+                s = i.error[0];
+            va(this, n[this.schema.primaryPath], n, s);
+            var c = te(i.success[0]);
+            return c
+        }, t.insertIfNotExists = async function(n) {
+            var i = await this.bulkInsert([n]);
+            if (i.error.length > 0) {
+                var s = i.error[0];
+                if (s.status === 409) {
+                    var c = s.documentInDb;
+                    return uo(this._docCache, [c])[0]
+                } else throw s
+            }
+            return i.success[0]
+        }, t.bulkInsert = async function(n) {
+            if (mt(this), n.length === 0) return {
+                success: [],
+                error: []
+            };
+            var i = this.schema.primaryPath,
+                s = new Set,
+                c;
+            if (this.hasHooks("pre", "insert")) c = await Promise.all(n.map(T => {
+                var F = Vi(this.schema, T);
+                return this._runHooks("pre", "insert", F).then(() => (s.add(F[i]), {
+                    document: F
+                }))
+            }));
+            else {
+                c = new Array(n.length);
+                for (var u = this.schema, h = 0; h < n.length; h++) {
+                    var v = n[h],
+                        m = Vi(u, v);
+                    s.add(m[i]), c[h] = {
+                        document: m
+                    }
+                }
+            }
+            if (s.size !== n.length) throw ee("COL22", {
+                collection: this.name,
+                args: {
+                    documents: n
+                }
+            });
+            var y = await this.storageInstance.bulkWrite(c, "rx-collection-bulk-insert"),
+                w, S = this,
+                b = {
+                    get success() {
+                        if (!w) {
+                            var T = vt(S.schema.primaryPath, c, y);
+                            w = uo(S._docCache, T)
+                        }
+                        return w
+                    },
+                    error: y.error
+                };
+            if (this.hasHooks("post", "insert")) {
+                var P = new Map;
+                c.forEach(T => {
+                    var F = T.document;
+                    P.set(F[i], F)
+                }), await Promise.all(b.success.map(T => this._runHooks("post", "insert", P.get(T.primary), T)))
+            }
+            return b
+        }, t.bulkRemove = async function(n) {
+            mt(this);
+            var i = this.schema.primaryPath;
+            if (n.length === 0) return {
+                success: [],
+                error: []
+            };
+            var s;
+            typeof n[0] == "string" ? s = await this.findByIds(n).exec() : (s = new Map, n.forEach(S => s.set(S.primary, S)));
+            var c = [],
+                u = new Map;
+            Array.from(s.values()).forEach(S => {
+                var b = S.toMutableJSON(!0);
+                c.push(b), u.set(S.primary, b)
+            }), await Promise.all(c.map(S => {
+                var b = S[this.schema.primaryPath];
+                return this._runHooks("pre", "remove", S, s.get(b))
+            }));
+            var h = c.map(S => {
+                    var b = De(S);
+                    return b._deleted = !0, {
+                        previous: S,
+                        document: b
+                    }
+                }),
+                v = await this.storageInstance.bulkWrite(h, "rx-collection-bulk-remove"),
+                m = vt(this.schema.primaryPath, h, v),
+                y = [],
+                w = m.map(S => {
+                    var b = S[i],
+                        P = this._docCache.getCachedRxDocument(S);
+                    return y.push(P), b
+                });
+            return await Promise.all(w.map(S => this._runHooks("post", "remove", u.get(S), s.get(S)))), {
+                success: y,
+                error: v.error
+            }
+        }, t.bulkUpsert = async function(n) {
+            mt(this);
+            var i = [],
+                s = new Map;
+            n.forEach(v => {
+                var m = Vi(this.schema, v),
+                    y = m[this.schema.primaryPath];
+                if (!y) throw ee("COL3", {
+                    primaryPath: this.schema.primaryPath,
+                    data: m,
+                    schema: this.schema.jsonSchema
+                });
+                s.set(y, m), i.push(m)
+            });
+            var c = await this.bulkInsert(i),
+                u = c.success.slice(0),
+                h = [];
+            return await Promise.all(c.error.map(async v => {
+                if (v.status !== 409) h.push(v);
+                else {
+                    var m = v.documentId,
+                        y = Tr(s, m),
+                        w = te(v.documentInDb),
+                        S = this._docCache.getCachedRxDocuments([w])[0],
+                        b = await S.incrementalModify(() => y);
+                    u.push(b)
+                }
+            })), {
+                error: h,
+                success: u
+            }
+        }, t.upsert = async function(n) {
+            mt(this);
+            var i = await this.bulkUpsert([n]);
+            return va(this.asRxCollection, n[this.schema.primaryPath], n, i.error[0]), i.success[0]
+        }, t.incrementalUpsert = function(n) {
+            mt(this);
+            var i = Vi(this.schema, n),
+                s = i[this.schema.primaryPath];
+            if (!s) throw ee("COL4", {
+                data: n
+            });
+            var c = this._incrementalUpsertQueues.get(s);
+            return c || (c = Ze), c = c.then(() => Vv(this, s, i)).then(u => u.inserted ? u.doc : Gv(u.doc, i)), this._incrementalUpsertQueues.set(s, c), c
+        }, t.find = function(n) {
+            mt(this), it("prePrepareRxQuery", {
+                op: "find",
+                queryObj: n,
+                collection: this
+            }), n || (n = na());
+            var i = xn("find", n, this);
+            return i
+        }, t.findOne = function(n) {
+            mt(this), it("prePrepareRxQuery", {
+                op: "findOne",
+                queryObj: n,
+                collection: this
+            });
+            var i;
+            if (typeof n == "string") i = xn("findOne", {
+                selector: {
+                    [this.schema.primaryPath]: n
+                },
+                limit: 1
+            }, this);
+            else {
+                if (n || (n = na()), n.limit) throw ee("QU6");
+                n = De(n), n.limit = 1, i = xn("findOne", n, this)
+            }
+            return i
+        }, t.count = function(n) {
+            mt(this), n || (n = na());
+            var i = xn("count", n, this);
+            return i
+        }, t.findByIds = function(n) {
+            mt(this);
+            var i = {
+                    selector: {
+                        [this.schema.primaryPath]: {
+                            $in: n.slice(0)
+                        }
+                    }
+                },
+                s = xn("findByIds", i, this);
+            return s
+        }, t.exportJSON = function() {
+            throw Ie("json-dump")
+        }, t.importJSON = function(n) {
+            throw Ie("json-dump")
+        }, t.insertCRDT = function(n) {
+            throw Ie("crdt")
+        }, t.addPipeline = function(n) {
+            throw Ie("pipeline")
+        }, t.addHook = function(n, i, s, c = !1) {
+            if (typeof s != "function") throw fa("COL7", {
+                key: i,
+                when: n
+            });
+            if (!wd.includes(n)) throw fa("COL8", {
+                key: i,
+                when: n
+            });
+            if (!bd.includes(i)) throw ee("COL9", {
+                key: i
+            });
+            if (n === "post" && i === "create" && c === !0) throw ee("COL10", {
+                when: n,
+                key: i,
+                parallel: c
+            });
+            var u = s.bind(this),
+                h = c ? "parallel" : "series";
+            this.hooks[i] = this.hooks[i] || {}, this.hooks[i][n] = this.hooks[i][n] || {
+                series: [],
+                parallel: []
+            }, this.hooks[i][n][h].push(u)
+        }, t.getHooks = function(n, i) {
+            return !this.hooks[i] || !this.hooks[i][n] ? {
+                series: [],
+                parallel: []
+            } : this.hooks[i][n]
+        }, t.hasHooks = function(n, i) {
+            if (!this.hooks[i] || !this.hooks[i][n]) return !1;
+            var s = this.getHooks(n, i);
+            return s ? s.series.length > 0 || s.parallel.length > 0 : !1
+        }, t._runHooks = function(n, i, s, c) {
+            var u = this.getHooks(n, i);
+            if (!u) return Ze;
+            var h = u.series.map(v => () => v(s, c));
+            return $p(h).then(() => Promise.all(u.parallel.map(v => v(s, c))))
+        }, t._runHooksSync = function(n, i, s, c) {
+            if (this.hasHooks(n, i)) {
+                var u = this.getHooks(n, i);
+                u && u.series.forEach(h => h(s, c))
+            }
+        }, t.promiseWait = function(n) {
+            var i = new Promise(s => {
+                var c = setTimeout(() => {
+                    this.timeouts.delete(c), s()
+                }, n);
+                this.timeouts.add(c)
+            });
+            return i
+        }, t.close = async function() {
+            return this.closed ? Ut : (Vr.delete(this), await Promise.all(this.onClose.map(n => n())), this.closed = !0, Array.from(this.timeouts).forEach(n => clearTimeout(n)), this._changeEventBuffer && this._changeEventBuffer.close(), this.database.requestIdlePromise().then(() => this.storageInstance.close()).then(() => (this._subs.forEach(n => n.unsubscribe()), delete this.database.collections[this.name], Wt("postCloseRxCollection", this).then(() => !0))))
+        }, t.remove = async function() {
+            await this.close(), await Promise.all(this.onRemove.map(n => n())), await vd(this.database.storage, this.database.internalStore, this.database.token, this.database.name, this.name, this.database.multiInstance, this.database.password, this.database.hashFunction)
+        }, cr(e, [{
+            key: "insert$",
+            get: function() {
+                return this.$.pipe(Te(r => r.operation === "INSERT"))
+            }
+        }, {
+            key: "update$",
+            get: function() {
+                return this.$.pipe(Te(r => r.operation === "UPDATE"))
+            }
+        }, {
+            key: "remove$",
+            get: function() {
+                return this.$.pipe(Te(r => r.operation === "DELETE"))
+            }
+        }, {
+            key: "asRxCollection",
+            get: function() {
+                return this
+            }
+        }])
+    }();
+
+function jv(e) {
+    if (!Su) {
+        Su = !0;
+        var t = Object.getPrototypeOf(e);
+        bd.forEach(r => {
+            wd.map(n => {
+                var i = n + xl(r);
+                t[i] = function(s, c) {
+                    return this.addHook(n, r, s, c)
+                }
+            })
+        })
+    }
+}
+
+function Gv(e, t) {
+    return e.incrementalModify(r => t)
+}
+
+function Vv(e, t, r) {
+    var n = e._docCache.getLatestDocumentDataIfExists(t);
+    return n ? Promise.resolve({
+        doc: e._docCache.getCachedRxDocuments([n])[0],
+        inserted: !1
+    }) : e.findOne(t).exec().then(i => i ? {
+        doc: i,
+        inserted: !1
+    } : e.insert(r).then(s => ({
+        doc: s,
+        inserted: !0
+    })))
+}
+async function Yv({
+    database: e,
+    name: t,
+    schema: r,
+    instanceCreationOptions: n = {},
+    migrationStrategies: i = {},
+    autoMigrate: s = !0,
+    statics: c = {},
+    methods: u = {},
+    attachments: h = {},
+    options: v = {},
+    localDocuments: m = !1,
+    cacheReplacementPolicy: y = dd,
+    conflictHandler: w = gd
+}) {
+    var S = {
+        databaseInstanceToken: e.token,
+        databaseName: e.name,
+        collectionName: t,
+        schema: r.jsonSchema,
+        options: n,
+        multiInstance: e.multiInstance,
+        password: e.password,
+        devMode: Ae.isDevMode()
+    };
+    it("preCreateRxStorageInstance", S);
+    var b = await Lv(e, S),
+        P = new Sd(e, t, r, b, n, i, u, h, v, y, c, w);
+    try {
+        await P.prepare(), Object.entries(c).forEach(([T, F]) => {
+            Object.defineProperty(P, T, {
+                get: () => F.bind(P)
+            })
+        }), it("createRxCollection", {
+            collection: P,
+            creator: {
+                name: t,
+                schema: r,
+                storageInstance: b,
+                instanceCreationOptions: n,
+                migrationStrategies: i,
+                methods: u,
+                attachments: h,
+                options: v,
+                cacheReplacementPolicy: y,
+                localDocuments: m,
+                statics: c
+            }
+        }), s && P.schema.version !== 0 && await P.migratePromise()
+    } catch (T) {
+        throw Vr.delete(P), await b.close(), T
+    }
+    return P
+}
+var Ed = function() {
+    var t = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : 1;
+    this._parallels = t || 1, this._qC = 0, this._iC = new Set, this._lHN = 0, this._hPM = new Map, this._pHM = new Map
+};
+Ed.prototype = {
+    isIdle: function() {
+        return this._qC < this._parallels
+    },
+    lock: function() {
+        this._qC++
+    },
+    unlock: function() {
+        this._qC--, lo(this)
+    },
+    wrapCall: function(t) {
+        var r = this;
+        this._qC++;
+        var n;
+        try {
+            n = t()
+        } catch (i) {
+            throw this.unlock(), i
+        }
+        return !n.then || typeof n.then != "function" ? (this.unlock(), n) : n.then(function(i) {
+            return r.unlock(), i
+        }).catch(function(i) {
+            throw r.unlock(), i
+        })
+    },
+    requestIdlePromise: function(t) {
+        var r = this;
+        t = t || {};
+        var n, i = new Promise(function(u) {
+                return n = u
+            }),
+            s = function() {
+                Ws(r, i), n()
+            };
+        if (i._manRes = s, t.timeout) {
+            var c = setTimeout(function() {
+                i._manRes()
+            }, t.timeout);
+            i._timeoutObj = c
+        }
+        return this._iC.add(i), lo(this), i
+    },
+    cancelIdlePromise: function(t) {
+        Ws(this, t)
+    },
+    requestIdleCallback: function(t, r) {
+        var n = this._lHN++,
+            i = this.requestIdlePromise(r);
+        return this._hPM.set(n, i), this._pHM.set(i, n), i.then(function() {
+            return t()
+        }), n
+    },
+    cancelIdleCallback: function(t) {
+        var r = this._hPM.get(t);
+        this.cancelIdlePromise(r)
+    },
+    clear: function() {
+        var t = this;
+        this._iC.forEach(function(r) {
+            return Ws(t, r)
+        }), this._qC = 0, this._iC.clear(), this._hPM = new Map, this._pHM = new Map
+    }
+};
+
+function Qv(e) {
+    if (e._iC.size !== 0) {
+        var t = e._iC.values(),
+            r = t.next().value;
+        r._manRes(), setTimeout(function() {
+            return lo(e)
+        }, 0)
+    }
+}
+
+function Ws(e, t) {
+    if (t) {
+        if (t._timeoutObj && clearTimeout(t._timeoutObj), e._pHM.has(t)) {
+            var r = e._pHM.get(t);
+            e._hPM.delete(r), e._pHM.delete(t)
+        }
+        e._iC.delete(t)
+    }
+}
+
+function lo(e) {
+    e._tryIR || e._iC.size === 0 || (e._tryIR = !0, setTimeout(function() {
+        if (!e.isIdle()) {
+            e._tryIR = !1;
+            return
+        }
+        setTimeout(function() {
+            if (!e.isIdle()) {
+                e._tryIR = !1;
+                return
+            }
+            Qv(e), e._tryIR = !1
+        }, 0)
+    }, 0))
+}
+class qo {
+    constructor(t) {
+        zi(this, "ttl");
+        zi(this, "map", new Map);
+        zi(this, "_to", !1);
+        this.ttl = t
+    }
+    has(t) {
+        return this.map.has(t)
+    }
+    add(t) {
+        this.map.set(t, _d()), this._to || (this._to = !0, setTimeout(() => {
+            this._to = !1, Xv(this)
+        }, 0))
+    }
+    clear() {
+        this.map.clear()
+    }
+}
+
+function Xv(e) {
+    const t = _d() - e.ttl,
+        r = e.map[Symbol.iterator]();
+    for (;;) {
+        const n = r.next().value;
+        if (!n) return;
+        const i = n[0];
+        if (n[1] < t) e.map.delete(i);
+        else return
+    }
+}
+
+function _d() {
+    return Date.now()
+}
+var ho = new Set,
+    Eu = new Map,
+    Ho = function() {
+        function e(r, n, i, s, c, u, h = !1, v = {}, m, y, w, S, b, P) {
+            this.idleQueue = new Ed, this.rxdbVersion = Ro, this.storageInstances = new Set, this._subs = [], this.startupErrors = [], this.onClose = [], this.closed = !1, this.collections = {}, this.states = {}, this.eventBulks$ = new nt, this.closePromise = null, this.observable$ = this.eventBulks$.pipe(Dr(T => Ll(T))), this.storageToken = Ut, this.storageTokenDocument = Ut, this.emittedEventBulkIds = new qo(60 * 1e3), this.name = r, this.token = n, this.storage = i, this.instanceCreationOptions = s, this.password = c, this.multiInstance = u, this.eventReduce = h, this.options = v, this.internalStore = m, this.hashFunction = y, this.cleanupPolicy = w, this.allowSlowCount = S, this.reactivity = b, this.onClosed = P, this.name !== "pseudoInstance" && (this.internalStore = Ao(this.asRxDatabase, m, $o), this.storageTokenDocument = Nv(this.asRxDatabase).catch(T => this.startupErrors.push(T)), this.storageToken = this.storageTokenDocument.then(T => T.data.token).catch(T => this.startupErrors.push(T)))
+        }
+        var t = e.prototype;
+        return t.getReactivityFactory = function() {
+            if (!this.reactivity) throw ee("DB14", {
+                database: this.name
+            });
+            return this.reactivity
+        }, t.$emit = function(n) {
+            this.emittedEventBulkIds.has(n.id) || (this.emittedEventBulkIds.add(n.id), this.eventBulks$.next(n))
+        }, t.removeCollectionDoc = async function(n, i) {
+            var s = await Wa(this.internalStore, ii(ga(n, i), Ir));
+            if (!s) throw ee("SNH", {
+                name: n,
+                schema: i
+            });
+            var c = mi(s);
+            c._deleted = !0, await this.internalStore.bulkWrite([{
+                document: c,
+                previous: s
+            }], "rx-database-remove-collection")
+        }, t.addCollections = async function(n) {
+            var i = {},
+                s = {},
+                c = [],
+                u = {};
+            await Promise.all(Object.entries(n).map(async ([m, y]) => {
+                var w = m,
+                    S = y.schema;
+                i[w] = S;
+                var b = tm(S, this.hashFunction);
+                if (s[w] = b, this.collections[m]) throw ee("DB3", {
+                    name: m
+                });
+                var P = ga(m, S),
+                    T = {
+                        id: ii(P, Ir),
+                        key: P,
+                        context: Ir,
+                        data: {
+                            name: w,
+                            schemaHash: await b.hash,
+                            schema: b.jsonSchema,
+                            version: b.version,
+                            connectedStorages: []
+                        },
+                        _deleted: !1,
+                        _meta: li(),
+                        _rev: Lt(),
+                        _attachments: {}
+                    };
+                c.push({
+                    document: T
+                });
+                var F = Object.assign({}, y, {
+                        name: w,
+                        schema: b,
+                        database: this
+                    }),
+                    U = De(y);
+                U.database = this, U.name = m, it("preCreateRxCollection", U), F.conflictHandler = U.conflictHandler, u[w] = F
+            }));
+            var h = await this.internalStore.bulkWrite(c, "rx-database-add-collection");
+            await tg(this), await Promise.all(h.error.map(async m => {
+                if (m.status !== 409) throw ee("DB12", {
+                    database: this.name,
+                    writeError: m
+                });
+                var y = te(m.documentInDb),
+                    w = y.data.name,
+                    S = s[w];
+                if (y.data.schemaHash !== await S.hash) throw ee("DB6", {
+                    database: this.name,
+                    collection: w,
+                    previousSchemaHash: y.data.schemaHash,
+                    schemaHash: await S.hash,
+                    previousSchema: y.data.schema,
+                    schema: te(i[w])
+                })
+            }));
+            var v = {};
+            return await Promise.all(Object.keys(n).map(async m => {
+                var y = u[m],
+                    w = await Yv(y);
+                v[m] = w, this.collections[m] = w, this[m] || Object.defineProperty(this, m, {
+                    get: () => this.collections[m]
+                })
+            })), v
+        }, t.lockedRun = function(n) {
+            return this.idleQueue.wrapCall(n)
+        }, t.requestIdlePromise = function() {
+            return this.idleQueue.requestIdlePromise()
+        }, t.exportJSON = function(n) {
+            throw Ie("json-dump")
+        }, t.addState = function(n) {
+            throw Ie("state")
+        }, t.importJSON = function(n) {
+            throw Ie("json-dump")
+        }, t.backup = function(n) {
+            throw Ie("backup")
+        }, t.leaderElector = function() {
+            throw Ie("leader-election")
+        }, t.isLeader = function() {
+            throw Ie("leader-election")
+        }, t.waitForLeadership = function() {
+            throw Ie("leader-election")
+        }, t.migrationStates = function() {
+            throw Ie("migration-schema")
+        }, t.close = function() {
+            if (this.closePromise) return this.closePromise;
+            var {
+                promise: n,
+                resolve: i
+            } = Pd(), s = c => {
+                this.onClosed && this.onClosed(), this.closed = !0, i(c)
+            };
+            return this.closePromise = n, (async () => {
+                if (await Wt("preCloseRxDatabase", this), this.eventBulks$.complete(), this._subs.map(c => c.unsubscribe()), this.name === "pseudoInstance") {
+                    s(!1);
+                    return
+                }
+                return this.requestIdlePromise().then(() => Promise.all(this.onClose.map(c => c()))).then(() => Promise.all(Object.keys(this.collections).map(c => this.collections[c]).map(c => c.close()))).then(() => this.internalStore.close()).then(() => s(!0))
+            })(), n
+        }, t.remove = function() {
+            return this.close().then(() => Jo(this.name, this.storage, this.multiInstance, this.password))
+        }, cr(e, [{
+            key: "$",
+            get: function() {
+                return this.observable$
+            }
+        }, {
+            key: "asRxDatabase",
+            get: function() {
+                return this
+            }
+        }])
+    }();
+
+function Zv(e, t) {
+    if (ho.has(kd(e, t))) throw ee("DB8", {
+        name: e,
+        storage: t.name,
+        link: "https://rxdb.info/rx-database.html#ignoreduplicate"
+    })
+}
+
+function Pd() {
+    var e, t, r = new Promise((n, i) => {
+        e = n, t = i
+    });
+    return {
+        promise: r,
+        resolve: e,
+        reject: t
+    }
+}
+
+function kd(e, t) {
+    return t.name + "|" + e
+}
+async function Cd(e, t, r, n, i, s) {
+    var c = await t.createStorageInstance({
+        databaseInstanceToken: e,
+        databaseName: r,
+        collectionName: my,
+        schema: $o,
+        options: n,
+        multiInstance: i,
+        password: s,
+        devMode: Ae.isDevMode()
+    });
+    return c
+}
+
+function eg({
+    storage: e,
+    instanceCreationOptions: t,
+    name: r,
+    password: n,
+    multiInstance: i = !0,
+    eventReduce: s = !0,
+    ignoreDuplicate: c = !1,
+    options: u = {},
+    cleanupPolicy: h,
+    closeDuplicates: v = !1,
+    allowSlowCount: m = !1,
+    localDocuments: y = !1,
+    hashFunction: w = Kl,
+    reactivity: S
+}) {
+    it("preCreateRxDatabase", {
+        storage: e,
+        instanceCreationOptions: t,
+        name: r,
+        password: n,
+        multiInstance: i,
+        eventReduce: s,
+        ignoreDuplicate: c,
+        options: u,
+        localDocuments: y
+    });
+    var b = kd(r, e),
+        P = Eu.get(b) || new Set,
+        T = Pd(),
+        F = Array.from(P),
+        U = () => {
+            P.delete(T.promise), ho.delete(b)
+        };
+    return P.add(T.promise), Eu.set(b, P), (async () => {
+        if (v && await Promise.all(F.map(Q => Q.catch(() => null).then(W => W && W.close()))), c) {
+            if (!Ae.isDevMode()) throw ee("DB9", {
+                database: r
+            })
+        } else Zv(r, e);
+        ho.add(b);
+        var M = ln(10),
+            z = await Cd(M, e, r, t, i, n),
+            H = new Ho(r, M, e, t, n, i, s, u, z, w, h, m, S, U);
+        return await Wt("createRxDatabase", {
+            database: H,
+            creator: {
+                storage: e,
+                instanceCreationOptions: t,
+                name: r,
+                password: n,
+                multiInstance: i,
+                eventReduce: s,
+                ignoreDuplicate: c,
+                options: u,
+                localDocuments: y
+            }
+        }), H
+    })().then(M => {
+        T.resolve(M)
+    }).catch(M => {
+        T.reject(M), U()
+    }), T.promise
+}
+async function Jo(e, t, r = !0, n) {
+    var i = ln(10),
+        s = await Cd(i, t, e, {}, r, n),
+        c = await md(s),
+        u = new Set;
+    c.forEach(v => u.add(v.data.name));
+    var h = Array.from(u);
+    return await Promise.all(h.map(v => vd(t, s, i, e, v, r, n))), await Wt("postRemoveRxDatabase", {
+        databaseName: e,
+        storage: t
+    }), await s.remove(), h
+}
+
+function Id(e) {
+    return e instanceof Ho
+}
+async function tg(e) {
+    if (await e.storageToken, e.startupErrors[0]) throw e.startupErrors[0]
+}
+var rg = {
+        RxSchema: Ml.prototype,
+        RxDocument: qa,
+        RxQuery: fd.prototype,
+        RxCollection: Sd.prototype,
+        RxDatabase: Ho.prototype
+    },
+    $s = new Set,
+    _u = new Set;
+
+function ia(e) {
+    if (it("preAddRxPlugin", {
+            plugin: e,
+            plugins: $s
+        }), !$s.has(e)) {
+        {
+            if (_u.has(e.name)) throw ee("PL3", {
+                name: e.name,
+                plugin: e
+            });
+            $s.add(e), _u.add(e.name)
+        }
+        if (!e.rxdb) throw fa("PL1", {
+            plugin: e
+        });
+        e.init && e.init(), e.prototypes && Object.entries(e.prototypes).forEach(([t, r]) => r(rg[t])), e.overwritable && Object.assign(Ae, e.overwritable), e.hooks && Object.entries(e.hooks).forEach(([t, r]) => {
+            r.after && Vn[t].push(r.after), r.before && Vn[t].unshift(r.before)
+        })
+    }
+}
+async function wa(e, t) {
+    var r = ur(e.input.metaInstance.schema, {
+            isCheckpoint: "1",
+            itemId: t
+        }),
+        n = await e.input.metaInstance.findDocumentsById([r], !1),
+        i = n[0];
+    if (e.lastCheckpointDoc[t] = i, i) return i.checkpointData
+}
+async function ba(e, t, r) {
+    e.checkpointQueue = e.checkpointQueue.then(async () => {
+        var n = e.lastCheckpointDoc[t];
+        if (r && !e.events.canceled.getValue() && (!n || JSON.stringify(n.checkpointData) !== JSON.stringify(r))) {
+            var i = {
+                id: "",
+                isCheckpoint: "1",
+                itemId: t,
+                _deleted: !1,
+                _attachments: {},
+                checkpointData: r,
+                _meta: li(),
+                _rev: Lt()
+            };
+            for (i.id = ur(e.input.metaInstance.schema, i); !e.events.canceled.getValue();) {
+                if (n && (i.checkpointData = ni([n.checkpointData, i.checkpointData])), i._meta.lwt = tt(), i._rev = ar(await e.checkpointKey, n), e.events.canceled.getValue()) return;
+                var s = [{
+                        previous: n,
+                        document: i
+                    }],
+                    c = await e.input.metaInstance.bulkWrite(s, "replication-set-checkpoint"),
+                    u = vt(e.primaryPath, s, c)[0];
+                if (u) {
+                    e.lastCheckpointDoc[t] = u;
+                    return
+                } else {
+                    var h = c.error[0];
+                    if (h.status !== 409) throw h;
+                    n = te(h.documentInDb), i._rev = ar(await e.checkpointKey, n)
+                }
+            }
+        }
+    }), await e.checkpointQueue
+}
+async function ng(e) {
+    var t = await e.hashFunction([e.identifier, e.forkInstance.databaseName, e.forkInstance.collectionName].join("||"));
+    return "rx_storage_replication_" + t
+}
+
+function Rd(e, t, r) {
+    var n = De(e);
+    return t || delete n._attachments, r || (delete n._meta, delete n._rev), n
+}
+
+function fo(e, t) {
+    return e.hasAttachments ? t.map(r => {
+        var n = Ft(r.document);
+        return n.docData = Ct(n.docData), {
+            document: n,
+            previous: r.previous
+        }
+    }) : t
+}
+
+function Pu(e) {
+    for (;;)
+        if (e.underlyingPersistentStorage) e = e.underlyingPersistentStorage;
+        else return e
+}
+var ig = "RxReplicationProtocolMetaData";
+
+function ag(e, t) {
+    var r = Gp(e),
+        n = {
+            title: ig,
+            primaryKey: {
+                key: "id",
+                fields: ["itemId", "isCheckpoint"],
+                separator: "|"
+            },
+            type: "object",
+            version: e.version,
+            additionalProperties: !1,
+            properties: {
+                id: {
+                    type: "string",
+                    minLength: 1,
+                    maxLength: r + 2
+                },
+                isCheckpoint: {
+                    type: "string",
+                    enum: ["0", "1"],
+                    minLength: 1,
+                    maxLength: 1
+                },
+                itemId: {
+                    type: "string",
+                    maxLength: r > 4 ? r : 4
+                },
+                checkpointData: {
+                    type: "object",
+                    additionalProperties: !0
+                },
+                docData: {
+                    type: "object",
+                    properties: e.properties
+                },
+                isResolvedConflict: {
+                    type: "string"
+                }
+            },
+            keyCompression: e.keyCompression,
+            required: ["id", "isCheckpoint", "itemId"]
+        };
+    t && (n.encrypted = ["docData"]);
+    var i = Ba(n);
+    return i
+}
+
+function Dd(e, t) {
+    return e.input.metaInstance.findDocumentsById(t.map(r => {
+        var n = ur(e.input.metaInstance.schema, {
+            itemId: r,
+            isCheckpoint: "0"
+        });
+        return n
+    }), !0).then(r => {
+        var n = {};
+        return Object.values(r).forEach(i => {
+            n[i.itemId] = {
+                docData: i.docData,
+                metaDocument: i
+            }
+        }), n
+    })
+}
+async function Sa(e, t, r, n) {
+    var i = t[e.primaryPath],
+        s = r ? mi(r) : {
+            id: "",
+            isCheckpoint: "0",
+            itemId: i,
+            docData: t,
+            _attachments: {},
+            _deleted: !1,
+            _rev: Lt(),
+            _meta: {
+                lwt: 0
+            }
+        };
+    s.docData = t, n && (s.isResolvedConflict = n), s._meta.lwt = tt(), s.id = ur(e.input.metaInstance.schema, s), s._rev = ar(await e.checkpointKey, r);
+    var c = {
+        previous: r,
+        document: s
+    };
+    return c
+}
+async function sg(e) {
+    if (e.input.initialCheckpoint && e.input.initialCheckpoint.downstream) {
+        var t = await wa(e, "down");
+        t || await ba(e, "down", e.input.initialCheckpoint.downstream)
+    }
+    var r = await e.input.hashFunction(e.input.identifier),
+        n = e.input.replicationHandler,
+        i = 0,
+        s = [];
+
+    function c(b) {
+        e.stats.down.addNewTask = e.stats.down.addNewTask + 1;
+        var P = {
+            time: i++,
+            task: b
+        };
+        s.push(P), e.streamQueue.down = e.streamQueue.down.then(() => {
+            for (var T = []; s.length > 0;) {
+                e.events.active.down.next(!0);
+                var F = te(s.shift());
+                if (!(F.time < h)) {
+                    if (F.task === "RESYNC")
+                        if (T.length === 0) {
+                            T.push(F.task);
+                            break
+                        } else break;
+                    T.push(F.task)
+                }
+            }
+            if (T.length !== 0) return T[0] === "RESYNC" ? v() : m(T)
+        }).then(() => {
+            e.events.active.down.next(!1), !e.firstSyncDone.down.getValue() && !e.events.canceled.getValue() && e.firstSyncDone.down.next(!0)
+        })
+    }
+    if (c("RESYNC"), !e.events.canceled.getValue()) {
+        var u = n.masterChangeStream$.pipe(Dr(async b => (await Kr(e.events.active.up.pipe(Te(P => !P))), b))).subscribe(b => {
+            e.stats.down.masterChangeStreamEmit = e.stats.down.masterChangeStreamEmit + 1, c(b)
+        });
+        Kr(e.events.canceled.pipe(Te(b => !!b))).then(() => u.unsubscribe())
+    }
+    var h = -1;
+    async function v() {
+        if (e.stats.down.downstreamResyncOnce = e.stats.down.downstreamResyncOnce + 1, !e.events.canceled.getValue()) {
+            e.checkpointQueue = e.checkpointQueue.then(() => wa(e, "down"));
+            for (var b = await e.checkpointQueue, P = []; !e.events.canceled.getValue();) {
+                h = i++;
+                var T = await n.masterChangesSince(b, e.input.pullBatchSize);
+                if (T.documents.length === 0 || (b = ni([b, T.checkpoint]), P.push(S(T.documents, b)), T.documents.length < e.input.pullBatchSize)) break
+            }
+            await Promise.all(P)
+        }
+    }
+
+    function m(b) {
+        e.stats.down.downstreamProcessChanges = e.stats.down.downstreamProcessChanges + 1;
+        var P = [],
+            T = null;
+        return b.forEach(F => {
+            if (F === "RESYNC") throw new Error("SNH");
+            Or(P, F.documents), T = ni([T, F.checkpoint])
+        }), S(P, te(T))
+    }
+    var y = Ze,
+        w = {
+            docs: {}
+        };
+
+    function S(b, P) {
+        var T = e.primaryPath;
+        return e.stats.down.persistFromMaster = e.stats.down.persistFromMaster + 1, b.forEach(F => {
+            var U = F[T];
+            w.docs[U] = F
+        }), w.checkpoint = P, y = y.then(() => {
+            var F = w.docs;
+            w.docs = {};
+            var U = w.checkpoint,
+                M = Object.keys(F);
+            if (e.events.canceled.getValue() || M.length === 0) return Ze;
+            var z = [],
+                H = {},
+                Q = {},
+                W = [];
+            return Promise.all([e.input.forkInstance.findDocumentsById(M, !0), Dd(e, M)]).then(([ie, de]) => {
+                var Se = new Map;
+                return ie.forEach(ue => Se.set(ue[T], ue)), Promise.all(M.map(async ue => {
+                    var re = Se.get(ue),
+                        oe = re ? Rd(re, e.hasAttachments, !1) : void 0,
+                        ye = F[ue],
+                        Pe = de[ue];
+                    Pe && re && Pe.metaDocument.isResolvedConflict === re._rev && await e.streamQueue.up;
+                    var $e = !Pe || !oe ? !1 : e.input.conflictHandler.isEqual(Pe.docData, oe, "downstream-check-if-equal-0");
+                    if (!$e && Pe && Pe.docData._rev && re && re._meta[e.input.identifier] && ir(re._rev) === re._meta[e.input.identifier] && ($e = !0), re && Pe && $e === !1 || re && !Pe) return Ze;
+                    var Be = oe ? e.input.conflictHandler.isEqual(ye, oe, "downstream-check-if-equal-1") : !1;
+                    if (oe && Be) return (!Pe || $e === !1) && W.push(await Sa(e, oe, Pe ? Pe.metaDocument : void 0)), Ze;
+                    var fe = Object.assign({}, ye, re ? {
+                        _meta: De(re._meta),
+                        _attachments: e.hasAttachments && ye._attachments ? ye._attachments : {},
+                        _rev: Lt()
+                    } : {
+                        _meta: {
+                            lwt: tt()
+                        },
+                        _rev: Lt(),
+                        _attachments: e.hasAttachments && ye._attachments ? ye._attachments : {}
+                    });
+                    if (ye._rev) {
+                        var ve = re ? ir(re._rev) + 1 : 1;
+                        fe._meta[e.input.identifier] = ve, e.input.keepMeta && (fe._rev = ye._rev)
+                    }
+                    e.input.keepMeta && ye._meta && (fe._meta = ye._meta);
+                    var ne = {
+                        previous: re,
+                        document: fe
+                    };
+                    ne.document._rev = ne.document._rev ? ne.document._rev : ar(r, ne.previous), z.push(ne), H[ue] = ne, Q[ue] = await Sa(e, ye, Pe ? Pe.metaDocument : void 0)
+                }))
+            }).then(async () => {
+                if (z.length > 0) return e.input.forkInstance.bulkWrite(z, await e.downstreamBulkWriteFlag).then(ie => {
+                    var de = vt(e.primaryPath, z, ie);
+                    de.forEach(ue => {
+                        var re = ue[T];
+                        e.events.processed.down.next(H[re]), W.push(Q[re])
+                    });
+                    var Se;
+                    if (ie.error.forEach(ue => {
+                            if (ue.status !== 409) {
+                                var re = ee("RC_PULL", {
+                                    writeError: ue
+                                });
+                                e.events.error.next(re), Se = re
+                            }
+                        }), Se) throw Se
+                })
+            }).then(() => {
+                if (W.length > 0) return e.input.metaInstance.bulkWrite(fo(e, W), "replication-down-write-meta").then(ie => {
+                    ie.error.forEach(de => {
+                        e.events.error.next(ee("RC_PULL", {
+                            id: de.documentId,
+                            writeError: de
+                        }))
+                    })
+                })
+            }).then(() => {
+                ba(e, "down", U)
+            })
+        }).catch(F => e.events.error.next(F)), y
+    }
+}
+async function og(e, t, r) {
+    var n = e.input.conflictHandler,
+        i = n.isEqual(t.realMasterState, t.newDocumentState, "replication-resolve-conflict");
+    if (!i) {
+        var s = await n.resolve(t, "replication-resolve-conflict"),
+            c = Object.assign({}, s, {
+                _meta: De(r._meta),
+                _rev: Lt(),
+                _attachments: De(r._attachments)
+            });
+        return c._meta.lwt = tt(), c._rev = ar(await e.checkpointKey, r), c
+    }
+}
+async function cg(e, t, r, n) {
+    if (!r._attachments || n && !n._attachments) throw new Error("_attachments missing");
+    var i = r[e],
+        s = new Set(n && n._attachments ? Object.keys(n._attachments) : []);
+    return await Promise.all(Object.entries(r._attachments).map(async ([c, u]) => {
+        if ((!s.has(c) || n && te(n._attachments)[c].digest !== u.digest) && !u.data) {
+            var h = await t.getAttachmentData(i, c, u.digest);
+            u.data = h
+        }
+    })), r
+}
+async function ug(e) {
+    if (e.input.initialCheckpoint && e.input.initialCheckpoint.upstream) {
+        var t = await wa(e, "up");
+        t || await ba(e, "up", e.input.initialCheckpoint.upstream)
+    }
+    var r = e.input.replicationHandler;
+    e.streamQueue.up = e.streamQueue.up.then(() => m().then(() => y()));
+    var n = 0,
+        i = -1,
+        s = [],
+        c = Ut,
+        u = {
+            docs: {}
+        },
+        h = e.input.forkInstance.changeStream().subscribe(S => {
+            if (!e.events.paused.getValue()) return e.stats.up.forkChangeStreamEmit = e.stats.up.forkChangeStreamEmit + 1, s.push({
+                task: S,
+                time: n++
+            }), e.events.active.up.getValue() || e.events.active.up.next(!0), e.input.waitBeforePersist ? e.input.waitBeforePersist().then(() => y()) : y()
+        }),
+        v = r.masterChangeStream$.pipe(Te(S => S === "RESYNC")).subscribe(() => {
+            s.push({
+                task: "RESYNC",
+                time: n++
+            }), y()
+        });
+    Kr(e.events.canceled.pipe(Te(S => !!S))).then(() => {
+        h.unsubscribe(), v.unsubscribe()
+    });
+    async function m() {
+        if (e.stats.up.upstreamInitialSync = e.stats.up.upstreamInitialSync + 1, !e.events.canceled.getValue()) {
+            e.checkpointQueue = e.checkpointQueue.then(() => wa(e, "up"));
+            for (var S = await e.checkpointQueue, b = new Set, P = async function() {
+                    i = n++, b.size > 3 && await Promise.race(Array.from(b));
+                    var U = await wy(e.input.forkInstance, e.input.pushBatchSize, S);
+                    if (U.documents.length === 0) return 1;
+                    S = ni([S, U.checkpoint]);
+                    var M = w(U.documents, te(S));
+                    b.add(M), M.catch().then(() => b.delete(M))
+                }; !e.events.canceled.getValue() && !await P(););
+            var T = await Promise.all(b),
+                F = T.find(U => !!U);
+            F ? await m() : !e.firstSyncDone.up.getValue() && !e.events.canceled.getValue() && e.firstSyncDone.up.next(!0)
+        }
+    }
+
+    function y() {
+        if (e.events.canceled.getValue() || s.length === 0) {
+            e.events.active.up.next(!1);
+            return
+        }
+        e.stats.up.processTasks = e.stats.up.processTasks + 1, e.events.active.up.next(!0), e.streamQueue.up = e.streamQueue.up.then(async () => {
+            for (var S = [], b = {}; s.length > 0;) {
+                var P = te(s.shift());
+                if (!(P.time < i)) {
+                    if (P.task === "RESYNC") {
+                        e.events.active.up.next(!1), await m();
+                        return
+                    }
+                    P.task.context !== await e.downstreamBulkWriteFlag && Or(S, P.task.events.map(T => T.documentData)), b = ni([b, P.task.checkpoint])
+                }
+            }
+            if (await w(S, b), s.length === 0) e.events.active.up.next(!1);
+            else return y()
+        })
+    }
+
+    function w(S, b) {
+        return e.stats.up.persistToMaster = e.stats.up.persistToMaster + 1, S.forEach(P => {
+            var T = P[e.primaryPath];
+            u.docs[T] = P
+        }), u.checkpoint = b, c = c.then(async () => {
+            if (e.events.canceled.getValue()) return !1;
+            var P = u.docs;
+            u.docs = {};
+            var T = u.checkpoint,
+                F = Object.keys(P);
+
+            function U() {
+                return ba(e, "up", T)
+            }
+            if (F.length === 0) return U(), !1;
+            var M = await Dd(e, F),
+                z = {},
+                H = [],
+                Q = {},
+                W = {};
+            if (await Promise.all(F.map(async ne => {
+                    var we = P[ne];
+                    W[ne] = we;
+                    var _e = Rd(we, e.hasAttachments, !!e.input.keepMeta),
+                        ge = M[ne];
+                    ge && ge.metaDocument.isResolvedConflict !== we._rev && e.input.conflictHandler.isEqual(ge.docData, _e, "upstream-check-if-equal") || ge && ge.docData._rev && ir(we._rev) === we._meta[e.input.identifier] || (H.push(ne), z[ne] = {
+                        assumedMasterState: ge ? ge.docData : void 0,
+                        newDocumentState: _e
+                    }, Q[ne] = await Sa(e, _e, ge ? ge.metaDocument : void 0))
+                })), H.length === 0) return U(), !1;
+            var ie = Object.values(z),
+                de = new Set,
+                Se = {},
+                ue = kp(ie, e.input.pushBatchSize);
+            await Promise.all(ue.map(async ne => {
+                e.hasAttachments && await Promise.all(ne.map(async _e => {
+                    _e.newDocumentState = await cg(e.primaryPath, e.input.forkInstance, Ft(_e.newDocumentState), _e.assumedMasterState)
+                }));
+                var we = await r.masterWrite(ne);
+                we.forEach(_e => {
+                    var ge = _e[e.primaryPath];
+                    de.add(ge), Se[ge] = _e
+                })
+            }));
+            var re = [];
+            if (H.forEach(ne => {
+                    de.has(ne) || (e.events.processed.up.next(z[ne]), re.push(Q[ne]))
+                }), e.events.canceled.getValue()) return !1;
+            re.length > 0 && await e.input.metaInstance.bulkWrite(fo(e, re), "replication-up-write-meta");
+            var oe = !1;
+            if (de.size > 0) {
+                e.stats.up.persistToMasterHadConflicts = e.stats.up.persistToMasterHadConflicts + 1;
+                var ye = [],
+                    Pe = {};
+                if (await Promise.all(Object.entries(Se).map(([ne, we]) => {
+                        var _e = z[ne],
+                            ge = {
+                                newDocumentState: _e.newDocumentState,
+                                assumedMasterState: _e.assumedMasterState,
+                                realMasterState: we
+                            };
+                        return og(e, ge, W[ne]).then(async We => {
+                            if (We) {
+                                e.events.resolvedConflicts.next({
+                                    input: ge,
+                                    output: We
+                                }), ye.push({
+                                    previous: W[ne],
+                                    document: We
+                                });
+                                var ft = M[ne];
+                                Pe[ne] = await Sa(e, te(we), ft ? ft.metaDocument : void 0, We._rev)
+                            }
+                        })
+                    })), ye.length > 0) {
+                    oe = !0, e.stats.up.persistToMasterConflictWrites = e.stats.up.persistToMasterConflictWrites + 1;
+                    var $e = await e.input.forkInstance.bulkWrite(ye, "replication-up-write-conflict"),
+                        Be;
+                    if ($e.error.forEach(ne => {
+                            if (ne.status !== 409) {
+                                var we = ee("RC_PUSH", {
+                                    writeError: ne
+                                });
+                                e.events.error.next(we), Be = we
+                            }
+                        }), Be) throw Be;
+                    var fe = [],
+                        ve = vt(e.primaryPath, ye, $e);
+                    ve.forEach(ne => {
+                        var we = ne[e.primaryPath];
+                        fe.push(Pe[we])
+                    }), fe.length > 0 && await e.input.metaInstance.bulkWrite(fo(e, fe), "replication-up-write-conflict-meta")
+                }
+            }
+            return U(), oe
+        }).catch(P => (e.events.error.next(P), !1)), c
+    }
+}
+
+function lg(e) {
+    e = De(e), e.forkInstance = Pu(e.forkInstance), e.metaInstance = Pu(e.metaInstance);
+    var t = ng(e),
+        r = {
+            primaryPath: rt(e.forkInstance.schema.primaryKey),
+            hasAttachments: !!e.forkInstance.schema.attachments,
+            input: e,
+            checkpointKey: t,
+            downstreamBulkWriteFlag: t.then(n => "replication-downstream-" + n),
+            events: {
+                canceled: new Kt(!1),
+                paused: new Kt(!1),
+                active: {
+                    down: new Kt(!0),
+                    up: new Kt(!0)
+                },
+                processed: {
+                    down: new nt,
+                    up: new nt
+                },
+                resolvedConflicts: new nt,
+                error: new nt
+            },
+            stats: {
+                down: {
+                    addNewTask: 0,
+                    downstreamProcessChanges: 0,
+                    downstreamResyncOnce: 0,
+                    masterChangeStreamEmit: 0,
+                    persistFromMaster: 0
+                },
+                up: {
+                    forkChangeStreamEmit: 0,
+                    persistToMaster: 0,
+                    persistToMasterConflictWrites: 0,
+                    persistToMasterHadConflicts: 0,
+                    processTasks: 0,
+                    upstreamInitialSync: 0
+                }
+            },
+            firstSyncDone: {
+                down: new Kt(!1),
+                up: new Kt(!1)
+            },
+            streamQueue: {
+                down: Ze,
+                up: Ze
+            },
+            checkpointQueue: Ze,
+            lastCheckpointDoc: {}
+        };
+    return sg(r), ug(r), r
+}
+
+function qs(e) {
+    return Kr(pl([e.firstSyncDone.down.pipe(Te(t => !!t)), e.firstSyncDone.up.pipe(Te(t => !!t))])).then(() => {})
+}
+
+function ku(e) {
+    return Promise.all([e.streamQueue.up, e.streamQueue.down, e.checkpointQueue])
+}
+async function dg(e) {
+    e.events.canceled.next(!0), e.events.active.up.complete(), e.events.active.down.complete(), e.events.processed.up.complete(), e.events.processed.down.complete(), e.events.resolvedConflicts.complete(), e.events.canceled.complete(), await e.checkpointQueue
+}
+
+function hg(e) {
+    return e && typeof e.then == "function"
+}
+Promise.resolve(!1);
+var fg = Promise.resolve(!0),
+    Mt = Promise.resolve();
+
+function Er(e, t) {
+    return e || (e = 0), new Promise(function(r) {
+        return setTimeout(function() {
+            return r(t)
+        }, e)
+    })
+}
+
+function pg(e, t) {
+    return Math.floor(Math.random() * (t - e + 1) + e)
+}
+
+function yi() {
+    return Math.random().toString(36).substring(2)
+}
+var Hs = 0;
+
+function vi() {
+    var e = Date.now() * 1e3;
+    return e <= Hs && (e = Hs + 1), Hs = e, e
+}
+
+function mg() {
+    return typeof navigator < "u" && typeof navigator.locks < "u" && typeof navigator.locks.request == "function"
+}
+var yg = vi,
+    vg = "native";
+
+function gg(e) {
+    var t = {
+        time: vi(),
+        messagesCallback: null,
+        bc: new BroadcastChannel(e),
+        subFns: []
+    };
+    return t.bc.onmessage = function(r) {
+        t.messagesCallback && t.messagesCallback(r.data)
+    }, t
+}
+
+function wg(e) {
+    e.bc.close(), e.subFns = []
+}
+
+function bg(e, t) {
+    try {
+        return e.bc.postMessage(t, !1), Mt
+    } catch (r) {
+        return Promise.reject(r)
+    }
+}
+
+function Sg(e, t) {
+    e.messagesCallback = t
+}
+
+function Eg() {
+    if (typeof globalThis < "u" && globalThis.Deno && globalThis.Deno.args) return !0;
+    if ((typeof window < "u" || typeof self < "u") && typeof BroadcastChannel == "function") {
+        if (BroadcastChannel._pubkey) throw new Error("BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill");
+        return !0
+    } else return !1
+}
+
+function _g() {
+    return 150
+}
+var Pg = {
+    create: gg,
+    close: wg,
+    onMessage: Sg,
+    postMessage: bg,
+    canBeUsed: Eg,
+    type: vg,
+    averageResponseTime: _g,
+    microSeconds: yg
+};
+
+function zo() {
+    var e = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {},
+        t = JSON.parse(JSON.stringify(e));
+    return typeof t.webWorkerSupport > "u" && (t.webWorkerSupport = !0), t.idb || (t.idb = {}), t.idb.ttl || (t.idb.ttl = 1e3 * 45), t.idb.fallbackInterval || (t.idb.fallbackInterval = 150), e.idb && typeof e.idb.onclose == "function" && (t.idb.onclose = e.idb.onclose), t.localstorage || (t.localstorage = {}), t.localstorage.removeTimeout || (t.localstorage.removeTimeout = 1e3 * 60), e.methods && (t.methods = e.methods), t.node || (t.node = {}), t.node.ttl || (t.node.ttl = 1e3 * 60 * 2), t.node.maxParallelWrites || (t.node.maxParallelWrites = 2048), typeof t.node.useFastPath > "u" && (t.node.useFastPath = !0), t
+}
+var kg = vi,
+    Cg = "pubkey.broadcast-channel-0-",
+    qt = "messages",
+    Ha = {
+        durability: "relaxed"
+    },
+    Ig = "idb";
+
+function Kd() {
+    if (typeof indexedDB < "u") return indexedDB;
+    if (typeof window < "u") {
+        if (typeof window.mozIndexedDB < "u") return window.mozIndexedDB;
+        if (typeof window.webkitIndexedDB < "u") return window.webkitIndexedDB;
+        if (typeof window.msIndexedDB < "u") return window.msIndexedDB
+    }
+    return !1
+}
+
+function jo(e) {
+    e.commit && e.commit()
+}
+
+function Rg(e) {
+    var t = Kd(),
+        r = Cg + e,
+        n = t.open(r);
+    return n.onupgradeneeded = function(i) {
+        var s = i.target.result;
+        s.createObjectStore(qt, {
+            keyPath: "id",
+            autoIncrement: !0
+        })
+    }, new Promise(function(i, s) {
+        n.onerror = function(c) {
+            return s(c)
+        }, n.onsuccess = function() {
+            i(n.result)
+        }
+    })
+}
+
+function Dg(e, t, r) {
+    var n = Date.now(),
+        i = {
+            uuid: t,
+            time: n,
+            data: r
+        },
+        s = e.transaction([qt], "readwrite", Ha);
+    return new Promise(function(c, u) {
+        s.oncomplete = function() {
+            return c()
+        }, s.onerror = function(v) {
+            return u(v)
+        };
+        var h = s.objectStore(qt);
+        h.add(i), jo(s)
+    })
+}
+
+function Kg(e, t) {
+    var r = e.transaction(qt, "readonly", Ha),
+        n = r.objectStore(qt),
+        i = [],
+        s = IDBKeyRange.bound(t + 1, 1 / 0);
+    if (n.getAll) {
+        var c = n.getAll(s);
+        return new Promise(function(h, v) {
+            c.onerror = function(m) {
+                return v(m)
+            }, c.onsuccess = function(m) {
+                h(m.target.result)
+            }
+        })
+    }
+
+    function u() {
+        try {
+            return s = IDBKeyRange.bound(t + 1, 1 / 0), n.openCursor(s)
+        } catch {
+            return n.openCursor()
+        }
+    }
+    return new Promise(function(h, v) {
+        var m = u();
+        m.onerror = function(y) {
+            return v(y)
+        }, m.onsuccess = function(y) {
+            var w = y.target.result;
+            w ? w.value.id < t + 1 ? w.continue(t + 1) : (i.push(w.value), w.continue()) : (jo(r), h(i))
+        }
+    })
+}
+
+function xg(e, t) {
+    if (e.closed) return Promise.resolve([]);
+    var r = e.db.transaction(qt, "readwrite", Ha),
+        n = r.objectStore(qt);
+    return Promise.all(t.map(function(i) {
+        var s = n.delete(i);
+        return new Promise(function(c) {
+            s.onsuccess = function() {
+                return c()
+            }
+        })
+    }))
+}
+
+function Og(e, t) {
+    var r = Date.now() - t,
+        n = e.transaction(qt, "readonly", Ha),
+        i = n.objectStore(qt),
+        s = [];
+    return new Promise(function(c) {
+        i.openCursor().onsuccess = function(u) {
+            var h = u.target.result;
+            if (h) {
+                var v = h.value;
+                v.time < r ? (s.push(v), h.continue()) : (jo(n), c(s))
+            } else c(s)
+        }
+    })
+}
+
+function Tg(e) {
+    return Og(e.db, e.options.idb.ttl).then(function(t) {
+        return xg(e, t.map(function(r) {
+            return r.id
+        }))
+    })
+}
+
+function Ag(e, t) {
+    return t = zo(t), Rg(e).then(function(r) {
+        var n = {
+            closed: !1,
+            lastCursorId: 0,
+            channelName: e,
+            options: t,
+            uuid: yi(),
+            eMIs: new qo(t.idb.ttl * 2),
+            writeBlockPromise: Mt,
+            messagesCallback: null,
+            readQueuePromises: [],
+            db: r
+        };
+        return r.onclose = function() {
+            n.closed = !0, t.idb.onclose && t.idb.onclose()
+        }, xd(n), n
+    })
+}
+
+function xd(e) {
+    e.closed || Od(e).then(function() {
+        return Er(e.options.idb.fallbackInterval)
+    }).then(function() {
+        return xd(e)
+    })
+}
+
+function Ng(e, t) {
+    return !(e.uuid === t.uuid || t.eMIs.has(e.id) || e.data.time < t.messagesCallbackTime)
+}
+
+function Od(e) {
+    return e.closed || !e.messagesCallback ? Mt : Kg(e.db, e.lastCursorId).then(function(t) {
+        var r = t.filter(function(n) {
+            return !!n
+        }).map(function(n) {
+            return n.id > e.lastCursorId && (e.lastCursorId = n.id), n
+        }).filter(function(n) {
+            return Ng(n, e)
+        }).sort(function(n, i) {
+            return n.time - i.time
+        });
+        return r.forEach(function(n) {
+            e.messagesCallback && (e.eMIs.add(n.id), e.messagesCallback(n.data))
+        }), Mt
+    })
+}
+
+function Bg(e) {
+    e.closed = !0, e.db.close()
+}
+
+function Mg(e, t) {
+    return e.writeBlockPromise = e.writeBlockPromise.then(function() {
+        return Dg(e.db, e.uuid, t)
+    }).then(function() {
+        pg(0, 10) === 0 && Tg(e)
+    }), e.writeBlockPromise
+}
+
+function Fg(e, t, r) {
+    e.messagesCallbackTime = r, e.messagesCallback = t, Od(e)
+}
+
+function Lg() {
+    return !!Kd()
+}
+
+function Ug(e) {
+    return e.idb.fallbackInterval * 2
+}
+var Wg = {
+        create: Ag,
+        close: Bg,
+        onMessage: Fg,
+        postMessage: Mg,
+        canBeUsed: Lg,
+        type: Ig,
+        averageResponseTime: Ug,
+        microSeconds: kg
+    },
+    $g = vi,
+    qg = "pubkey.broadcastChannel-",
+    Hg = "localstorage";
+
+function Td() {
+    var e;
+    if (typeof window > "u") return null;
+    try {
+        e = window.localStorage, e = window["ie8-eventlistener/storage"] || window.localStorage
+    } catch {}
+    return e
+}
+
+function Ad(e) {
+    return qg + e
+}
+
+function Jg(e, t) {
+    return new Promise(function(r) {
+        Er().then(function() {
+            var n = Ad(e.channelName),
+                i = {
+                    token: yi(),
+                    time: Date.now(),
+                    data: t,
+                    uuid: e.uuid
+                },
+                s = JSON.stringify(i);
+            Td().setItem(n, s);
+            var c = document.createEvent("Event");
+            c.initEvent("storage", !0, !0), c.key = n, c.newValue = s, window.dispatchEvent(c), r()
+        })
+    })
+}
+
+function zg(e, t) {
+    var r = Ad(e),
+        n = function(s) {
+            s.key === r && t(JSON.parse(s.newValue))
+        };
+    return window.addEventListener("storage", n), n
+}
+
+function jg(e) {
+    window.removeEventListener("storage", e)
+}
+
+function Gg(e, t) {
+    if (t = zo(t), !Nd()) throw new Error("BroadcastChannel: localstorage cannot be used");
+    var r = yi(),
+        n = new qo(t.localstorage.removeTimeout),
+        i = {
+            channelName: e,
+            uuid: r,
+            eMIs: n
+        };
+    return i.listener = zg(e, function(s) {
+        i.messagesCallback && s.uuid !== r && (!s.token || n.has(s.token) || s.data.time && s.data.time < i.messagesCallbackTime || (n.add(s.token), i.messagesCallback(s.data)))
+    }), i
+}
+
+function Vg(e) {
+    jg(e.listener)
+}
+
+function Yg(e, t, r) {
+    e.messagesCallbackTime = r, e.messagesCallback = t
+}
+
+function Nd() {
+    var e = Td();
+    if (!e) return !1;
+    try {
+        var t = "__broadcastchannel_check";
+        e.setItem(t, "works"), e.removeItem(t)
+    } catch {
+        return !1
+    }
+    return !0
+}
+
+function Qg() {
+    var e = 120,
+        t = navigator.userAgent.toLowerCase();
+    return t.includes("safari") && !t.includes("chrome") ? e * 2 : e
+}
+var Xg = {
+        create: Gg,
+        close: Vg,
+        onMessage: Yg,
+        postMessage: Jg,
+        canBeUsed: Nd,
+        type: Hg,
+        averageResponseTime: Qg,
+        microSeconds: $g
+    },
+    Bd = vi,
+    Zg = "simulate",
+    Go = new Set;
+
+function ew(e) {
+    var t = {
+        time: Bd(),
+        name: e,
+        messagesCallback: null
+    };
+    return Go.add(t), t
+}
+
+function tw(e) {
+    Go.delete(e)
+}
+var Md = 5;
+
+function rw(e, t) {
+    return new Promise(function(r) {
+        return setTimeout(function() {
+            var n = Array.from(Go);
+            n.forEach(function(i) {
+                i.name === e.name && i !== e && i.messagesCallback && i.time < t.time && i.messagesCallback(t)
+            }), r()
+        }, Md)
+    })
+}
+
+function nw(e, t) {
+    e.messagesCallback = t
+}
+
+function iw() {
+    return !0
+}
+
+function aw() {
+    return Md
+}
+var sw = {
+        create: ew,
+        close: tw,
+        onMessage: nw,
+        postMessage: rw,
+        canBeUsed: iw,
+        type: Zg,
+        averageResponseTime: aw,
+        microSeconds: Bd
+    },
+    Cu = [Pg, Wg, Xg];
+
+function ow(e) {
+    var t = [].concat(e.methods, Cu).filter(Boolean);
+    if (e.type) {
+        if (e.type === "simulate") return sw;
+        var r = t.find(function(i) {
+            return i.type === e.type
+        });
+        if (r) return r;
+        throw new Error("method-type " + e.type + " not found")
+    }
+    e.webWorkerSupport || (t = t.filter(function(i) {
+        return i.type !== "idb"
+    }));
+    var n = t.find(function(i) {
+        return i.canBeUsed()
+    });
+    if (n) return n;
+    throw new Error("No usable method found in " + JSON.stringify(Cu.map(function(i) {
+        return i.type
+    })))
+}
+var Fd = new Set,
+    cw = 0,
+    Vo = function(t, r) {
+        this.id = cw++, Fd.add(this), this.name = t, this.options = zo(r), this.method = ow(this.options), this._iL = !1, this._onML = null, this._addEL = {
+            message: [],
+            internal: []
+        }, this._uMP = new Set, this._befC = [], this._prepP = null, uw(this)
+    };
+Vo._pubkey = !0;
+Vo.prototype = {
+    postMessage: function(t) {
+        if (this.closed) throw new Error("BroadcastChannel.postMessage(): Cannot post message after channel has closed " + JSON.stringify(t));
+        return Iu(this, "message", t)
+    },
+    postInternal: function(t) {
+        return Iu(this, "internal", t)
+    },
+    set onmessage(e) {
+        var t = this.method.microSeconds(),
+            r = {
+                time: t,
+                fn: e
+            };
+        Du(this, "message", this._onML), e && typeof e == "function" ? (this._onML = r, Ru(this, "message", r)) : this._onML = null
+    },
+    addEventListener: function(t, r) {
+        var n = this.method.microSeconds(),
+            i = {
+                time: n,
+                fn: r
+            };
+        Ru(this, t, i)
+    },
+    removeEventListener: function(t, r) {
+        var n = this._addEL[t].find(function(i) {
+            return i.fn === r
+        });
+        Du(this, t, n)
+    },
+    close: function() {
+        var t = this;
+        if (!this.closed) {
+            Fd.delete(this), this.closed = !0;
+            var r = this._prepP ? this._prepP : Mt;
+            return this._onML = null, this._addEL.message = [], r.then(function() {
+                return Promise.all(Array.from(t._uMP))
+            }).then(function() {
+                return Promise.all(t._befC.map(function(n) {
+                    return n()
+                }))
+            }).then(function() {
+                return t.method.close(t._state)
+            })
+        }
+    },
+    get type() {
+        return this.method.type
+    },
+    get isClosed() {
+        return this.closed
+    }
+};
+
+function Iu(e, t, r) {
+    var n = e.method.microSeconds(),
+        i = {
+            time: n,
+            type: t,
+            data: r
+        },
+        s = e._prepP ? e._prepP : Mt;
+    return s.then(function() {
+        var c = e.method.postMessage(e._state, i);
+        return e._uMP.add(c), c.catch().then(function() {
+            return e._uMP.delete(c)
+        }), c
+    })
+}
+
+function uw(e) {
+    var t = e.method.create(e.name, e.options);
+    hg(t) ? (e._prepP = t, t.then(function(r) {
+        e._state = r
+    })) : e._state = t
+}
+
+function Ld(e) {
+    return e._addEL.message.length > 0 || e._addEL.internal.length > 0
+}
+
+function Ru(e, t, r) {
+    e._addEL[t].push(r), lw(e)
+}
+
+function Du(e, t, r) {
+    e._addEL[t] = e._addEL[t].filter(function(n) {
+        return n !== r
+    }), dw(e)
+}
+
+function lw(e) {
+    if (!e._iL && Ld(e)) {
+        var t = function(i) {
+                e._addEL[i.type].forEach(function(s) {
+                    i.time >= s.time && s.fn(i.data)
+                })
+            },
+            r = e.method.microSeconds();
+        e._prepP ? e._prepP.then(function() {
+            e._iL = !0, e.method.onMessage(e._state, t, r)
+        }) : (e._iL = !0, e.method.onMessage(e._state, t, r))
+    }
+}
+
+function dw(e) {
+    if (e._iL && !Ld(e)) {
+        e._iL = !1;
+        var t = e.method.microSeconds();
+        e.method.onMessage(e._state, null, t)
+    }
+}
+
+function hw(e) {
+    if (typeof WorkerGlobalScope == "function" && self instanceof WorkerGlobalScope) {
+        var t = self.close.bind(self);
+        self.close = function() {
+            return e(), t()
+        }
+    } else {
+        if (typeof window.addEventListener != "function") return;
+        window.addEventListener("beforeunload", function() {
+            e()
+        }, !0), window.addEventListener("unload", function() {
+            e()
+        }, !0)
+    }
+}
+
+function fw(e) {
+    process.on("exit", function() {
+        return e()
+    }), process.on("beforeExit", function() {
+        return e().then(function() {
+            return process.exit()
+        })
+    }), process.on("SIGINT", function() {
+        return e().then(function() {
+            return process.exit()
+        })
+    }), process.on("uncaughtException", function(t) {
+        return e().then(function() {
+            console.trace(t), process.exit(101)
+        })
+    })
+}
+var pw = Object.prototype.toString.call(typeof process < "u" ? process : 0) === "[object process]",
+    mw = pw ? fw : hw,
+    Fn = new Set,
+    Ku = !1;
+
+function yw() {
+    Ku || (Ku = !0, mw(gw))
+}
+
+function vw(e) {
+    if (yw(), typeof e != "function") throw new Error("Listener is no function");
+    Fn.add(e);
+    var t = {
+        remove: function() {
+            return Fn.delete(e)
+        },
+        run: function() {
+            return Fn.delete(e), e()
+        }
+    };
+    return t
+}
+
+function gw() {
+    var e = [];
+    return Fn.forEach(function(t) {
+        e.push(t()), Fn.delete(t)
+    }), Promise.all(e)
+}
+
+function Rr(e, t) {
+    var r = {
+        context: "leader",
+        action: t,
+        token: e.token
+    };
+    return e.broadcastChannel.postInternal(r)
+}
+
+function Ud(e) {
+    e.isLeader = !0, e._hasLeader = !0;
+    var t = vw(function() {
+        return e.die()
+    });
+    e._unl.push(t);
+    var r = function(i) {
+        i.context === "leader" && i.action === "apply" && Rr(e, "tell"), i.context === "leader" && i.action === "tell" && !e._dpLC && (e._dpLC = !0, e._dpL(), Rr(e, "tell"))
+    };
+    return e.broadcastChannel.addEventListener("internal", r), e._lstns.push(r), Rr(e, "tell")
+}
+var Wd = function(t, r) {
+    var n = this;
+    this.broadcastChannel = t, t._befC.push(function() {
+        return n.die()
+    }), this._options = r, this.isLeader = !1, this.isDead = !1, this.token = yi(), this._lstns = [], this._unl = [], this._dpL = function() {}, this._dpLC = !1, this._wKMC = {}, this.lN = "pubkey-bc||" + t.method.type + "||" + t.name
+};
+Wd.prototype = {
+    hasLeader: function() {
+        var t = this;
+        return navigator.locks.query().then(function(r) {
+            var n = r.held ? r.held.filter(function(i) {
+                return i.name === t.lN
+            }) : [];
+            return !!(n && n.length > 0)
+        })
+    },
+    awaitLeadership: function() {
+        var t = this;
+        if (!this._wLMP) {
+            this._wKMC.c = new AbortController;
+            var r = new Promise(function(n, i) {
+                t._wKMC.res = n, t._wKMC.rej = i
+            });
+            this._wLMP = new Promise(function(n) {
+                navigator.locks.request(t.lN, {
+                    signal: t._wKMC.c.signal
+                }, function() {
+                    return t._wKMC.c = void 0, Ud(t), n(), r
+                }).catch(function() {})
+            })
+        }
+        return this._wLMP
+    },
+    set onduplicate(e) {},
+    die: function() {
+        var t = this;
+        return this._lstns.forEach(function(r) {
+            return t.broadcastChannel.removeEventListener("internal", r)
+        }), this._lstns = [], this._unl.forEach(function(r) {
+            return r.remove()
+        }), this._unl = [], this.isLeader && (this.isLeader = !1), this.isDead = !0, this._wKMC.res && this._wKMC.res(), this._wKMC.c && this._wKMC.c.abort("LeaderElectionWebLock.die() called"), Rr(this, "death")
+    }
+};
+var $d = function(t, r) {
+    var n = this;
+    this.broadcastChannel = t, this._options = r, this.isLeader = !1, this._hasLeader = !1, this.isDead = !1, this.token = yi(), this._aplQ = Mt, this._aplQC = 0, this._unl = [], this._lstns = [], this._dpL = function() {}, this._dpLC = !1;
+    var i = function(c) {
+        c.context === "leader" && (c.action === "death" && (n._hasLeader = !1), c.action === "tell" && (n._hasLeader = !0))
+    };
+    this.broadcastChannel.addEventListener("internal", i), this._lstns.push(i)
+};
+$d.prototype = {
+    hasLeader: function() {
+        return Promise.resolve(this._hasLeader)
+    },
+    applyOnce: function(t) {
+        var r = this;
+        if (this.isLeader) return Er(0, !0);
+        if (this.isDead) return Er(0, !1);
+        if (this._aplQC > 1) return this._aplQ;
+        var n = function() {
+            if (r.isLeader) return fg;
+            var s = !1,
+                c, u = new Promise(function(m) {
+                    c = function() {
+                        s = !0, m()
+                    }
+                }),
+                h = function(y) {
+                    y.context === "leader" && y.token != r.token && (y.action === "apply" && y.token > r.token && c(), y.action === "tell" && (c(), r._hasLeader = !0))
+                };
+            r.broadcastChannel.addEventListener("internal", h);
+            var v = t ? r._options.responseTime * 4 : r._options.responseTime;
+            return Rr(r, "apply").then(function() {
+                return Promise.race([Er(v), u.then(function() {
+                    return Promise.reject(new Error)
+                })])
+            }).then(function() {
+                return Rr(r, "apply")
+            }).then(function() {
+                return Promise.race([Er(v), u.then(function() {
+                    return Promise.reject(new Error)
+                })])
+            }).catch(function() {}).then(function() {
+                return r.broadcastChannel.removeEventListener("internal", h), s ? !1 : Ud(r).then(function() {
+                    return !0
+                })
+            })
+        };
+        return this._aplQC = this._aplQC + 1, this._aplQ = this._aplQ.then(function() {
+            return n()
+        }).then(function() {
+            r._aplQC = r._aplQC - 1
+        }), this._aplQ.then(function() {
+            return r.isLeader
+        })
+    },
+    awaitLeadership: function() {
+        return this._aLP || (this._aLP = ww(this)), this._aLP
+    },
+    set onduplicate(e) {
+        this._dpL = e
+    },
+    die: function() {
+        var t = this;
+        return this._lstns.forEach(function(r) {
+            return t.broadcastChannel.removeEventListener("internal", r)
+        }), this._lstns = [], this._unl.forEach(function(r) {
+            return r.remove()
+        }), this._unl = [], this.isLeader && (this._hasLeader = !1, this.isLeader = !1), this.isDead = !0, Rr(this, "death")
+    }
+};
+
+function ww(e) {
+    return e.isLeader ? Mt : new Promise(function(t) {
+        var r = !1;
+
+        function n() {
+            r || (r = !0, e.broadcastChannel.removeEventListener("internal", s), t(!0))
+        }
+        e.applyOnce().then(function() {
+            e.isLeader && n()
+        });
+        var i = function() {
+            return Er(e._options.fallbackInterval).then(function() {
+                if (!(e.isDead || r))
+                    if (e.isLeader) n();
+                    else return e.applyOnce(!0).then(function() {
+                        e.isLeader ? n() : i()
+                    })
+            })
+        };
+        i();
+        var s = function(u) {
+            u.context === "leader" && u.action === "death" && (e._hasLeader = !1, e.applyOnce().then(function() {
+                e.isLeader && n()
+            }))
+        };
+        e.broadcastChannel.addEventListener("internal", s), e._lstns.push(s)
+    })
+}
+
+function bw(e, t) {
+    return e || (e = {}), e = JSON.parse(JSON.stringify(e)), e.fallbackInterval || (e.fallbackInterval = 3e3), e.responseTime || (e.responseTime = t.method.averageResponseTime(t.options)), e
+}
+
+function Sw(e, t) {
+    if (e._leaderElector) throw new Error("BroadcastChannel already has a leader-elector");
+    t = bw(t, e);
+    var r = mg() ? new Wd(e, t) : new $d(e, t);
+    return e._befC.push(function() {
+        return r.die()
+    }), e._leaderElector = r, r
+}
+var Ea = new Map;
+
+function qd(e, t, r, n) {
+    var i = Ea.get(t);
+    return i || (i = {
+        bc: new Vo(["RxDB:", e, r].join("|")),
+        refs: new Set
+    }, Ea.set(t, i)), i.refs.add(n), i.bc
+}
+
+function po(e, t) {
+    var r = Ea.get(e);
+    if (r && (r.refs.delete(t), r.refs.size === 0)) return Ea.delete(e), r.bc.close()
+}
+
+function Hd(e, t, r, n) {
+    if (t.multiInstance) {
+        var i = qd(e, t.databaseInstanceToken, r.databaseName, r),
+            s = new nt,
+            c = w => {
+                w.storageName === e && w.databaseName === t.databaseName && w.collectionName === t.collectionName && w.version === t.schema.version && s.next(w.eventBulk)
+            };
+        i.addEventListener("message", c);
+        var u = r.changeStream(),
+            h = !1,
+            v = u.subscribe(w => {
+                h || i.postMessage({
+                    storageName: e,
+                    databaseName: t.databaseName,
+                    collectionName: t.collectionName,
+                    version: t.schema.version,
+                    eventBulk: w
+                })
+            });
+        r.changeStream = function() {
+            return s.asObservable().pipe(of(u))
+        };
+        var m = r.close.bind(r);
+        r.close = async function() {
+            return h = !0, v.unsubscribe(), i.removeEventListener("message", c), await po(t.databaseInstanceToken, r), m()
+        };
+        var y = r.remove.bind(r);
+        r.remove = async function() {
+            return h = !0, v.unsubscribe(), i.removeEventListener("message", c), await po(t.databaseInstanceToken, r), y()
+        }
+    }
+}
+
+function Ew(e, t) {
+    var r = t.map(n => {
+        var i = $t(e, n);
+        if (!i) throw new Error("not in schema: " + n);
+        var s = i.type,
+            c;
+        (s === "number" || s === "integer") && (c = Yo(i));
+        var u = kl(n),
+            h = i.maxLength ? i.maxLength : 0,
+            v;
+        s === "string" ? v = y => {
+            var w = u(y);
+            return w || (w = ""), w.padEnd(h, " ")
+        } : s === "boolean" ? v = y => {
+            var w = u(y);
+            return w ? "1" : "0"
+        } : v = y => {
+            var w = u(y);
+            return _a(c, w)
+        };
+        var m = {
+            fieldName: n,
+            schemaPart: i,
+            parsedLengths: c,
+            getValue: u,
+            getIndexStringPart: v
+        };
+        return m
+    });
+    return r
+}
+
+function Jd(e, t) {
+    var r = Ew(e, t),
+        n = r.length,
+        i = r.map(c => c.getIndexStringPart),
+        s = function(c) {
+            for (var u = "", h = 0; h < n; ++h) u += i[h](c);
+            return u
+        };
+    return s
+}
+
+function Yo(e) {
+    var t = Math.floor(e.minimum),
+        r = Math.ceil(e.maximum),
+        n = e.multipleOf,
+        i = r - t,
+        s = i.toString().length,
+        c = n.toString().split("."),
+        u = 0;
+    return c.length > 1 && (u = c[1].length), {
+        minimum: t,
+        maximum: r,
+        nonDecimals: s,
+        decimals: u,
+        roundedMinimum: t
+    }
+}
+
+function _a(e, t) {
+    typeof t > "u" && (t = 0), t < e.minimum && (t = e.minimum), t > e.maximum && (t = e.maximum);
+    var r = (Math.floor(t) - e.roundedMinimum).toString(),
+        n = r.padStart(e.nonDecimals, "0");
+    if (e.decimals > 0) {
+        var i = t.toString().split("."),
+            s = i.length > 1 ? i[1] : "0";
+        n += s.padEnd(e.decimals, "0")
+    }
+    return n
+}
+
+function ai(e, t, r) {
+    var n = "";
+    return t.forEach((i, s) => {
+        var c = $t(e, i),
+            u = r[s],
+            h = c.type;
+        switch (h) {
+            case "string":
+                var v = te(c.maxLength, "maxLength not set");
+                typeof u == "string" ? n += u.padEnd(v, " ") : n += "".padEnd(v, " ");
+                break;
+            case "boolean":
+                if (u === null) n += "0";
+                else if (u === St) n += "0";
+                else if (u === bt) n += "1";
+                else {
+                    var m = u ? "1" : "0";
+                    n += m
+                }
+                break;
+            case "number":
+            case "integer":
+                var y = Yo(c);
+                if (u === null || u === St) {
+                    var w = "0";
+                    n += w.repeat(y.nonDecimals + y.decimals)
+                } else if (u === bt) n += _a(y, y.maximum);
+                else {
+                    var S = _a(y, u);
+                    n += S
+                }
+                break;
+            default:
+                throw new Error("unknown index type " + h)
+        }
+    }), n
+}
+
+function Ja(e, t, r) {
+    var n = "";
+    return t.forEach((i, s) => {
+        var c = $t(e, i),
+            u = r[s],
+            h = c.type;
+        switch (h) {
+            case "string":
+                var v = te(c.maxLength, "maxLength not set");
+                typeof u == "string" && u !== bt ? n += u.padEnd(v, " ") : u === St ? n += "".padEnd(v, " ") : n += "".padEnd(v, bt);
+                break;
+            case "boolean":
+                if (u === null) n += "1";
+                else {
+                    var m = u ? "1" : "0";
+                    n += m
+                }
+                break;
+            case "number":
+            case "integer":
+                var y = Yo(c);
+                if (u === null || u === bt) {
+                    var w = "9";
+                    n += w.repeat(y.nonDecimals + y.decimals)
+                } else if (u === St) {
+                    var S = "0";
+                    n += S.repeat(y.nonDecimals + y.decimals)
+                } else n += _a(y, u);
+                break;
+            default:
+                throw new Error("unknown index type " + h)
+        }
+    }), n
+}
+var zd = new WeakMap,
+    _w = new WeakMap;
+
+function xu(e) {
+    return ut(_w, e, () => Sw(e))
+}
+
+function Pw() {
+    var e = qd(this.storage.name, this.token, this.name, this),
+        t = this.close.bind(this);
+    this.close = function() {
+        return po(this.token, this), t()
+    };
+    var r = xu(e);
+    return r || (r = xu(e), zd.set(this, r)), this.leaderElector = () => r, r
+}
+
+function kw() {
+    return this.multiInstance ? this.leaderElector().isLeader : !0
+}
+
+function Cw() {
+    return this.multiInstance ? this.leaderElector().awaitLeadership().then(() => !0) : di
+}
+
+function Iw(e) {
+    var t = zd.get(e);
+    t && t.die()
+}
+var Rw = !0,
+    Dw = {
+        RxDatabase: e => {
+            e.leaderElector = Pw, e.isLeader = kw, e.waitForLeadership = Cw
+        }
+    },
+    jd = {
+        name: "leader-election",
+        rxdb: Rw,
+        prototypes: Dw,
+        hooks: {
+            preCloseRxDatabase: {
+                after: Iw
+            }
+        }
+    },
+    Ou = e => Promise.resolve(e);
+
+function Tu(e, t) {
+    if (e === "_deleted") return t;
+    t = De(t);
+    var r = !!t._deleted;
+    return t[e] = r, delete t._deleted, t
+}
+
+function Js(e, t, r) {
+    return r.map(n => {
+        var i = De(n);
+        if (t !== "_deleted") {
+            var s = !!i[t];
+            i._deleted = s, delete i[t]
+        } else i._deleted = !!i._deleted;
+        var c = e.schema.primaryPath;
+        return i[c] = ur(e.schema.jsonSchema, i), i
+    })
+}
+
+function Au(e, t) {
+    if (typeof window > "u" || typeof window != "object" || typeof window.addEventListener > "u" || navigator.onLine) return e.promiseWait(t);
+    var r, n = new Promise(i => {
+        r = () => {
+            window.removeEventListener("online", r), i()
+        }, window.addEventListener("online", r)
+    });
+    return Promise.race([n, e.promiseWait(t)]).then(() => {
+        window.removeEventListener("online", r)
+    })
+}
+
+function Kw(e) {
+    function t() {
+        if (!(typeof document > "u" || typeof document.dispatchEvent != "function")) {
+            var n = new Event("mousemove");
+            document.dispatchEvent(n)
+        }
+    }
+    var r = setInterval(t, 20 * 1e3);
+    e.onCancel.push(() => clearInterval(r))
+}
+var Qo = new WeakMap,
+    xw = function() {
+        function e(r, n, i, s, c, u, h, v, m) {
+            this.subs = [], this.subjects = {
+                received: new nt,
+                sent: new nt,
+                error: new nt,
+                canceled: new Kt(!1),
+                active: new Kt(!1)
+            }, this.received$ = this.subjects.received.asObservable(), this.sent$ = this.subjects.sent.asObservable(), this.error$ = this.subjects.error.asObservable(), this.canceled$ = this.subjects.canceled.asObservable(), this.active$ = this.subjects.active.asObservable(), this.wasStarted = !1, this.startQueue = Ze, this.onCancel = [], this.callOnStart = void 0, this.remoteEvents$ = new nt, this.replicationIdentifier = r, this.collection = n, this.deletedField = i, this.pull = s, this.push = c, this.live = u, this.retryTime = h, this.autoStart = v, this.toggleOnDocumentVisible = m, this.metaInfoPromise = (async () => {
+                var S = "rx-replication-meta-" + await n.database.hashFunction([this.collection.name, this.replicationIdentifier].join("-")),
+                    b = ag(this.collection.schema.jsonSchema, td(this.collection.schema.jsonSchema));
+                return {
+                    collectionName: S,
+                    schema: b
+                }
+            })();
+            var y = ut(Qo, n, () => []);
+            y.push(this), this.collection.onClose.push(() => this.cancel()), Object.keys(this.subjects).forEach(S => {
+                Object.defineProperty(this, S + "$", {
+                    get: function() {
+                        return this.subjects[S].asObservable()
+                    }
+                })
+            });
+            var w = new Promise(S => {
+                this.callOnStart = S
+            });
+            this.startPromise = w
+        }
+        var t = e.prototype;
+        return t.start = function() {
+            return this.startQueue = this.startQueue.then(() => this._start()), this.startQueue
+        }, t._start = async function() {
+            if (!this.isStopped()) {
+                if (this.internalReplicationState && this.internalReplicationState.events.paused.next(!1), this.wasStarted) {
+                    this.reSync();
+                    return
+                }
+                this.wasStarted = !0, this.toggleOnDocumentVisible || Kw(this);
+                var n = this.pull && this.pull.modifier ? this.pull.modifier : Ou,
+                    i = this.push && this.push.modifier ? this.push.modifier : Ou,
+                    s = this.collection.database,
+                    c = await this.metaInfoPromise,
+                    [u] = await Promise.all([this.collection.database.storage.createStorageInstance({
+                        databaseName: s.name,
+                        collectionName: c.collectionName,
+                        databaseInstanceToken: s.token,
+                        multiInstance: s.multiInstance,
+                        options: {},
+                        schema: c.schema,
+                        password: s.password,
+                        devMode: Ae.isDevMode()
+                    }), Mv(this.collection, c.collectionName, c.schema)]);
+                this.metaInstance = u, this.internalReplicationState = lg({
+                    pushBatchSize: this.push && this.push.batchSize ? this.push.batchSize : 100,
+                    pullBatchSize: this.pull && this.pull.batchSize ? this.pull.batchSize : 100,
+                    initialCheckpoint: {
+                        upstream: this.push ? this.push.initialCheckpoint : void 0,
+                        downstream: this.pull ? this.pull.initialCheckpoint : void 0
+                    },
+                    forkInstance: this.collection.storageInstance,
+                    metaInstance: this.metaInstance,
+                    hashFunction: s.hashFunction,
+                    identifier: "rxdbreplication" + this.replicationIdentifier,
+                    conflictHandler: this.collection.conflictHandler,
+                    replicationHandler: {
+                        masterChangeStream$: this.remoteEvents$.asObservable().pipe(Te(h => !!this.pull), Dr(async h => {
+                            if (h === "RESYNC") return h;
+                            var v = De(h);
+                            return v.documents = Js(this.collection, this.deletedField, v.documents), v.documents = await Promise.all(v.documents.map(m => n(m))), v
+                        })),
+                        masterChangesSince: async (h, v) => {
+                            if (!this.pull) return {
+                                checkpoint: null,
+                                documents: []
+                            };
+                            for (var m = !1, y = {}; !m && !this.isStoppedOrPaused();) try {
+                                y = await this.pull.handler(h, v), m = !0
+                            } catch (b) {
+                                var w = ee("RC_PULL", {
+                                    checkpoint: h,
+                                    errors: an(b).map(P => tu(P)),
+                                    direction: "pull"
+                                });
+                                this.subjects.error.next(w), await Au(this.collection, te(this.retryTime))
+                            }
+                            if (this.isStoppedOrPaused()) return {
+                                checkpoint: null,
+                                documents: []
+                            };
+                            var S = De(y);
+                            return S.documents = Js(this.collection, this.deletedField, S.documents), S.documents = await Promise.all(S.documents.map(b => n(b))), S
+                        },
+                        masterWrite: async h => {
+                            if (!this.push) return [];
+                            var v = !1;
+                            await Wt("preReplicationMasterWrite", {
+                                rows: h,
+                                collection: this.collection
+                            });
+                            var m = await Promise.all(h.map(async P => (P.newDocumentState = await i(P.newDocumentState), P.newDocumentState === null ? null : (P.assumedMasterState && (P.assumedMasterState = await i(P.assumedMasterState)), this.deletedField !== "_deleted" && (P.newDocumentState = Tu(this.deletedField, P.newDocumentState), P.assumedMasterState && (P.assumedMasterState = Tu(this.deletedField, P.assumedMasterState))), P)))),
+                                y = m.filter(Cp),
+                                w = null;
+                            for (y.length === 0 && (v = !0, w = []); !v && !this.isStoppedOrPaused();) try {
+                                if (w = await this.push.handler(y), !Array.isArray(w)) throw ee("RC_PUSH_NO_AR", {
+                                    pushRows: h,
+                                    direction: "push",
+                                    args: {
+                                        result: w
+                                    }
+                                });
+                                v = !0
+                            } catch (P) {
+                                var S = P.rxdb ? P : ee("RC_PUSH", {
+                                    pushRows: h,
+                                    errors: an(P).map(T => tu(T)),
+                                    direction: "push"
+                                });
+                                this.subjects.error.next(S), await Au(this.collection, te(this.retryTime))
+                            }
+                            if (this.isStoppedOrPaused()) return [];
+                            await Wt("preReplicationMasterWriteDocumentsHandle", {
+                                result: w,
+                                collection: this.collection
+                            });
+                            var b = Js(this.collection, this.deletedField, te(w));
+                            return b
+                        }
+                    }
+                }), this.subs.push(this.internalReplicationState.events.error.subscribe(h => {
+                    this.subjects.error.next(h)
+                }), this.internalReplicationState.events.processed.down.subscribe(h => this.subjects.received.next(h.document)), this.internalReplicationState.events.processed.up.subscribe(h => {
+                    this.subjects.sent.next(h.newDocumentState)
+                }), pl([this.internalReplicationState.events.active.down, this.internalReplicationState.events.active.up]).subscribe(([h, v]) => {
+                    var m = h || v;
+                    this.subjects.active.next(m)
+                })), this.pull && this.pull.stream$ && this.live && this.subs.push(this.pull.stream$.subscribe({
+                    next: h => {
+                        this.isStoppedOrPaused() || this.remoteEvents$.next(h)
+                    },
+                    error: h => {
+                        this.subjects.error.next(h)
+                    }
+                })), this.live || (await qs(this.internalReplicationState), await ku(this.internalReplicationState), await this._cancel()), this.callOnStart()
+            }
+        }, t.pause = function() {
+            return this.startQueue = this.startQueue.then(() => {
+                te(this.internalReplicationState).events.paused.next(!0)
+            }), this.startQueue
+        }, t.isPaused = function() {
+            return !!(this.internalReplicationState && this.internalReplicationState.events.paused.getValue())
+        }, t.isStopped = function() {
+            return !!this.subjects.canceled.getValue()
+        }, t.isStoppedOrPaused = function() {
+            return this.isPaused() || this.isStopped()
+        }, t.awaitInitialReplication = async function() {
+            return await this.startPromise, qs(te(this.internalReplicationState))
+        }, t.awaitInSync = async function() {
+            await this.startPromise, await qs(te(this.internalReplicationState));
+            for (var n = 2; n > 0;) n--, await this.collection.database.requestIdlePromise(), await ku(te(this.internalReplicationState));
+            return !0
+        }, t.reSync = function() {
+            this.remoteEvents$.next("RESYNC")
+        }, t.emitEvent = function(n) {
+            this.remoteEvents$.next(n)
+        }, t.cancel = async function() {
+            this.startQueue = this.startQueue.catch(() => {}).then(async () => {
+                await this._cancel()
+            }), await this.startQueue
+        }, t._cancel = async function(n = !1) {
+            if (this.isStopped()) return Ut;
+            var i = this.onCancel.map(s => Lp(s()));
+            return this.internalReplicationState && await dg(this.internalReplicationState), this.metaInstance && !n && i.push(te(this.internalReplicationState).checkpointQueue.then(() => te(this.metaInstance).close())), this.subs.forEach(s => s.unsubscribe()), this.subjects.canceled.next(!0), this.subjects.active.complete(), this.subjects.canceled.complete(), this.subjects.error.complete(), this.subjects.received.complete(), this.subjects.sent.complete(), Promise.all(i)
+        }, t.remove = async function() {
+            return this.startQueue = this.startQueue.then(async () => {
+                var n = await this.metaInfoPromise;
+                await this._cancel(!0), await te(this.internalReplicationState).checkpointQueue.then(() => te(this.metaInstance).remove()), await Fv(this.collection, n.collectionName, n.schema)
+            }), this.startQueue
+        }, e
+    }();
+
+function Ow({
+    replicationIdentifier: e,
+    collection: t,
+    deletedField: r = "_deleted",
+    pull: n,
+    push: i,
+    live: s = !0,
+    retryTime: c = 1e3 * 5,
+    waitForLeadership: u = !0,
+    autoStart: h = !0,
+    toggleOnDocumentVisible: v = !1
+}) {
+    if (ia(jd), !n && !i) throw ee("UT3", {
+        collection: t.name,
+        args: {
+            replicationIdentifier: e
+        }
+    });
+    var m = new xw(e, t, r, n, i, s, c, h, v);
+    if (v && typeof document < "u" && typeof document.addEventListener == "function" && typeof document.visibilityState == "string") {
+        var y = () => {
+            if (!m.isStopped()) {
+                var w = document.visibilityState === "visible";
+                w ? m.start() : t.database.isLeader() || m.pause()
+            }
+        };
+        document.addEventListener("visibilitychange", y), m.onCancel.push(() => document.removeEventListener("visibilitychange", y))
+    }
+    return Tw(u, m), m
+}
+
+function Tw(e, t) {
+    var r = e && t.collection.database.multiInstance,
+        n = r ? t.collection.database.waitForLeadership() : di;
+    return n.then(() => {
+        t.isStopped() || t.autoStart && t.start()
+    })
+}
+const Aw = {
+    Free: "FREE",
+    Pro: "PRO"
+};
+
+function Nu(e) {
+    return Nw(e)
+}
+
+function Nw(e, t) {
+    return e
+}
+
+function Bu(e) {
+    return Bw(e)
+}
+
+function Bw(e, t) {
+    return e
+}
+
+function Mw(e) {
+    return Fw(e)
+}
+
+function Fw(e, t) {
+    return e == null ? e : {
+        status: e.status == null ? void 0 : e.status,
+        purchasePriceUsdcCent: e.purchasePriceUsdcCent,
+        period: Bu(e.period),
+        periodAfterCurrentTerm: e.periodAfterCurrentTerm == null ? void 0 : Bu(e.periodAfterCurrentTerm),
+        createdAt: new Date(e.createdAt),
+        currentTermStart: new Date(e.currentTermStart),
+        currentTermEnd: e.currentTermEnd == null ? void 0 : new Date(e.currentTermEnd),
+        trialEnd: e.trialEnd == null ? void 0 : new Date(e.trialEnd)
+    }
+}
+
+function Lw(e) {
+    return e == null ? e : {
+        status: e.status,
+        purchasePriceUsdcCent: e.purchasePriceUsdcCent,
+        period: e.period,
+        periodAfterCurrentTerm: e.periodAfterCurrentTerm,
+        createdAt: e.createdAt.toISOString(),
+        currentTermStart: e.currentTermStart.toISOString(),
+        currentTermEnd: e.currentTermEnd == null ? void 0 : e.currentTermEnd.toISOString(),
+        trialEnd: e.trialEnd == null ? void 0 : e.trialEnd.toISOString()
+    }
+}
+
+function Uw(e) {
+    return Ww(e)
+}
+
+function Ww(e, t) {
+    return e == null ? e : {
+        subscription: Mw(e.subscription),
+        tier: Nu(e.tier),
+        tierAfterCurrentTerm: Nu(e.tierAfterCurrentTerm),
+        discountedByLimeWireOriginal: e.discountedByLimeWireOriginal,
+        discountedByLimeWireOriginalAfterCurrentTerm: e.discountedByLimeWireOriginalAfterCurrentTerm,
+        nextCreditsForYearlySubscription: e.nextCreditsForYearlySubscription == null ? void 0 : new Date(e.nextCreditsForYearlySubscription),
+        nextCreditsForTrialingSubscription: e.nextCreditsForTrialingSubscription == null ? void 0 : new Date(e.nextCreditsForTrialingSubscription),
+        nextCreditsForBasicLmwoSubscription: e.nextCreditsForBasicLmwoSubscription == null ? void 0 : new Date(e.nextCreditsForBasicLmwoSubscription)
+    }
+}
+
+function $w(e) {
+    return e == null ? e : {
+        subscription: Lw(e.subscription),
+        tier: e.tier,
+        tierAfterCurrentTerm: e.tierAfterCurrentTerm,
+        discountedByLimeWireOriginal: e.discountedByLimeWireOriginal,
+        discountedByLimeWireOriginalAfterCurrentTerm: e.discountedByLimeWireOriginalAfterCurrentTerm,
+        nextCreditsForYearlySubscription: e.nextCreditsForYearlySubscription == null ? void 0 : e.nextCreditsForYearlySubscription.toISOString(),
+        nextCreditsForTrialingSubscription: e.nextCreditsForTrialingSubscription == null ? void 0 : e.nextCreditsForTrialingSubscription.toISOString(),
+        nextCreditsForBasicLmwoSubscription: e.nextCreditsForBasicLmwoSubscription == null ? void 0 : e.nextCreditsForBasicLmwoSubscription.toISOString()
+    }
+}
+const G_ = {
+    FileEncryptionKey: "FILE_ENCRYPTION_KEY"
+};
+
+function qw(e) {
+    return Hw(e)
+}
+
+function Hw(e, t) {
+    return e == null ? e : {
+        encryptedPrivateKey: e.encryptedPrivateKey,
+        encryptedByKeyType: e.encryptedByKeyType,
+        encryptedByKeyId: e.encryptedByKeyId
+    }
+}
+
+function Gd(e) {
+    return e == null ? e : {
+        encryptedPrivateKey: e.encryptedPrivateKey,
+        encryptedByKeyType: e.encryptedByKeyType,
+        encryptedByKeyId: e.encryptedByKeyId
+    }
+}
+
+function Jw(e) {
+    return e == null ? e : {
+        solvedNonce: e.solvedNonce,
+        nonceEncryptionIv: e.nonceEncryptionIv,
+        wrappedFileSharingKey: Gd(e.wrappedFileSharingKey)
+    }
+}
+
+function Vd(e) {
+    return zw(e)
+}
+
+function zw(e, t) {
+    return e == null ? e : {
+        lmwr: e.lmwr,
+        credits: e.credits
+    }
+}
+
+function Yd(e) {
+    return e == null ? e : {
+        lmwr: e.lmwr,
+        credits: e.credits
+    }
+}
+const V_ = {
+    Viewer: "VIEWER"
+};
+
+function jw(e) {
+    return Gw(e)
+}
+
+function Gw(e, t) {
+    return e
+}
+const Y_ = {
+    Shared: "SHARED",
+    NotShared: "NOT_SHARED"
+};
+
+function Vw(e) {
+    return Yw(e)
+}
+
+function Yw(e, t) {
+    return e
+}
+
+function Qw(e) {
+    return Xw(e)
+}
+
+function Xw(e, t) {
+    return e == null ? e : {
+        type: e.type,
+        wrappedKeyWrappingKey: e.wrappedKeyWrappingKey,
+        wrappedAsymmetricPrivateKey: e.wrappedAsymmetricPrivateKey,
+        keyWrappingKeyPassphraseSalt: e.keyWrappingKeyPassphraseSalt == null ? void 0 : e.keyWrappingKeyPassphraseSalt,
+        asymmetricKeyPassphraseSalt: e.asymmetricKeyPassphraseSalt == null ? void 0 : e.asymmetricKeyPassphraseSalt,
+        wrappedByKeyId: e.wrappedByKeyId == null ? void 0 : e.wrappedByKeyId
+    }
+}
+
+function Zw(e) {
+    return e == null ? e : {
+        type: e.type,
+        wrappedKeyWrappingKey: e.wrappedKeyWrappingKey,
+        wrappedAsymmetricPrivateKey: e.wrappedAsymmetricPrivateKey,
+        keyWrappingKeyPassphraseSalt: e.keyWrappingKeyPassphraseSalt,
+        asymmetricKeyPassphraseSalt: e.asymmetricKeyPassphraseSalt,
+        wrappedByKeyId: e.wrappedByKeyId
+    }
+}
+
+function Br(e) {
+    return eb(e)
+}
+
+function eb(e, t) {
+    return e == null ? e : {
+        time: e.time,
+        increment: e.increment
+    }
+}
+
+function dn(e) {
+    return e == null ? e : {
+        time: e.time,
+        increment: e.increment
+    }
+}
+
+function Qd(e) {
+    return tb(e)
+}
+
+function tb(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        publicKey: e.publicKey,
+        privateKeys: e.privateKeys.map(Qw),
+        deleted: e.deleted,
+        createdDate: new Date(e.createdDate),
+        lastModifiedTimestamp: e.lastModifiedTimestamp == null ? void 0 : Br(e.lastModifiedTimestamp)
+    }
+}
+
+function cn(e) {
+    return e == null ? e : {
+        id: e.id,
+        publicKey: e.publicKey,
+        privateKeys: e.privateKeys.map(Zw),
+        deleted: e.deleted,
+        createdDate: e.createdDate.toISOString(),
+        lastModifiedTimestamp: dn(e.lastModifiedTimestamp)
+    }
+}
+
+function rb(e) {
+    return e == null ? e : {
+        userEncryptionKey: cn(e.userEncryptionKey)
+    }
+}
+
+function nb(e) {
+    return ib(e)
+}
+
+function ib(e, t) {
+    return e == null ? e : {
+        amountBucketsClaimed: e.amountBucketsClaimed
+    }
+}
+
+function ab(e) {
+    return e == null ? e : {
+        claimToken: e.claimToken,
+        userEncryptionKey: cn(e.userEncryptionKey)
+    }
+}
+
+function sb(e) {
+    return ob(e)
+}
+
+function ob(e, t) {
+    return e == null ? e : {
+        amountBucketsClaimed: e.amountBucketsClaimed
+    }
+}
+
+function cb(e) {
+    return ub(e)
+}
+
+function ub(e, t) {
+    return e
+}
+
+function lb(e) {
+    return db(e)
+}
+
+function db(e, t) {
+    return e
+}
+
+function hb(e) {
+    return fb(e)
+}
+
+function fb(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        mediaType: e.mediaType,
+        type: lb(e.type)
+    }
+}
+
+function pb(e) {
+    return e == null ? e : {
+        id: e.id,
+        mediaType: e.mediaType,
+        type: e.type
+    }
+}
+
+function mb(e) {
+    return yb(e)
+}
+
+function yb(e, t) {
+    return e
+}
+
+function Xd(e) {
+    return vb(e)
+}
+
+function vb(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        originalSharingBucketId: e.originalSharingBucketId,
+        s3Status: cb(e.s3Status),
+        itemType: mb(e.itemType),
+        mediaType: e.mediaType,
+        size: e.size,
+        nameEncrypted: e.nameEncrypted == null ? void 0 : e.nameEncrypted,
+        sha1Encrypted: e.sha1Encrypted == null ? void 0 : e.sha1Encrypted,
+        baseFileEncryptionKeyId: e.baseFileEncryptionKeyId,
+        ephemeralPublicKey: e.ephemeralPublicKey,
+        metadata: e.metadata == null ? void 0 : e.metadata,
+        previews: e.previews.map(hb),
+        createdDate: new Date(e.createdDate),
+        lastModifiedTimestamp: e.lastModifiedTimestamp == null ? void 0 : Br(e.lastModifiedTimestamp),
+        deleted: e.deleted
+    }
+}
+
+function gb(e) {
+    return e == null ? e : {
+        id: e.id,
+        originalSharingBucketId: e.originalSharingBucketId,
+        s3Status: e.s3Status,
+        itemType: e.itemType,
+        mediaType: e.mediaType,
+        size: e.size,
+        nameEncrypted: e.nameEncrypted,
+        sha1Encrypted: e.sha1Encrypted,
+        baseFileEncryptionKeyId: e.baseFileEncryptionKeyId,
+        ephemeralPublicKey: e.ephemeralPublicKey,
+        metadata: e.metadata,
+        previews: e.previews.map(pb),
+        createdDate: e.createdDate.toISOString(),
+        lastModifiedTimestamp: dn(e.lastModifiedTimestamp),
+        deleted: e.deleted
+    }
+}
+
+function wb(e) {
+    return e == null ? e : {
+        id: e.id,
+        metadataId: e.metadataId
+    }
+}
+
+function bb(e) {
+    return Sb(e)
+}
+
+function Sb(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        metadataId: e.metadataId == null ? void 0 : e.metadataId,
+        downloadUrl: e.downloadUrl
+    }
+}
+
+function Xo(e) {
+    return Eb(e)
+}
+
+function Eb(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        ownerId: e.ownerId == null ? void 0 : e.ownerId,
+        clientDeviceId: e.clientDeviceId == null ? void 0 : e.clientDeviceId,
+        ownerNick: e.ownerNick == null ? void 0 : e.ownerNick,
+        sharingStatus: Vw(e.sharingStatus),
+        sharingPermission: jw(e.sharingPermission),
+        sharingId: e.sharingId == null ? void 0 : e.sharingId,
+        primaryEncryptionKeyId: e.primaryEncryptionKeyId,
+        contentItemIds: e.contentItemIds,
+        totalFileSize: e.totalFileSize == null ? void 0 : e.totalFileSize,
+        name: e.name,
+        createdDate: new Date(e.createdDate),
+        lastModifiedTimestamp: e.lastModifiedTimestamp == null ? void 0 : Br(e.lastModifiedTimestamp),
+        deleted: e.deleted,
+        expiresAt: e.expiresAt == null ? null : new Date(e.expiresAt),
+        downloadCounter: e.downloadCounter == null ? void 0 : e.downloadCounter,
+        publicDownloadCounter: e.publicDownloadCounter == null ? void 0 : e.publicDownloadCounter,
+        pinned: e.pinned
+    }
+}
+
+function _b(e) {
+    return e == null ? e : {
+        id: e.id,
+        ownerId: e.ownerId,
+        clientDeviceId: e.clientDeviceId,
+        ownerNick: e.ownerNick,
+        sharingStatus: e.sharingStatus,
+        sharingPermission: e.sharingPermission,
+        sharingId: e.sharingId,
+        primaryEncryptionKeyId: e.primaryEncryptionKeyId,
+        contentItemIds: e.contentItemIds,
+        totalFileSize: e.totalFileSize,
+        name: e.name,
+        createdDate: e.createdDate.toISOString(),
+        lastModifiedTimestamp: dn(e.lastModifiedTimestamp),
+        deleted: e.deleted,
+        expiresAt: e.expiresAt == null ? null : e.expiresAt.toISOString(),
+        downloadCounter: e.downloadCounter,
+        publicDownloadCounter: e.publicDownloadCounter,
+        pinned: e.pinned
+    }
+}
+
+function Zo(e) {
+    return Pb(e)
+}
+
+function Pb(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        publicKey: e.publicKey,
+        privateKeys: e.privateKeys.map(qw),
+        encryptedPassphrase: e.encryptedPassphrase == null ? void 0 : e.encryptedPassphrase,
+        passphraseWrappedPrivateKey: e.passphraseWrappedPrivateKey == null ? void 0 : e.passphraseWrappedPrivateKey,
+        deleted: e.deleted,
+        createdDate: new Date(e.createdDate),
+        lastModifiedTimestamp: e.lastModifiedTimestamp == null ? void 0 : Br(e.lastModifiedTimestamp)
+    }
+}
+
+function kb(e) {
+    return e == null ? e : {
+        id: e.id,
+        publicKey: e.publicKey,
+        privateKeys: e.privateKeys.map(Gd),
+        encryptedPassphrase: e.encryptedPassphrase,
+        passphraseWrappedPrivateKey: e.passphraseWrappedPrivateKey,
+        deleted: e.deleted,
+        createdDate: e.createdDate.toISOString(),
+        lastModifiedTimestamp: dn(e.lastModifiedTimestamp)
+    }
+}
+
+function Cb(e) {
+    return e == null ? e : {
+        passphrase: e.passphrase,
+        primaryUserEncryptionKey: cn(e.primaryUserEncryptionKey)
+    }
+}
+
+function Ib(e) {
+    return Rb(e)
+}
+
+function Rb(e, t) {
+    return e == null ? e : {
+        contentItems: e.contentItems.map(bb)
+    }
+}
+
+function Db(e) {
+    return e == null ? e : {
+        oldUserEncryptionKey: cn(e.oldUserEncryptionKey),
+        newUserEncryptionKey: cn(e.newUserEncryptionKey)
+    }
+}
+
+function Kb(e) {
+    return e == null ? e : {
+        sharingPermission: e.sharingPermission,
+        encryptedPassphrase: e.encryptedPassphrase,
+        passphraseWrappedPrivateKey: e.passphraseWrappedPrivateKey
+    }
+}
+
+function xb(e) {
+    return Ob(e)
+}
+
+function Ob(e, t) {
+    return e == null ? e : {
+        sharingBucket: Xo(e.sharingBucket),
+        fileEncryptionKey: Zo(e.fileEncryptionKey)
+    }
+}
+
+function Tb(e) {
+    return Ab(e)
+}
+
+function Ab(e, t) {
+    return e == null ? e : {
+        contentItemId: e.contentItemId,
+        errorCode: e.errorCode
+    }
+}
+
+function Nb(e) {
+    return e == null ? e : {
+        contentItemId: e.contentItemId,
+        errorCode: e.errorCode
+    }
+}
+
+function Bb(e) {
+    return e == null ? e : {
+        contentItems: e.contentItems.map(wb)
+    }
+}
+
+function Mb(e) {
+    return Fb(e)
+}
+
+function Fb(e, t) {
+    return e == null ? e : {
+        ephemeralPublicKey: e.ephemeralPublicKey,
+        nonce: e.nonce
+    }
+}
+
+function Mu(e) {
+    return Lb(e)
+}
+
+function Lb(e, t) {
+    return e == null ? e : {
+        sharingBucket: Xo(e.sharingBucket),
+        contentItemList: e.contentItemList.map(Xd),
+        fileEncryptionKeys: e.fileEncryptionKeys.map(Zo)
+    }
+}
+
+function Ub(e) {
+    return Wb(e)
+}
+
+function Wb(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        status: e.status,
+        platformActionId: e.platformActionId,
+        cost: Vd(e.cost),
+        sharingBucketId: e.sharingBucketId,
+        succeededContentItemIds: e.succeededContentItemIds,
+        failedContentItemInfo: e.failedContentItemInfo.map(Tb),
+        createdDate: new Date(e.createdDate),
+        lastModifiedTimestamp: Br(e.lastModifiedTimestamp)
+    }
+}
+
+function $b(e) {
+    return e == null ? e : {
+        id: e.id,
+        status: e.status,
+        platformActionId: e.platformActionId,
+        cost: Yd(e.cost),
+        sharingBucketId: e.sharingBucketId,
+        succeededContentItemIds: e.succeededContentItemIds,
+        failedContentItemInfo: e.failedContentItemInfo.map(Nb),
+        createdDate: e.createdDate.toISOString(),
+        lastModifiedTimestamp: dn(e.lastModifiedTimestamp)
+    }
+}
+
+function qb(e) {
+    return Hb(e)
+}
+
+function Hb(e, t) {
+    return e == null ? e : {
+        documents: e.documents,
+        checkpoint: Br(e.checkpoint)
+    }
+}
+
+function Jb(e) {
+    return e == null ? e : {
+        assumedMasterState: e.assumedMasterState,
+        newDocumentState: e.newDocumentState
+    }
+}
+
+function zb(e) {
+    return e == null ? e : {
+        changedDocuments: e.changedDocuments.map(Jb)
+    }
+}
+
+function jb(e) {
+    return Gb(e)
+}
+
+function Gb(e, t) {
+    return e == null ? e : {
+        conflicts: e.conflicts
+    }
+}
+
+function Vb(e) {
+    return e == null ? e : {
+        sharingPassphrase: e.sharingPassphrase,
+        destinationEmails: e.destinationEmails,
+        recaptchaToken: e.recaptchaToken
+    }
+}
+
+function Yb(e) {
+    return e == null ? e : {
+        clientId: e.clientId,
+        url: e.url
+    }
+}
+
+function Qb(e) {
+    return Xb(e)
+}
+
+function Xb(e, t) {
+    return e == null ? e : {
+        sharingBucketsCount: e.sharingBucketsCount
+    }
+}
+
+function Zb(e) {
+    return eS(e)
+}
+
+function eS(e, t) {
+    return e == null ? e : {
+        userEncryptionKey: Qd(e.userEncryptionKey)
+    }
+}
+
+function tS(e) {
+    return rS(e)
+}
+
+function rS(e, t) {
+    return e
+}
+
+function nS(e) {
+    return iS(e)
+}
+
+function iS(e, t) {
+    return e == null ? e : {
+        id: e.id,
+        email: e.email,
+        nick: e.nick,
+        name: e.name == null ? void 0 : e.name,
+        description: e.description == null ? void 0 : e.description,
+        userEncryptionKeyType: e.userEncryptionKeyType,
+        totp2faEnabled: e.totp2faEnabled,
+        balance: Vd(e.balance),
+        level: e.level == null ? void 0 : e.level,
+        accountSubscription: e.accountSubscription == null ? void 0 : Uw(e.accountSubscription),
+        verificationStatus: e.verificationStatus == null ? void 0 : tS(e.verificationStatus),
+        referralCode: e.referralCode == null ? void 0 : e.referralCode,
+        kycPassed: e.kycPassed == null ? void 0 : e.kycPassed,
+        planSelectionShown: e.planSelectionShown == null ? void 0 : e.planSelectionShown,
+        lastModifiedTimestamp: e.lastModifiedTimestamp == null ? void 0 : Br(e.lastModifiedTimestamp)
+    }
+}
+
+function aS(e) {
+    return e == null ? e : {
+        id: e.id,
+        email: e.email,
+        nick: e.nick,
+        name: e.name,
+        description: e.description,
+        userEncryptionKeyType: e.userEncryptionKeyType,
+        totp2faEnabled: e.totp2faEnabled,
+        balance: Yd(e.balance),
+        level: e.level,
+        accountSubscription: $w(e.accountSubscription),
+        verificationStatus: e.verificationStatus,
+        referralCode: e.referralCode,
+        kycPassed: e.kycPassed,
+        planSelectionShown: e.planSelectionShown,
+        lastModifiedTimestamp: dn(e.lastModifiedTimestamp)
+    }
+}
+class sS extends fl {
+    async getDownloadUrlsRaw(t, r) {
+        if (t.sharingBucketId == null) throw new yt("sharingBucketId", 'Required parameter "sharingBucketId" was null or undefined when calling getDownloadUrls().');
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/download/{sharingBucketId}".replace("{sharingBucketId}", encodeURIComponent(String(t.sharingBucketId))),
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Bb(t.generateDownloadUrlsRequest)
+        }, r);
+        return new gt(s, c => Ib(c))
+    }
+    async getDownloadUrls(t, r) {
+        return await (await this.getDownloadUrlsRaw(t, r)).value()
+    }
+    async getSharingBucketContentRaw(t, r) {
+        if (t.sharingBucketId == null) throw new yt("sharingBucketId", 'Required parameter "sharingBucketId" was null or undefined when calling getSharingBucketContent().');
+        const n = {},
+            i = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/bucket/{sharingBucketId}/content".replace("{sharingBucketId}", encodeURIComponent(String(t.sharingBucketId))),
+            method: "GET",
+            headers: i,
+            query: n
+        }, r);
+        return new gt(s, c => Mu(c))
+    }
+    async getSharingBucketContent(t, r) {
+        return await (await this.getSharingBucketContentRaw(t, r)).value()
+    }
+    async getSharingBucketContentBySharingIdRaw(t, r) {
+        if (t.sharingId == null) throw new yt("sharingId", 'Required parameter "sharingId" was null or undefined when calling getSharingBucketContentBySharingId().');
+        const n = {},
+            i = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/bucket/{sharingId}/content-by-sharing-id".replace("{sharingId}", encodeURIComponent(String(t.sharingId))),
+            method: "GET",
+            headers: i,
+            query: n
+        }, r);
+        return new gt(s, c => Mu(c))
+    }
+    async getSharingBucketContentBySharingId(t, r) {
+        return await (await this.getSharingBucketContentBySharingIdRaw(t, r)).value()
+    }
+}
+class Zd extends fl {
+    async addSharingBucketRaw(t, r) {
+        if (t.sharingBucketId == null) throw new yt("sharingBucketId", 'Required parameter "sharingBucketId" was null or undefined when calling addSharingBucket().');
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/add-sharing-bucket/{sharingBucketId}".replace("{sharingBucketId}", encodeURIComponent(String(t.sharingBucketId))),
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Jw(t.addSharingBucketRequest)
+        }, r);
+        return new Jr(s)
+    }
+    async addSharingBucket(t, r) {
+        await this.addSharingBucketRaw(t, r)
+    }
+    async claimBucketsRaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/claim-buckets",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: rb(t.claimBucketRequest)
+        }, r);
+        return new Jr(s)
+    }
+    async claimBuckets(t = {}, r) {
+        await this.claimBucketsRaw(t, r)
+    }
+    async claimBucketsLegacyRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/sharing/claim-buckets-legacy",
+            method: "POST",
+            headers: n,
+            query: r
+        }, t);
+        return new gt(i, s => nb(s))
+    }
+    async claimBucketsLegacy(t) {
+        return await (await this.claimBucketsLegacyRaw(t)).value()
+    }
+    async claimCrossDomainContentRaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/claim-buckets-external",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: ab(t.claimCrossDomainContentRequest)
+        }, r);
+        return new gt(s, c => sb(c))
+    }
+    async claimCrossDomainContent(t = {}, r) {
+        return await (await this.claimCrossDomainContentRaw(t, r)).value()
+    }
+    async disableE2ERaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/e2e/disable",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Cb(t.disableE2ERequest)
+        }, r);
+        return new Jr(s)
+    }
+    async disableE2E(t = {}, r) {
+        await this.disableE2ERaw(t, r)
+    }
+    async enableE2ERaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/e2e/enable",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Db(t.enableE2ERequest)
+        }, r);
+        return new Jr(s)
+    }
+    async enableE2E(t = {}, r) {
+        await this.enableE2ERaw(t, r)
+    }
+    async enableSharingForBucketRaw(t, r) {
+        if (t.sharingBucketId == null) throw new yt("sharingBucketId", 'Required parameter "sharingBucketId" was null or undefined when calling enableSharingForBucket().');
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/bucket/{sharingBucketId}/enable-sharing".replace("{sharingBucketId}", encodeURIComponent(String(t.sharingBucketId))),
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Kb(t.enableSharingRequest)
+        }, r);
+        return new gt(s, c => xb(c))
+    }
+    async enableSharingForBucket(t, r) {
+        return await (await this.enableSharingForBucketRaw(t, r)).value()
+    }
+    async generateSharingInfoRaw(t, r) {
+        if (t.sharingBucketId == null) throw new yt("sharingBucketId", 'Required parameter "sharingBucketId" was null or undefined when calling generateSharingInfo().');
+        const n = {},
+            i = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/generate-sharing-info/{sharingBucketId}".replace("{sharingBucketId}", encodeURIComponent(String(t.sharingBucketId))),
+            method: "GET",
+            headers: i,
+            query: n
+        }, r);
+        return new gt(s, c => Mb(c))
+    }
+    async generateSharingInfo(t, r) {
+        return await (await this.generateSharingInfoRaw(t, r)).value()
+    }
+    async getOrCreateUserEncryptionKeyRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/sharing/user-encryption-key",
+            method: "POST",
+            headers: n,
+            query: r
+        }, t);
+        return new gt(i, s => Zb(s))
+    }
+    async getOrCreateUserEncryptionKey(t) {
+        return await (await this.getOrCreateUserEncryptionKeyRaw(t)).value()
+    }
+    async getSharingInfoMetadataRaw(t) {
+        const r = {},
+            n = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const s = this.configuration.accessToken,
+                c = await s("jwt", []);
+            c && (n.Authorization = `Bearer ${c}`)
+        }
+        const i = await this.request({
+            path: "/sharing/sharing-info",
+            method: "GET",
+            headers: n,
+            query: r
+        }, t);
+        return new gt(i, s => Qb(s))
+    }
+    async getSharingInfoMetadata(t) {
+        return await (await this.getSharingInfoMetadataRaw(t)).value()
+    }
+    async pullCollectionChangesRaw(t, r) {
+        if (t.replicatedCollectionName == null) throw new yt("replicatedCollectionName", 'Required parameter "replicatedCollectionName" was null or undefined when calling pullCollectionChanges().');
+        if (t.timestampSeconds == null) throw new yt("timestampSeconds", 'Required parameter "timestampSeconds" was null or undefined when calling pullCollectionChanges().');
+        if (t.timestampIncrement == null) throw new yt("timestampIncrement", 'Required parameter "timestampIncrement" was null or undefined when calling pullCollectionChanges().');
+        if (t.limit == null) throw new yt("limit", 'Required parameter "limit" was null or undefined when calling pullCollectionChanges().');
+        const n = {};
+        t.timestampSeconds != null && (n.timestampSeconds = t.timestampSeconds), t.timestampIncrement != null && (n.timestampIncrement = t.timestampIncrement), t.limit != null && (n.limit = t.limit), t.clientDeviceId != null && (n.clientDeviceId = t.clientDeviceId), t.userId != null && (n.userId = t.userId);
+        const i = {};
+        if (this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/replication/{replicatedCollectionName}/pull".replace("{replicatedCollectionName}", encodeURIComponent(String(t.replicatedCollectionName))),
+            method: "GET",
+            headers: i,
+            query: n
+        }, r);
+        return new gt(s, c => qb(c))
+    }
+    async pullCollectionChanges(t, r) {
+        return await (await this.pullCollectionChangesRaw(t, r)).value()
+    }
+    async pushCollectionChangesRaw(t, r) {
+        if (t.replicatedCollectionName == null) throw new yt("replicatedCollectionName", 'Required parameter "replicatedCollectionName" was null or undefined when calling pushCollectionChanges().');
+        const n = {};
+        t.clientDeviceId != null && (n.clientDeviceId = t.clientDeviceId), t.userId != null && (n.userId = t.userId);
+        const i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/replication/{replicatedCollectionName}/push".replace("{replicatedCollectionName}", encodeURIComponent(String(t.replicatedCollectionName))),
+            method: "POST",
+            headers: i,
+            query: n,
+            body: zb(t.pushRequest)
+        }, r);
+        return new gt(s, c => jb(c))
+    }
+    async pushCollectionChanges(t, r) {
+        return await (await this.pushCollectionChangesRaw(t, r)).value()
+    }
+    async sendShareBucketEmailRaw(t, r) {
+        if (t.sharingBucketId == null) throw new yt("sharingBucketId", 'Required parameter "sharingBucketId" was null or undefined when calling sendShareBucketEmail().');
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/send-share-bucket-email/{sharingBucketId}".replace("{sharingBucketId}", encodeURIComponent(String(t.sharingBucketId))),
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Vb(t.shareBucketEmailRequest)
+        }, r);
+        return new Jr(s)
+    }
+    async sendShareBucketEmail(t, r) {
+        await this.sendShareBucketEmailRaw(t, r)
+    }
+    async shareBucketWithClientRaw(t, r) {
+        const n = {},
+            i = {};
+        if (i["Content-Type"] = "application/json", this.configuration && this.configuration.accessToken) {
+            const c = this.configuration.accessToken,
+                u = await c("jwt", []);
+            u && (i.Authorization = `Bearer ${u}`)
+        }
+        const s = await this.request({
+            path: "/sharing/share-bucket-with-client",
+            method: "POST",
+            headers: i,
+            query: n,
+            body: Yb(t.shareBucketWithClientRequest)
+        }, r);
+        return new Jr(s)
+    }
+    async shareBucketWithClient(t = {}, r) {
+        await this.shareBucketWithClientRaw(t, r)
+    }
+}
+const zr = {
+        SharingBucket: "SHARING_BUCKET",
+        ContentItem: "CONTENT_ITEM",
+        UserEncryptionKey: "USER_ENCRYPTION_KEY",
+        FileEncryptionKey: "FILE_ENCRYPTION_KEY",
+        User: "USER",
+        PlatformActionHistory: "PLATFORM_ACTION_HISTORY"
+    },
+    oS = {
+        type: "object",
+        description: `Represents a content item.
+Some fields are read-only by the client and managed by the server (createdDate, lastModifiedTimestamp).
+`,
+        title: "ContentItem",
+        properties: {
+            id: {
+                type: "string",
+                description: "Unique identifier for the document"
+            },
+            originalSharingBucketId: {
+                type: "string",
+                description: "Original sharing bucket id"
+            },
+            s3Status: {
+                type: "string",
+                enum: ["PENDING", "IN_PROGRESS", "UPLOADED", "DELETED"]
+            },
+            itemType: {
+                type: "string",
+                enum: ["IMAGE", "AUDIO", "VIDEO", "DOCUMENT", "OTHER"]
+            },
+            mediaType: {
+                type: "string",
+                description: "Media type of the content"
+            },
+            size: {
+                type: "number",
+                description: "Size of the content in bytes",
+                format: "int64"
+            },
+            nameEncrypted: {
+                type: "string",
+                description: "AES-GCM base64 representation of the encrypted name of the ContentItem, encrypted by file encryption key (see docs for baseFileEncryptionKeyId)"
+            },
+            sha1Encrypted: {
+                type: "string",
+                description: "AES-GCM base64 representation of the encrypted SHA1 of the content, encrypted by file encryption key (see docs for baseFileEncryptionKeyId)"
+            },
+            baseFileEncryptionKeyId: {
+                type: "string",
+                description: `Base file encryption key id which after derivation will be used to encrypt the content.
+Derivation function deterministicaly derives a new encryption key from the base key and the id of the content item.
+`
+            },
+            ephemeralPublicKey: {
+                type: "string",
+                description: `Base64 representation of the public key of the ephemeral key that was used for deriving the encryption key
+`
+            },
+            metadata: {
+                type: "object",
+                additionalProperties: {
+                    type: "object"
+                },
+                description: "Metadata of the content"
+            },
+            previews: {
+                type: "array",
+                items: {
+                    type: "object",
+                    description: "Represents a preview for a content item.",
+                    title: "PreviewItem",
+                    properties: {
+                        id: {
+                            type: "string",
+                            description: "Unique identifier for the preview"
+                        },
+                        mediaType: {
+                            type: "string",
+                            description: "Media type of the content"
+                        },
+                        type: {
+                            type: "string",
+                            enum: ["IMAGE", "WAVEFORM_JSON"]
+                        }
+                    },
+                    required: ["id", "type", "mediaType"]
+                }
+            },
+            createdDate: {
+                type: "string",
+                description: "Date when the document was created",
+                format: "date-time"
+            },
+            lastModifiedTimestamp: {
+                type: "object",
+                description: "Represents a timestamp with a second and increment",
+                title: "Timestamp",
+                properties: {
+                    time: {
+                        type: "number",
+                        description: "Seconds since the Unix epoch"
+                    },
+                    increment: {
+                        type: "number",
+                        description: "For operations within a given second."
+                    }
+                },
+                required: ["time", "increment"]
+            },
+            deleted: {
+                type: "boolean",
+                description: "True if the document is deleted (client managed)"
+            }
+        },
+        required: ["id", "originalSharingBucketId", "s3Status", "itemType", "mediaType", "size", "baseFileEncryptionKeyId", "ephemeralPublicKey", "previews", "deleted", "createdDate"]
+    },
+    cS = {
+        type: "object",
+        description: `Represents a file encryption key.
+Some fields are read-only by the client and managed by the server (createdDate, lastModifiedTimestamp).
+`,
+        title: "FileEncryptionKeyRequest",
+        properties: {
+            id: {
+                type: "string",
+                description: "Unique identifier for the document (client managed)"
+            },
+            publicKey: {
+                type: "string",
+                description: "String representation of the raw public key in Base64"
+            },
+            privateKeys: {
+                type: "array",
+                items: {
+                    type: "object",
+                    title: "PrivateKeyRepresentation",
+                    properties: {
+                        encryptedPrivateKey: {
+                            type: "string",
+                            description: 'Base64 representation of the AES-KW wrapped private part of the ECDH key ("d" parameter in jwk format)'
+                        },
+                        encryptedByKeyType: {
+                            type: "string"
+                        },
+                        encryptedByKeyId: {
+                            type: "string",
+                            description: "Id of the key that was used to encrypt the private-key."
+                        }
+                    },
+                    required: ["encryptedPrivateKey", "encryptedByKeyType", "encryptedByKeyId"]
+                }
+            },
+            encryptedPassphrase: {
+                type: "string",
+                description: "Encrypted passphrase for sharing the sharing bucket"
+            },
+            passphraseWrappedPrivateKey: {
+                type: "string",
+                description: "Passphrase wrapped private key"
+            },
+            deleted: {
+                type: "boolean",
+                description: "True if the document is deleted"
+            },
+            createdDate: {
+                type: "string",
+                description: "Date when the document was created",
+                format: "date-time"
+            },
+            lastModifiedTimestamp: {
+                type: "object",
+                description: "Represents a timestamp with a second and increment",
+                title: "Timestamp",
+                properties: {
+                    time: {
+                        type: "number",
+                        description: "Seconds since the Unix epoch"
+                    },
+                    increment: {
+                        type: "number",
+                        description: "For operations within a given second."
+                    }
+                },
+                required: ["time", "increment"]
+            }
+        },
+        required: ["id", "publicKey", "privateKeys", "deleted", "createdDate"]
+    },
+    uS = {
+        type: "object",
+        description: `Represents a bucket that contains a list of content items.
+Some fields are read-only by the client and managed by the server (ownerId, createdDate, lastModifiedTimestamp).
+`,
+        title: "SharingBucket",
+        properties: {
+            id: {
+                type: "string",
+                description: "Unique identifier for the document"
+            },
+            ownerId: {
+                type: "string",
+                description: "User id of the owner (client RO). Can be null in case the bucket was created by an anonymous user"
+            },
+            clientDeviceId: {
+                type: "string",
+                description: "id of the ClientDevice that created this SharingBucket"
+            },
+            ownerNick: {
+                type: "string",
+                description: 'Nick of the owner of the bucket (client RO). In case of anonymous users this will be set to "anonymous"'
+            },
+            sharingStatus: {
+                type: "string",
+                enum: ["SHARED", "NOT_SHARED"]
+            },
+            sharingPermission: {
+                type: "string",
+                enum: ["VIEWER", "EDITOR"]
+            },
+            sharingId: {
+                type: "string",
+                description: "Sharing id of the bucket (client RO)"
+            },
+            primaryEncryptionKeyId: {
+                type: "string",
+                description: "Primary encryption key id"
+            },
+            contentItemIds: {
+                type: "array",
+                description: "List of content item ids",
+                items: {
+                    type: "string"
+                }
+            },
+            totalFileSize: {
+                type: "number",
+                description: "Total size of all files in bytes (Client RO)",
+                format: "int64"
+            },
+            name: {
+                type: "string",
+                description: "Name of the bucket"
+            },
+            createdDate: {
+                type: "string",
+                description: "Date when the document was created",
+                format: "date-time"
+            },
+            lastModifiedTimestamp: {
+                type: "object",
+                description: "Represents a timestamp with a second and increment",
+                title: "Timestamp",
+                properties: {
+                    time: {
+                        type: "number",
+                        description: "Seconds since the Unix epoch"
+                    },
+                    increment: {
+                        type: "number",
+                        description: "For operations within a given second."
+                    }
+                },
+                required: ["time", "increment"]
+            },
+            deleted: {
+                type: "boolean",
+                description: "True if the document is deleted (client managed)"
+            },
+            expiresAt: {
+                type: ["string", "null"],
+                description: `Date when this bucket will expire (client managed). Max value depends on user subscription plan.
+If null, the bucket will never expire (allowed only on some plans)
+`,
+                format: "date-time"
+            },
+            downloadCounter: {
+                type: "number",
+                description: "Counter on how often some ContentItem has been downloaded from this SharingBucket (client RO)"
+            },
+            publicDownloadCounter: {
+                type: "number",
+                description: "Counter on how often some ContentItem has been downloaded from this SharingBucket by users other than the owner (client RO)"
+            },
+            pinned: {
+                type: "boolean",
+                description: "Pinned bucket are shown on top of the list and do not expire"
+            }
+        },
+        required: ["id", "sharingStatus", "sharingPermission", "primaryEncryptionKeyId", "contentItemIds", "name", "deleted", "pinned", "createdDate", "expiresAt"]
+    },
+    lS = {
+        type: "object",
+        description: `Represents a user's encryption key.
+Some fields are read-only by the client and managed by the server (createdDate, lastModifiedTimestamp).
+`,
+        title: "UserEncryptionKey",
+        properties: {
+            id: {
+                type: "string",
+                description: "Unique identifier for the document (client managed)"
+            },
+            publicKey: {
+                type: "string",
+                description: "String representation of the public key in Base64 encoding"
+            },
+            privateKeys: {
+                type: "array",
+                items: {
+                    type: "object",
+                    title: "UserPrivateKeyRepresentation",
+                    properties: {
+                        type: {
+                            type: "string"
+                        },
+                        wrappedKeyWrappingKey: {
+                            type: "string",
+                            description: "Base64 representation of the encrypted version of the symmetric private key"
+                        },
+                        wrappedAsymmetricPrivateKey: {
+                            type: "string",
+                            description: 'Base64 representation of the AES-KW wrapped private part of the ECDH key ("d" parameter in jwk format)'
+                        },
+                        keyWrappingKeyPassphraseSalt: {
+                            type: "string",
+                            description: "PASSPHRASE_WRAPPED - Base64 representation of the salt that was used to generate the PBKDF key"
+                        },
+                        asymmetricKeyPassphraseSalt: {
+                            type: "string",
+                            description: "PASSPHRASE_WRAPPED - Base64 representation of the salt that was used to generate the PBKDF key"
+                        },
+                        wrappedByKeyId: {
+                            type: "string",
+                            description: "KEY_WRAPPED - Id of the key that was used to encrypt the private-key."
+                        }
+                    },
+                    required: ["type", "wrappedKeyWrappingKey", "wrappedAsymmetricPrivateKey"]
+                }
+            },
+            deleted: {
+                type: "boolean",
+                description: "True if the document is deleted"
+            },
+            createdDate: {
+                type: "string",
+                description: "Date when the document was created",
+                format: "date-time"
+            },
+            lastModifiedTimestamp: {
+                type: "object",
+                description: "Represents a timestamp with a second and increment",
+                title: "Timestamp",
+                properties: {
+                    time: {
+                        type: "number",
+                        description: "Seconds since the Unix epoch"
+                    },
+                    increment: {
+                        type: "number",
+                        description: "For operations within a given second."
+                    }
+                },
+                required: ["time", "increment"]
+            }
+        },
+        required: ["id", "publicKey", "privateKeys", "deleted", "createdDate"]
+    },
+    dS = {
+        type: "object",
+        properties: {
+            id: {
+                type: "string"
+            },
+            email: {
+                type: "string",
+                format: "email"
+            },
+            nick: {
+                type: "string"
+            },
+            name: {
+                type: "string"
+            },
+            description: {
+                type: "string"
+            },
+            userEncryptionKeyType: {
+                type: "string"
+            },
+            totp2faEnabled: {
+                type: "boolean"
+            },
+            balance: {
+                type: "object",
+                title: "BalanceInfo",
+                properties: {
+                    lmwr: {
+                        type: "number"
+                    },
+                    credits: {
+                        type: "number"
+                    }
+                },
+                required: ["lmwr", "credits"]
+            },
+            level: {
+                type: "string"
+            },
+            accountSubscription: {
+                type: "object",
+                title: "AccountSubscription",
+                properties: {
+                    subscription: {
+                        type: "object",
+                        title: "PlatformSubscription",
+                        properties: {
+                            status: {
+                                type: "string"
+                            },
+                            purchasePriceUsdcCent: {
+                                type: "number",
+                                format: "int64"
+                            },
+                            period: {
+                                type: "string",
+                                enum: ["MONTH", "YEAR"]
+                            },
+                            periodAfterCurrentTerm: {
+                                type: "string",
+                                enum: ["MONTH", "YEAR"]
+                            },
+                            createdAt: {
+                                type: "string",
+                                format: "date-time"
+                            },
+                            currentTermStart: {
+                                type: "string",
+                                format: "date-time"
+                            },
+                            currentTermEnd: {
+                                type: "string",
+                                format: "date-time"
+                            },
+                            trialEnd: {
+                                type: "string",
+                                format: "date-time"
+                            }
+                        },
+                        required: ["purchasePriceUsdcCent", "period", "createdAt", "currentTermStart"]
+                    },
+                    tier: {
+                        type: "string",
+                        enum: ["FREE", "PRO", "PRO_PLUS", "ADVANCED", "LEGACY_PRO", "LEGACY_PRO_PLUS", "BLUE_WILLOW_SUPPORTER", "BLUE_WILLOW_WILLOWER", "BLUE_WILLOW_BLUE_ANGEL", "BLUE_WILLOW_SAPPHIRE", "API_BASIC", "API_PRO", "API_PRO_PLUS"]
+                    },
+                    tierAfterCurrentTerm: {
+                        type: "string",
+                        enum: ["FREE", "PRO", "PRO_PLUS", "ADVANCED", "LEGACY_PRO", "LEGACY_PRO_PLUS", "BLUE_WILLOW_SUPPORTER", "BLUE_WILLOW_WILLOWER", "BLUE_WILLOW_BLUE_ANGEL", "BLUE_WILLOW_SAPPHIRE", "API_BASIC", "API_PRO", "API_PRO_PLUS"]
+                    },
+                    discountedByLimeWireOriginal: {
+                        type: "boolean"
+                    },
+                    discountedByLimeWireOriginalAfterCurrentTerm: {
+                        type: "boolean"
+                    },
+                    nextCreditsForYearlySubscription: {
+                        type: "string",
+                        format: "date-time"
+                    },
+                    nextCreditsForTrialingSubscription: {
+                        type: "string",
+                        format: "date-time"
+                    },
+                    nextCreditsForBasicLmwoSubscription: {
+                        type: "string",
+                        format: "date-time"
+                    }
+                },
+                required: ["subscription", "tier", "tierAfterCurrentTerm", "discountedByLimeWireOriginal", "discountedByLimeWireOriginalAfterCurrentTerm"]
+            },
+            verificationStatus: {
+                type: "string",
+                enum: ["none", "self_verified", "staff_verified"]
+            },
+            referralCode: {
+                type: "string"
+            },
+            kycPassed: {
+                type: "boolean"
+            },
+            planSelectionShown: {
+                type: "boolean"
+            },
+            lastModifiedTimestamp: {
+                type: "object",
+                description: "Represents a timestamp with a second and increment",
+                title: "Timestamp",
+                properties: {
+                    time: {
+                        type: "number",
+                        description: "Seconds since the Unix epoch"
+                    },
+                    increment: {
+                        type: "number",
+                        description: "For operations within a given second."
+                    }
+                },
+                required: ["time", "increment"]
+            }
+        },
+        required: ["id", "email", "nick", "userEncryptionKeyType", "totp2faEnabled", "balance"]
+    },
+    hS = {
+        type: "object",
+        description: `Represents a single platform-action execution. This object will be synced through rx-db from the backend
+to the client to notify it about status updates. All fields are read-only, as this object is only meant to be
+written by the backend.
+`,
+        title: "PlatformActionHistory",
+        properties: {
+            id: {
+                type: "string",
+                description: "Id of the PlatformAction, matches the generationId that is returned when a platform-action is being executed."
+            },
+            status: {
+                type: "string",
+                description: `Current status of the platform action.
+PROCESSING: The action is currently being processed
+FINISHED: The action is finished. Check succeededContentItemIds amd failedContentItemInfo to see if they failed
+`
+            },
+            platformActionId: {
+                type: "string",
+                description: "Identifier of the platform-action itself, which is also part of the URL when an action is exection.\ne.g. `stable-diffusion-xl-10-text-to-image-v1`\n"
+            },
+            cost: {
+                type: "object",
+                title: "BalanceInfo",
+                properties: {
+                    lmwr: {
+                        type: "number"
+                    },
+                    credits: {
+                        type: "number"
+                    }
+                },
+                required: ["lmwr", "credits"]
+            },
+            sharingBucketId: {
+                type: "string",
+                description: "ID of the sharingBucket this action belongs to"
+            },
+            succeededContentItemIds: {
+                type: "array",
+                description: "contentItemIds that have been successfully processed",
+                items: {
+                    type: "string"
+                }
+            },
+            failedContentItemInfo: {
+                type: "array",
+                description: "ContentItemIds where processing failed",
+                items: {
+                    type: "object"
+                }
+            },
+            createdDate: {
+                type: "string",
+                description: "Date when the document was created",
+                format: "date-time"
+            },
+            lastModifiedTimestamp: {
+                type: "object",
+                description: "Represents a timestamp with a second and increment",
+                title: "Timestamp",
+                properties: {
+                    time: {
+                        type: "number",
+                        description: "Seconds since the Unix epoch"
+                    },
+                    increment: {
+                        type: "number",
+                        description: "For operations within a given second."
+                    }
+                },
+                required: ["time", "increment"]
+            }
+        },
+        required: ["id", "status", "platformActionId", "cost", "sharingBucketId", "succeededContentItemIds", "failedContentItemInfo", "createdDate", "lastModifiedTimestamp"]
+    };
+var ec = {
+        minimumDeletedTime: 1e3 * 60 * 60 * 24 * 31,
+        minimumCollectionAge: 1e3 * 60,
+        runEach: 1e3 * 60 * 5,
+        awaitReplicationsInSync: !0,
+        waitForLeadership: !0
+    },
+    zs = di;
+async function fS(e) {
+    var t = e.database,
+        r = Object.assign({}, ec, t.cleanupPolicy ? t.cleanupPolicy : {});
+    await eh(e, r), !e.closed && (await th(e, r), await pS(e, r))
+}
+async function eh(e, t) {
+    await e.promiseWait(t.minimumCollectionAge), !e.closed && e.database.multiInstance && t.waitForLeadership && await e.database.waitForLeadership()
+}
+async function th(e, t) {
+    for (var r = e.database, n = e.storageInstance, i = !1; !i && !e.closed;) {
+        if (t.awaitReplicationsInSync) {
+            var s = Qo.get(e);
+            s && await Promise.all(s.map(c => {
+                if (!c.isStopped()) return c.awaitInSync()
+            }))
+        }
+        if (e.closed) return;
+        zs = zs.then(async () => e.closed ? !0 : (await r.requestIdlePromise(), n.cleanup(t.minimumDeletedTime))), i = await zs
+    }
+    await Wt("postCleanup", {
+        collectionName: e.name,
+        databaseName: r.name
+    })
+}
+async function pS(e, t) {
+    for (; !e.closed;) {
+        if (await Kr(e.eventBulks$).catch(() => {}), await e.promiseWait(t.runEach), e.closed) return;
+        await th(e, t)
+    }
+}
+var js = di;
+async function mS(e) {
+    var t = e.collection,
+        r = t.database,
+        n = Object.assign({}, ec, r.cleanupPolicy ? r.cleanupPolicy : {});
+    await eh(t, n), !t.closed && (await rh(e, n), await yS(e, n))
+}
+async function rh(e, t) {
+    for (var r = e.collection, n = r.database, i = !1; !i && !r.closed;) {
+        if (t.awaitReplicationsInSync) {
+            var s = Qo.get(r);
+            s && await Promise.all(s.map(c => {
+                if (!c.isStopped()) return c.awaitInSync()
+            }))
+        }
+        if (r.closed) return;
+        js = js.then(async () => r.closed ? !0 : (await n.requestIdlePromise(), e._cleanup())), i = await js
+    }
+}
+async function yS(e, t) {
+    for (var r = e.collection; !r.closed;) {
+        if (await Kr(r.eventBulks$).catch(() => {}), await r.promiseWait(t.runEach), r.closed) return;
+        await rh(e, t)
+    }
+}
+var vS = {
+        name: "cleanup",
+        rxdb: !0,
+        prototypes: {
+            RxCollection: e => {
+                e.cleanup = async function(t) {
+                    var r = Object.assign({}, ec, this.database.cleanupPolicy ? this.database.cleanupPolicy : {});
+                    typeof t > "u" && (t = r.minimumDeletedTime);
+                    for (var n = !1; !n && !this.closed;) n = await this.storageInstance.cleanup(t);
+                    await Wt("postCleanup", {
+                        collectionName: this.name,
+                        databaseName: this.database.name
+                    })
+                }
+            }
+        },
+        hooks: {
+            createRxCollection: {
+                after: e => {
+                    fS(e.collection)
+                }
+            },
+            createRxState: {
+                after: e => {
+                    mS(e.state)
+                }
+            }
+        }
+    },
+    gS = "16.15.0";
+
+function wS() {
+    ta.premium = "yesIgotRxDBPremiumAccess"
+}
+
+function tc(e) {
+    return e.join("||")
+}
+var Ln = ["_deleted", "_meta.lwt"];
+tc(Ln);
+var bS = id(),
+    SS = function(e) {
+        function t(r, n, i) {
+            var s;
+            return s = e.call(this, null, n) || this, s.id = r, s.parent = i, s
+        }
+        return ko(t, e), t
+    }(bS),
+    Un = {
+        get isLocal() {
+            return !0
+        },
+        get allAttachments$() {
+            throw ee("LD1", {
+                document: this
+            })
+        },
+        get primaryPath() {
+            return "id"
+        },
+        get primary() {
+            return this.id
+        },
+        get $() {
+            var e = this,
+                t = Tr(mo, this.parent),
+                r = this.primary;
+            return e.parent.eventBulks$.pipe(Te(n => !!n.isLocal), Ye(n => n.events.find(i => i.documentId === r)), Te(n => !!n), Ye(n => Fl(te(n))), Oa(t.docCache.getLatestDocumentData(this.primary)), Hn((n, i) => n._rev === i._rev), Ye(n => t.docCache.getCachedRxDocument(n)), Eo(Io))
+        },
+        get $$() {
+            var e = this,
+                t = Gs(e),
+                r = t.getReactivityFactory();
+            return r.fromObservable(e.$, e.getLatest()._data, t)
+        },
+        get deleted$$() {
+            var e = this,
+                t = Gs(e),
+                r = t.getReactivityFactory();
+            return r.fromObservable(e.deleted$, e.getLatest().deleted, t)
+        },
+        getLatest() {
+            var e = Tr(mo, this.parent),
+                t = e.docCache.getLatestDocumentData(this.primary);
+            return e.docCache.getCachedRxDocument(t)
+        },
+        get(e) {
+            if (e = "data." + e, !!this._data) {
+                if (typeof e != "string") throw fa("LD2", {
+                    objPath: e
+                });
+                var t = sr(this._data, e);
+                return t = Ae.deepFreezeWhenDevMode(t), t
+            }
+        },
+        get$(e) {
+            if (e = "data." + e, Ae.isDevMode()) {
+                if (e.includes(".item.")) throw ee("LD3", {
+                    objPath: e
+                });
+                if (e === this.primaryPath) throw ee("LD4")
+            }
+            return this.$.pipe(Ye(t => t._data), Ye(t => sr(t, e)), Hn())
+        },
+        get$$(e) {
+            var t = Gs(this),
+                r = t.getReactivityFactory();
+            return r.fromObservable(this.get$(e), this.getLatest().get(e), t)
+        },
+        async incrementalModify(e) {
+            var t = await Wn(this.parent);
+            return t.incrementalWriteQueue.addWrite(this._data, async r => (r.data = await e(r.data, this), r)).then(r => t.docCache.getCachedRxDocument(r))
+        },
+        incrementalPatch(e) {
+            return this.incrementalModify(t => (Object.entries(e).forEach(([r, n]) => {
+                t[r] = n
+            }), t))
+        },
+        async _saveData(e) {
+            var t = await Wn(this.parent),
+                r = this._data;
+            e.id = this.id;
+            var n = [{
+                previous: r,
+                document: e
+            }];
+            return t.storageInstance.bulkWrite(n, "local-document-save-data").then(i => {
+                if (i.error[0]) throw i.error[0];
+                var s = vt(this.collection.schema.primaryPath, n, i)[0];
+                e = De(e), e._rev = s._rev
+            })
+        },
+        async remove() {
+            var e = await Wn(this.parent),
+                t = De(this._data);
+            return t._deleted = !0, $a(e.storageInstance, {
+                previous: this._data,
+                document: t
+            }, "local-document-remove").then(r => e.docCache.getCachedRxDocument(r))
+        }
+    },
+    Fu = !1,
+    ES = () => {
+        if (!Fu) {
+            Fu = !0;
+            var e = qa,
+                t = Object.getOwnPropertyNames(e);
+            t.forEach(n => {
+                var i = Object.getOwnPropertyDescriptor(Un, n);
+                if (!i) {
+                    var s = Object.getOwnPropertyDescriptor(e, n);
+                    Object.defineProperty(Un, n, s)
+                }
+            });
+            var r = n => () => {
+                throw ee("LD6", {
+                    functionName: n
+                })
+            };
+            ["populate", "update", "putAttachment", "putAttachmentBase64", "getAttachment", "allAttachments"].forEach(n => Un[n] = r(n))
+        }
+    };
+
+function _S(e, t) {
+    ES();
+    var r = new SS(e.id, e, t);
+    return Object.setPrototypeOf(r, Un), r.prototype = Un, r
+}
+
+function Gs(e) {
+    var t = e.parent;
+    return Id(t) ? t : t.database
+}
+var Pa = new WeakMap,
+    mo = new WeakMap;
+
+function Lu(e) {
+    var t = e.database ? e.database : e,
+        r = e.database ? e.name : "",
+        n = (async () => {
+            var i = await nh(t.token, t.storage, t.name, r, t.instanceCreationOptions, t.multiInstance);
+            i = Ao(t, i, ih);
+            var s = new hd("id", t.eventBulks$.pipe(Te(m => {
+                    var y = !1;
+                    return (r === "" && !m.collectionName || r !== "" && m.collectionName === r) && (y = !0), y && m.isLocal
+                }), Ye(m => m.events)), m => _S(m, e)),
+                c = new nd(i, "id", () => {}, () => {}),
+                u = await t.storageToken,
+                h = i.changeStream().subscribe(m => {
+                    for (var y = new Array(m.events.length), w = m.events, S = e.database ? e.name : void 0, b = 0; b < w.length; b++) {
+                        var P = w[b];
+                        y[b] = {
+                            documentId: P.documentId,
+                            collectionName: S,
+                            isLocal: !0,
+                            operation: P.operation,
+                            documentData: Ae.deepFreezeWhenDevMode(P.documentData),
+                            previousDocumentData: Ae.deepFreezeWhenDevMode(P.previousDocumentData)
+                        }
+                    }
+                    var T = {
+                        id: m.id,
+                        isLocal: !0,
+                        internal: !1,
+                        collectionName: e.database ? e.name : void 0,
+                        storageToken: u,
+                        events: y,
+                        databaseToken: t.token,
+                        checkpoint: m.checkpoint,
+                        context: m.context
+                    };
+                    t.$emit(T)
+                });
+            e._subs.push(h);
+            var v = {
+                database: t,
+                parent: e,
+                storageInstance: i,
+                docCache: s,
+                incrementalWriteQueue: c
+            };
+            return mo.set(e, v), v
+        })();
+    Pa.set(e, n)
+}
+
+function Wn(e) {
+    var t = Pa.get(e);
+    if (!t) {
+        var r = e.database ? e.database : e,
+            n = e.database ? e.name : "";
+        throw ee("LD8", {
+            database: r.name,
+            collection: n
+        })
+    }
+    return t
+}
+
+function nh(e, t, r, n, i, s) {
+    return t.createStorageInstance({
+        databaseInstanceToken: e,
+        databaseName: r,
+        collectionName: PS(n),
+        schema: ih,
+        options: i,
+        multiInstance: s,
+        devMode: Ae.isDevMode()
+    })
+}
+
+function Uu(e) {
+    var t = Pa.get(e);
+    if (t) return Pa.delete(e), t.then(r => r.storageInstance.close())
+}
+async function Wu(e, t, r) {
+    var n = ln(10),
+        i = await nh(n, e, t, r, {}, !1);
+    await i.remove()
+}
+
+function PS(e) {
+    return "plugin-local-documents-" + e
+}
+var ih = Ba({
+    title: "RxLocalDocument",
+    version: 0,
+    primaryKey: "id",
+    type: "object",
+    properties: {
+        id: {
+            type: "string",
+            maxLength: 128
+        },
+        data: {
+            type: "object",
+            additionalProperties: !0
+        }
+    },
+    required: ["id", "data"]
+});
+async function $u(e, t) {
+    var r = await Wn(this),
+        n = {
+            id: e,
+            data: t,
+            _deleted: !1,
+            _meta: li(),
+            _rev: Lt(),
+            _attachments: {}
+        };
+    return $a(r.storageInstance, {
+        document: n
+    }, "local-document-insert").then(i => r.docCache.getCachedRxDocument(i))
+}
+
+function qu(e, t) {
+    return this.getLocal(e).then(r => {
+        if (r) return r.incrementalModify(() => t);
+        var n = this.insertLocal(e, t);
+        return n
+    })
+}
+async function Hu(e) {
+    var t = await Wn(this),
+        r = t.docCache,
+        n = r.getLatestDocumentDataIfExists(e);
+    return n ? Promise.resolve(r.getCachedRxDocument(n)) : Wa(t.storageInstance, e).then(i => i ? t.docCache.getCachedRxDocument(i) : null)
+}
+
+function Ju(e) {
+    return this.$.pipe(Oa(null), Dr(async t => {
+        if (t) return {
+            changeEvent: t
+        };
+        var r = await this.getLocal(e);
+        return {
+            doc: r
+        }
+    }), Dr(async t => {
+        if (t.changeEvent) {
+            var r = t.changeEvent;
+            if (!r.isLocal || r.documentId !== e) return {
+                use: !1
+            };
+            var n = await this.getLocal(e);
+            return {
+                use: !0,
+                doc: n
+            }
+        } else return {
+            use: !0,
+            doc: t.doc
+        }
+    }), Te(t => t.use), Ye(t => t.doc))
+}
+var kS = {
+    name: "local-documents",
+    rxdb: !0,
+    prototypes: {
+        RxCollection: e => {
+            e.insertLocal = $u, e.upsertLocal = qu, e.getLocal = Hu, e.getLocal$ = Ju
+        },
+        RxDatabase: e => {
+            e.insertLocal = $u, e.upsertLocal = qu, e.getLocal = Hu, e.getLocal$ = Ju
+        }
+    },
+    hooks: {
+        createRxDatabase: {
+            before: e => {
+                e.creator.localDocuments && Lu(e.database)
+            }
+        },
+        createRxCollection: {
+            before: e => {
+                e.creator.localDocuments && Lu(e.collection)
+            }
+        },
+        preCloseRxDatabase: {
+            after: e => Uu(e)
+        },
+        postCloseRxCollection: {
+            after: e => Uu(e)
+        },
+        postRemoveRxDatabase: {
+            after: e => Wu(e.storage, e.databaseName, "")
+        },
+        postRemoveRxCollection: {
+            after: e => Wu(e.storage, e.databaseName, e.collectionName)
+        }
+    },
+    overwritable: {}
+};
+const hn = (e, t) => {
+        var u, h;
+        const {
+            primaryKey: r = "id",
+            primaryKeyMaxLength: n = 48,
+            deletedField: i = "deleted",
+            version: s = 0
+        } = t || {}, c = {
+            ...e
+        };
+        return delete c.properties[i], {
+            ...c,
+            primaryKey: r,
+            properties: {
+                ...e.properties,
+                [r]: {
+                    ...(u = e.properties) == null ? void 0 : u[r],
+                    maxLength: n
+                }
+            },
+            required: (h = e.required) == null ? void 0 : h.filter(v => v !== i),
+            version: s
+        }
+    },
+    CS = {
+        sharing_bucket: zr.SharingBucket,
+        content_item: zr.ContentItem,
+        file_encryption_key: zr.FileEncryptionKey,
+        user_encryption_key: zr.UserEncryptionKey,
+        user: zr.User,
+        platform_action_history: zr.PlatformActionHistory
+    },
+    IS = hn(oS),
+    RS = hn(cS),
+    DS = hn(uS),
+    KS = hn(lS),
+    xS = hn(dS),
+    OS = hn(hS),
+    TS = 4,
+    zu = async (e, t, r, n) => {
+        const {
+            response: i
+        } = e;
+        if (!i) return;
+        const {
+            status: s
+        } = i;
+        s < 400 || s > 499 || (t.add(e), t.size > TS && (await r.cancel(), n && await n(e)))
+    }, AS = async (e, t, r, n, i, s, c, u) => {
+        const {
+            replicationWaitForLeadership: h
+        } = r || {}, v = new Set, m = new Set, y = CS[e], w = Ow({
+            collection: t,
+            replicationIdentifier: `${y}-http-replication`,
+            deletedField: "deleted",
+            retryTime: 3e3,
+            toggleOnDocumentVisible: !0,
+            waitForLeadership: h ?? !0,
+            push: {
+                async handler(M) {
+                    const z = await ca(s.pushCollectionChanges({
+                        ...n,
+                        replicatedCollectionName: y,
+                        pushRequest: {
+                            changedDocuments: M
+                        }
+                    }));
+                    if (!z.ok) throw await zu(z.error, v, w, u), z.error;
+                    return v.clear(), z.value.conflicts
+                }
+            },
+            pull: {
+                batchSize: 1e3,
+                async handler(M, z) {
+                    const H = await ca(s.pullCollectionChanges({
+                        ...n,
+                        replicatedCollectionName: y,
+                        timestampSeconds: (M == null ? void 0 : M.time) ?? 0,
+                        timestampIncrement: (M == null ? void 0 : M.increment) ?? 0,
+                        limit: z
+                    }));
+                    if (!H.ok) throw await zu(H.error, m, w, u), H.error;
+                    return m.clear(), H.value
+                },
+                stream$: i.asObservable()
+            }
+        });
+        let S = Oe();
+        const b = Oe(),
+            P = Oe();
+        S.resolve();
+        const T = w.active$.subscribe(M => {
+                M ? (b.resolve(), S = Oe()) : S.resolve()
+            }),
+            F = w.canceled$.subscribe(M => {
+                M && P.resolve()
+            }),
+            U = w.error$.subscribe(M => {
+                var z, H;
+                console.error(`Replication error on collection "${e}":`, M), !c.aborted && ((H = (z = M.parameters.errors) == null ? void 0 : z[0]) == null ? void 0 : H.code) === "RC_OUTDATED" && location.reload()
+            });
+        return {
+            replicationState: w,
+            activePromise: b.promise,
+            canceledPromise: P.promise,
+            awaitActiveReplication: () => S.promise,
+            dispose: () => {
+                T.unsubscribe(), F.unsubscribe(), U.unsubscribe(), w.cancel().catch(() => null), S.resolve()
+            }
+        }
+    }, NS = ["DB6", "DB8"], BS = e => e, ka = (e, t, r) => {
+        const n = "lmwr-file-sharing",
+            i = t ? "-anon" : "-user",
+            s = `-${e}`;
+        return `${n}${i}${s}${r?"-memory":""}`
+    }, ah = (e, t, r, n, i) => {
+        const {
+            multiInstance: s
+        } = n || {}, c = BS(r), u = async () => Jo(t, c), h = async () => {
+            const b = await eg({
+                name: t,
+                storage: c,
+                localDocuments: !0,
+                ignoreDuplicate: !1,
+                closeDuplicates: !0,
+                cleanupPolicy: {
+                    runEach: 9e5
+                },
+                multiInstance: s ?? !0
+            });
+            v().then(() => {
+                b.close().catch(() => null)
+            });
+            const P = await b.addCollections({
+                content_item: {
+                    schema: IS,
+                    localDocuments: !0
+                },
+                file_encryption_key: {
+                    schema: RS,
+                    localDocuments: !0
+                },
+                sharing_bucket: {
+                    schema: DS,
+                    localDocuments: !0
+                },
+                user_encryption_key: {
+                    schema: KS,
+                    localDocuments: !0
+                },
+                user: {
+                    schema: xS,
+                    localDocuments: !0
+                },
+                platform_action_history: {
+                    schema: OS,
+                    localDocuments: !0
+                }
+            });
+            return v().then(() => {
+                Object.values(P).forEach(T => {
+                    T.close().catch(() => null)
+                })
+            }), {
+                database: b,
+                collections: P
+            }
+        }, v = () => new Promise(b => {
+            e.aborted ? b() : e.addEventListener("abort", () => {
+                b()
+            })
+        }), y = (async () => h().catch(b => {
+            if (b instanceof ro) return console.error("Wiping rxdb due to:", b), u().then(() => h());
+            throw console.error("RXDB Error", b), b
+        }))(), S = (async () => {
+            if (!i) return {
+                async awaitActiveReplication() {}
+            };
+            const {
+                collections: b,
+                database: P
+            } = await y, {
+                userId: T,
+                isAnonymous: F,
+                apiOptions: U,
+                onUnrecoverableReplicationError: M
+            } = i, {
+                basePath: z
+            } = U, H = Jn(Zd, U, {
+                init: {
+                    signal: e
+                }
+            }), Q = {
+                userId: F ? void 0 : T,
+                clientDeviceId: F ? T : void 0
+            }, W = new URL(z);
+            W.pathname = "/sharing/replication/pull-stream", Q.clientDeviceId && W.searchParams.set("clientDeviceId", Q.clientDeviceId), Q.userId && W.searchParams.set("userId", Q.userId);
+            const ie = Object.fromEntries(Object.entries(b).map(([re]) => [re, new nt])),
+                de = Ta({
+                    maxDelay: 2e4
+                }),
+                Se = Af(W, {
+                    ...yf(W, U, {
+                        init: {
+                            signal: e
+                        }
+                    }),
+                    retry: (re, {
+                        underlyingError: oe,
+                        response: ye
+                    }) => {
+                        if (!(vf(ye) || !ye && !Mf(oe))) return de(re)
+                    },
+                    onMessage({
+                        event: re,
+                        data: oe
+                    }) {
+                        const [, ye] = Object.entries(ie).find(([Pe]) => re.toLowerCase() === `update-${Pe}`) || [];
+                        ye && ye.next(JSON.parse(oe))
+                    }
+                });
+            v().then(() => {
+                Se.close()
+            });
+            const ue = await Promise.all(Object.keys(b).map(re => AS(re, b[re], n, Q, ie[re], H, e, async oe => {
+                e.aborted || (await u(), M == null || M(oe))
+            }).then(oe => (v().then(() => {
+                oe.dispose()
+            }), oe)))).then(re => Object.keys(b).reduce((oe, ye) => {
+                const Pe = re.find($e => $e.replicationState.collection.name === ye);
+                return oe[ye] = Pe, oe
+            }, {}));
+            return Object.values(ue).forEach(re => {
+                re.canceledPromise.then(() => {
+                    e.aborted || Se.close()
+                })
+            }), await Promise.all(Object.entries(ue).map(([re, oe]) => {
+                const ye = b[re];
+                return (async () => {
+                    const Be = "sync-time";
+                    await ye.insertLocal(Be, {
+                        [Be]: 0
+                    }).catch(() => null);
+                    const fe = ye.$.subscribe(({
+                            isLocal: ne,
+                            documentId: we,
+                            operation: _e
+                        }) => {
+                            !ne || we !== Be || (_e === "INSERT" || _e === "DELETE") && (fe.unsubscribe(), P.close(), location.reload())
+                        }),
+                        ve = ye.getLocal$(Be).pipe(Te(ne => ne ? ne.get(Be) !== 0 : !1));
+                    oe.activePromise.then(async () => {
+                        await oe.replicationState.awaitInSync(), ye.closed || await ye.upsertLocal(Be, {
+                            [Be]: Date.now()
+                        })
+                    }), await Promise.race([Kr(ve).catch(() => null), v()]), fe.unsubscribe()
+                })()
+            })), {
+                async awaitActiveReplication() {
+                    await Promise.all(Object.values(ue).map(re => re.awaitActiveReplication()))
+                }
+            }
+        })();
+        return y.catch(b => {
+            i && b instanceof ro && NS.includes(b.code) && location.reload()
+        }), Promise.all([y, S]).then(([b, P]) => ({
+            database: b.database,
+            replication: P
+        }))
+    }, Q_ = () => {
+        wS(), ia(jd), ia(vS), ia(kS)
+    };
+var aa = {
+        exports: {}
+    },
+    MS = aa.exports,
+    ju;
+
+function FS() {
+    return ju || (ju = 1, function(e, t) {
+        (function(r, n) {
+            e.exports = n()
+        })(MS, function() {
+            var r = function(a, o) {
+                    return (r = Object.setPrototypeOf || {
+                            __proto__: []
+                        }
+                        instanceof Array && function(l, d) {
+                            l.__proto__ = d
+                        } || function(l, d) {
+                            for (var f in d) Object.prototype.hasOwnProperty.call(d, f) && (l[f] = d[f])
+                        })(a, o)
+                },
+                n = function() {
+                    return (n = Object.assign || function(a) {
+                        for (var o, l = 1, d = arguments.length; l < d; l++)
+                            for (var f in o = arguments[l]) Object.prototype.hasOwnProperty.call(o, f) && (a[f] = o[f]);
+                        return a
+                    }).apply(this, arguments)
+                };
+
+            function i(a, o, l) {
+                for (var d, f = 0, p = o.length; f < p; f++) !d && f in o || ((d = d || Array.prototype.slice.call(o, 0, f))[f] = o[f]);
+                return a.concat(d || Array.prototype.slice.call(o))
+            }
+            var s = typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : cf,
+                c = Object.keys,
+                u = Array.isArray;
+
+            function h(a, o) {
+                return typeof o != "object" || c(o).forEach(function(l) {
+                    a[l] = o[l]
+                }), a
+            }
+            typeof Promise > "u" || s.Promise || (s.Promise = Promise);
+            var v = Object.getPrototypeOf,
+                m = {}.hasOwnProperty;
+
+            function y(a, o) {
+                return m.call(a, o)
+            }
+
+            function w(a, o) {
+                typeof o == "function" && (o = o(v(a))), (typeof Reflect > "u" ? c : Reflect.ownKeys)(o).forEach(function(l) {
+                    b(a, l, o[l])
+                })
+            }
+            var S = Object.defineProperty;
+
+            function b(a, o, l, d) {
+                S(a, o, h(l && y(l, "get") && typeof l.get == "function" ? {
+                    get: l.get,
+                    set: l.set,
+                    configurable: !0
+                } : {
+                    value: l,
+                    configurable: !0,
+                    writable: !0
+                }, d))
+            }
+
+            function P(a) {
+                return {
+                    from: function(o) {
+                        return a.prototype = Object.create(o.prototype), b(a.prototype, "constructor", a), {
+                            extend: w.bind(null, a.prototype)
+                        }
+                    }
+                }
+            }
+            var T = Object.getOwnPropertyDescriptor,
+                F = [].slice;
+
+            function U(a, o, l) {
+                return F.call(a, o, l)
+            }
+
+            function M(a, o) {
+                return o(a)
+            }
+
+            function z(a) {
+                if (!a) throw new Error("Assertion Failed")
+            }
+
+            function H(a) {
+                s.setImmediate ? setImmediate(a) : setTimeout(a, 0)
+            }
+
+            function Q(a, o) {
+                if (typeof o == "string" && y(a, o)) return a[o];
+                if (!o) return a;
+                if (typeof o != "string") {
+                    for (var l = [], d = 0, f = o.length; d < f; ++d) {
+                        var p = Q(a, o[d]);
+                        l.push(p)
+                    }
+                    return l
+                }
+                var g = o.indexOf(".");
+                if (g !== -1) {
+                    var E = a[o.substr(0, g)];
+                    return E == null ? void 0 : Q(E, o.substr(g + 1))
+                }
+            }
+
+            function W(a, o, l) {
+                if (a && o !== void 0 && !("isFrozen" in Object && Object.isFrozen(a)))
+                    if (typeof o != "string" && "length" in o) {
+                        z(typeof l != "string" && "length" in l);
+                        for (var d = 0, f = o.length; d < f; ++d) W(a, o[d], l[d])
+                    } else {
+                        var p, g, E = o.indexOf(".");
+                        E !== -1 ? (p = o.substr(0, E), (g = o.substr(E + 1)) === "" ? l === void 0 ? u(a) && !isNaN(parseInt(p)) ? a.splice(p, 1) : delete a[p] : a[p] = l : W(E = !(E = a[p]) || !y(a, p) ? a[p] = {} : E, g, l)) : l === void 0 ? u(a) && !isNaN(parseInt(o)) ? a.splice(o, 1) : delete a[o] : a[o] = l
+                    }
+            }
+
+            function ie(a) {
+                var o, l = {};
+                for (o in a) y(a, o) && (l[o] = a[o]);
+                return l
+            }
+            var de = [].concat;
+
+            function Se(a) {
+                return de.apply([], a)
+            }
+            var Rt = "BigUint64Array,BigInt64Array,Array,Boolean,String,Date,RegExp,Blob,File,FileList,FileSystemFileHandle,FileSystemDirectoryHandle,ArrayBuffer,DataView,Uint8ClampedArray,ImageBitmap,ImageData,Map,Set,CryptoKey".split(",").concat(Se([8, 16, 32, 64].map(function(a) {
+                    return ["Int", "Uint", "Float"].map(function(o) {
+                        return o + a + "Array"
+                    })
+                }))).filter(function(a) {
+                    return s[a]
+                }),
+                ue = new Set(Rt.map(function(a) {
+                    return s[a]
+                })),
+                re = null;
+
+            function oe(a) {
+                return re = new WeakMap, a = function o(l) {
+                    if (!l || typeof l != "object") return l;
+                    var d = re.get(l);
+                    if (d) return d;
+                    if (u(l)) {
+                        d = [], re.set(l, d);
+                        for (var f = 0, p = l.length; f < p; ++f) d.push(o(l[f]))
+                    } else if (ue.has(l.constructor)) d = l;
+                    else {
+                        var g, E = v(l);
+                        for (g in d = E === Object.prototype ? {} : Object.create(E), re.set(l, d), l) y(l, g) && (d[g] = o(l[g]))
+                    }
+                    return d
+                }(a), re = null, a
+            }
+            var ye = {}.toString;
+
+            function Pe(a) {
+                return ye.call(a).slice(8, -1)
+            }
+            var $e = typeof Symbol < "u" ? Symbol.iterator : "@@iterator",
+                Be = typeof $e == "symbol" ? function(a) {
+                    var o;
+                    return a != null && (o = a[$e]) && o.apply(a)
+                } : function() {
+                    return null
+                };
+
+            function fe(a, o) {
+                return o = a.indexOf(o), 0 <= o && a.splice(o, 1), 0 <= o
+            }
+            var ve = {};
+
+            function ne(a) {
+                var o, l, d, f;
+                if (arguments.length === 1) {
+                    if (u(a)) return a.slice();
+                    if (this === ve && typeof a == "string") return [a];
+                    if (f = Be(a)) {
+                        for (l = []; !(d = f.next()).done;) l.push(d.value);
+                        return l
+                    }
+                    if (a == null) return [a];
+                    if (typeof(o = a.length) != "number") return [a];
+                    for (l = new Array(o); o--;) l[o] = a[o];
+                    return l
+                }
+                for (o = arguments.length, l = new Array(o); o--;) l[o] = arguments[o];
+                return l
+            }
+            var we = typeof Symbol < "u" ? function(a) {
+                    return a[Symbol.toStringTag] === "AsyncFunction"
+                } : function() {
+                    return !1
+                },
+                yn = ["Unknown", "Constraint", "Data", "TransactionInactive", "ReadOnly", "Version", "NotFound", "InvalidState", "InvalidAccess", "Abort", "Timeout", "QuotaExceeded", "Syntax", "DataClone"],
+                pt = ["Modify", "Bulk", "OpenFailed", "VersionChange", "Schema", "Upgrade", "InvalidTable", "MissingAPI", "NoSuchDatabase", "InvalidArgument", "SubTransaction", "Unsupported", "Internal", "DatabaseClosed", "PrematureCommit", "ForeignAwait"].concat(yn),
+                _e = {
+                    VersionChanged: "Database version changed by other database connection",
+                    DatabaseClosed: "Database has been closed",
+                    Abort: "Transaction aborted",
+                    TransactionInactive: "Transaction has already completed or failed",
+                    MissingAPI: "IndexedDB API missing. Please visit https://tinyurl.com/y2uuvskb"
+                };
+
+            function ge(a, o) {
+                this.name = a, this.message = o
+            }
+
+            function We(a, o) {
+                return a + ". Errors: " + Object.keys(o).map(function(l) {
+                    return o[l].toString()
+                }).filter(function(l, d, f) {
+                    return f.indexOf(l) === d
+                }).join(`
+`)
+            }
+
+            function ft(a, o, l, d) {
+                this.failures = o, this.failedKeys = d, this.successCount = l, this.message = We(a, o)
+            }
+
+            function Ht(a, o) {
+                this.name = "BulkError", this.failures = Object.keys(o).map(function(l) {
+                    return o[l]
+                }), this.failuresByPos = o, this.message = We(a, this.failures)
+            }
+            P(ge).from(Error).extend({
+                toString: function() {
+                    return this.name + ": " + this.message
+                }
+            }), P(ft).from(ge), P(Ht).from(ge);
+            var ja = pt.reduce(function(a, o) {
+                    return a[o] = o + "Error", a
+                }, {}),
+                Ih = ge,
+                se = pt.reduce(function(a, o) {
+                    var l = o + "Error";
+
+                    function d(f, p) {
+                        this.name = l, f ? typeof f == "string" ? (this.message = "".concat(f).concat(p ? `
+ ` + p : ""), this.inner = p || null) : typeof f == "object" && (this.message = "".concat(f.name, " ").concat(f.message), this.inner = f) : (this.message = _e[o] || l, this.inner = null)
+                    }
+                    return P(d).from(Ih), a[o] = d, a
+                }, {});
+            se.Syntax = SyntaxError, se.Type = TypeError, se.Range = RangeError;
+            var uc = yn.reduce(function(a, o) {
+                    return a[o + "Error"] = se[o], a
+                }, {}),
+                wi = pt.reduce(function(a, o) {
+                    return ["Syntax", "Type", "Range"].indexOf(o) === -1 && (a[o + "Error"] = se[o]), a
+                }, {});
+
+            function Ce() {}
+
+            function pn(a) {
+                return a
+            }
+
+            function Rh(a, o) {
+                return a == null || a === pn ? o : function(l) {
+                    return o(a(l))
+                }
+            }
+
+            function lr(a, o) {
+                return function() {
+                    a.apply(this, arguments), o.apply(this, arguments)
+                }
+            }
+
+            function Dh(a, o) {
+                return a === Ce ? o : function() {
+                    var l = a.apply(this, arguments);
+                    l !== void 0 && (arguments[0] = l);
+                    var d = this.onsuccess,
+                        f = this.onerror;
+                    this.onsuccess = null, this.onerror = null;
+                    var p = o.apply(this, arguments);
+                    return d && (this.onsuccess = this.onsuccess ? lr(d, this.onsuccess) : d), f && (this.onerror = this.onerror ? lr(f, this.onerror) : f), p !== void 0 ? p : l
+                }
+            }
+
+            function Kh(a, o) {
+                return a === Ce ? o : function() {
+                    a.apply(this, arguments);
+                    var l = this.onsuccess,
+                        d = this.onerror;
+                    this.onsuccess = this.onerror = null, o.apply(this, arguments), l && (this.onsuccess = this.onsuccess ? lr(l, this.onsuccess) : l), d && (this.onerror = this.onerror ? lr(d, this.onerror) : d)
+                }
+            }
+
+            function xh(a, o) {
+                return a === Ce ? o : function(l) {
+                    var d = a.apply(this, arguments);
+                    h(l, d);
+                    var f = this.onsuccess,
+                        p = this.onerror;
+                    return this.onsuccess = null, this.onerror = null, l = o.apply(this, arguments), f && (this.onsuccess = this.onsuccess ? lr(f, this.onsuccess) : f), p && (this.onerror = this.onerror ? lr(p, this.onerror) : p), d === void 0 ? l === void 0 ? void 0 : l : h(d, l)
+                }
+            }
+
+            function Oh(a, o) {
+                return a === Ce ? o : function() {
+                    return o.apply(this, arguments) !== !1 && a.apply(this, arguments)
+                }
+            }
+
+            function Ga(a, o) {
+                return a === Ce ? o : function() {
+                    var l = a.apply(this, arguments);
+                    if (l && typeof l.then == "function") {
+                        for (var d = this, f = arguments.length, p = new Array(f); f--;) p[f] = arguments[f];
+                        return l.then(function() {
+                            return o.apply(d, p)
+                        })
+                    }
+                    return o.apply(this, arguments)
+                }
+            }
+            wi.ModifyError = ft, wi.DexieError = ge, wi.BulkError = Ht;
+            var _t = typeof location < "u" && /^(http|https):\/\/(localhost|127\.0\.0\.1)/.test(location.href);
+
+            function lc(a) {
+                _t = a
+            }
+            var mn = {},
+                dc = 100,
+                Rt = typeof Promise > "u" ? [] : function() {
+                    var a = Promise.resolve();
+                    if (typeof crypto > "u" || !crypto.subtle) return [a, v(a), a];
+                    var o = crypto.subtle.digest("SHA-512", new Uint8Array([0]));
+                    return [o, v(o), a]
+                }(),
+                yn = Rt[0],
+                pt = Rt[1],
+                Rt = Rt[2],
+                pt = pt && pt.then,
+                dr = yn && yn.constructor,
+                Va = !!Rt,
+                vn = function(a, o) {
+                    gn.push([a, o]), bi && (queueMicrotask(Ah), bi = !1)
+                },
+                Ya = !0,
+                bi = !0,
+                hr = [],
+                Si = [],
+                Qa = pn,
+                Jt = {
+                    id: "global",
+                    global: !0,
+                    ref: 0,
+                    unhandleds: [],
+                    onunhandled: Ce,
+                    pgp: !1,
+                    env: {},
+                    finalize: Ce
+                },
+                ae = Jt,
+                gn = [],
+                fr = 0,
+                Ei = [];
+
+            function X(a) {
+                if (typeof this != "object") throw new TypeError("Promises must be constructed via new");
+                this._listeners = [], this._lib = !1;
+                var o = this._PSD = ae;
+                if (typeof a != "function") {
+                    if (a !== mn) throw new TypeError("Not a function");
+                    return this._state = arguments[1], this._value = arguments[2], void(this._state === !1 && Za(this, this._value))
+                }
+                this._state = null, this._value = null, ++o.ref,
+                    function l(d, f) {
+                        try {
+                            f(function(p) {
+                                if (d._state === null) {
+                                    if (p === d) throw new TypeError("A promise cannot be resolved with itself.");
+                                    var g = d._lib && Mr();
+                                    p && typeof p.then == "function" ? l(d, function(E, k) {
+                                        p instanceof X ? p._then(E, k) : p.then(E, k)
+                                    }) : (d._state = !0, d._value = p, fc(d)), g && Fr()
+                                }
+                            }, Za.bind(null, d))
+                        } catch (p) {
+                            Za(d, p)
+                        }
+                    }(this, a)
+            }
+            var Xa = {
+                get: function() {
+                    var a = ae,
+                        o = Ci;
+
+                    function l(d, f) {
+                        var p = this,
+                            g = !a.global && (a !== ae || o !== Ci),
+                            E = g && !jt(),
+                            k = new X(function(I, K) {
+                                es(p, new hc(mc(d, a, g, E), mc(f, a, g, E), I, K, a))
+                            });
+                        return this._consoleTask && (k._consoleTask = this._consoleTask), k
+                    }
+                    return l.prototype = mn, l
+                },
+                set: function(a) {
+                    b(this, "then", a && a.prototype === mn ? Xa : {
+                        get: function() {
+                            return a
+                        },
+                        set: Xa.set
+                    })
+                }
+            };
+
+            function hc(a, o, l, d, f) {
+                this.onFulfilled = typeof a == "function" ? a : null, this.onRejected = typeof o == "function" ? o : null, this.resolve = l, this.reject = d, this.psd = f
+            }
+
+            function Za(a, o) {
+                var l, d;
+                Si.push(o), a._state === null && (l = a._lib && Mr(), o = Qa(o), a._state = !1, a._value = o, d = a, hr.some(function(f) {
+                    return f._value === d._value
+                }) || hr.push(d), fc(a), l && Fr())
+            }
+
+            function fc(a) {
+                var o = a._listeners;
+                a._listeners = [];
+                for (var l = 0, d = o.length; l < d; ++l) es(a, o[l]);
+                var f = a._PSD;
+                --f.ref || f.finalize(), fr === 0 && (++fr, vn(function() {
+                    --fr == 0 && ts()
+                }, []))
+            }
+
+            function es(a, o) {
+                if (a._state !== null) {
+                    var l = a._state ? o.onFulfilled : o.onRejected;
+                    if (l === null) return (a._state ? o.resolve : o.reject)(a._value);
+                    ++o.psd.ref, ++fr, vn(Th, [l, a, o])
+                } else a._listeners.push(o)
+            }
+
+            function Th(a, o, l) {
+                try {
+                    var d, f = o._value;
+                    !o._state && Si.length && (Si = []), d = _t && o._consoleTask ? o._consoleTask.run(function() {
+                        return a(f)
+                    }) : a(f), o._state || Si.indexOf(f) !== -1 || function(p) {
+                        for (var g = hr.length; g;)
+                            if (hr[--g]._value === p._value) return hr.splice(g, 1)
+                    }(o), l.resolve(d)
+                } catch (p) {
+                    l.reject(p)
+                } finally {
+                    --fr == 0 && ts(), --l.psd.ref || l.psd.finalize()
+                }
+            }
+
+            function Ah() {
+                pr(Jt, function() {
+                    Mr() && Fr()
+                })
+            }
+
+            function Mr() {
+                var a = Ya;
+                return bi = Ya = !1, a
+            }
+
+            function Fr() {
+                var a, o, l;
+                do
+                    for (; 0 < gn.length;)
+                        for (a = gn, gn = [], l = a.length, o = 0; o < l; ++o) {
+                            var d = a[o];
+                            d[0].apply(null, d[1])
+                        }
+                while (0 < gn.length);
+                bi = Ya = !0
+            }
+
+            function ts() {
+                var a = hr;
+                hr = [], a.forEach(function(d) {
+                    d._PSD.onunhandled.call(null, d._value, d)
+                });
+                for (var o = Ei.slice(0), l = o.length; l;) o[--l]()
+            }
+
+            function _i(a) {
+                return new X(mn, !1, a)
+            }
+
+            function xe(a, o) {
+                var l = ae;
+                return function() {
+                    var d = Mr(),
+                        f = ae;
+                    try {
+                        return Gt(l, !0), a.apply(this, arguments)
+                    } catch (p) {
+                        o && o(p)
+                    } finally {
+                        Gt(f, !1), d && Fr()
+                    }
+                }
+            }
+            w(X.prototype, {
+                then: Xa,
+                _then: function(a, o) {
+                    es(this, new hc(null, null, a, o, ae))
+                },
+                catch: function(a) {
+                    if (arguments.length === 1) return this.then(null, a);
+                    var o = a,
+                        l = arguments[1];
+                    return typeof o == "function" ? this.then(null, function(d) {
+                        return (d instanceof o ? l : _i)(d)
+                    }) : this.then(null, function(d) {
+                        return (d && d.name === o ? l : _i)(d)
+                    })
+                },
+                finally: function(a) {
+                    return this.then(function(o) {
+                        return X.resolve(a()).then(function() {
+                            return o
+                        })
+                    }, function(o) {
+                        return X.resolve(a()).then(function() {
+                            return _i(o)
+                        })
+                    })
+                },
+                timeout: function(a, o) {
+                    var l = this;
+                    return a < 1 / 0 ? new X(function(d, f) {
+                        var p = setTimeout(function() {
+                            return f(new se.Timeout(o))
+                        }, a);
+                        l.then(d, f).finally(clearTimeout.bind(null, p))
+                    }) : this
+                }
+            }), typeof Symbol < "u" && Symbol.toStringTag && b(X.prototype, Symbol.toStringTag, "Dexie.Promise"), Jt.env = pc(), w(X, {
+                all: function() {
+                    var a = ne.apply(null, arguments).map(Ii);
+                    return new X(function(o, l) {
+                        a.length === 0 && o([]);
+                        var d = a.length;
+                        a.forEach(function(f, p) {
+                            return X.resolve(f).then(function(g) {
+                                a[p] = g, --d || o(a)
+                            }, l)
+                        })
+                    })
+                },
+                resolve: function(a) {
+                    return a instanceof X ? a : a && typeof a.then == "function" ? new X(function(o, l) {
+                        a.then(o, l)
+                    }) : new X(mn, !0, a)
+                },
+                reject: _i,
+                race: function() {
+                    var a = ne.apply(null, arguments).map(Ii);
+                    return new X(function(o, l) {
+                        a.map(function(d) {
+                            return X.resolve(d).then(o, l)
+                        })
+                    })
+                },
+                PSD: {
+                    get: function() {
+                        return ae
+                    },
+                    set: function(a) {
+                        return ae = a
+                    }
+                },
+                totalEchoes: {
+                    get: function() {
+                        return Ci
+                    }
+                },
+                newPSD: zt,
+                usePSD: pr,
+                scheduler: {
+                    get: function() {
+                        return vn
+                    },
+                    set: function(a) {
+                        vn = a
+                    }
+                },
+                rejectionMapper: {
+                    get: function() {
+                        return Qa
+                    },
+                    set: function(a) {
+                        Qa = a
+                    }
+                },
+                follow: function(a, o) {
+                    return new X(function(l, d) {
+                        return zt(function(f, p) {
+                            var g = ae;
+                            g.unhandleds = [], g.onunhandled = p, g.finalize = lr(function() {
+                                var E, k = this;
+                                E = function() {
+                                    k.unhandleds.length === 0 ? f() : p(k.unhandleds[0])
+                                }, Ei.push(function I() {
+                                    E(), Ei.splice(Ei.indexOf(I), 1)
+                                }), ++fr, vn(function() {
+                                    --fr == 0 && ts()
+                                }, [])
+                            }, g.finalize), a()
+                        }, o, l, d)
+                    })
+                }
+            }), dr && (dr.allSettled && b(X, "allSettled", function() {
+                var a = ne.apply(null, arguments).map(Ii);
+                return new X(function(o) {
+                    a.length === 0 && o([]);
+                    var l = a.length,
+                        d = new Array(l);
+                    a.forEach(function(f, p) {
+                        return X.resolve(f).then(function(g) {
+                            return d[p] = {
+                                status: "fulfilled",
+                                value: g
+                            }
+                        }, function(g) {
+                            return d[p] = {
+                                status: "rejected",
+                                reason: g
+                            }
+                        }).then(function() {
+                            return --l || o(d)
+                        })
+                    })
+                })
+            }), dr.any && typeof AggregateError < "u" && b(X, "any", function() {
+                var a = ne.apply(null, arguments).map(Ii);
+                return new X(function(o, l) {
+                    a.length === 0 && l(new AggregateError([]));
+                    var d = a.length,
+                        f = new Array(d);
+                    a.forEach(function(p, g) {
+                        return X.resolve(p).then(function(E) {
+                            return o(E)
+                        }, function(E) {
+                            f[g] = E, --d || l(new AggregateError(f))
+                        })
+                    })
+                })
+            }), dr.withResolvers && (X.withResolvers = dr.withResolvers));
+            var qe = {
+                    awaits: 0,
+                    echoes: 0,
+                    id: 0
+                },
+                Nh = 0,
+                Pi = [],
+                ki = 0,
+                Ci = 0,
+                Bh = 0;
+
+            function zt(a, o, l, d) {
+                var f = ae,
+                    p = Object.create(f);
+                return p.parent = f, p.ref = 0, p.global = !1, p.id = ++Bh, Jt.env, p.env = Va ? {
+                    Promise: X,
+                    PromiseProp: {
+                        value: X,
+                        configurable: !0,
+                        writable: !0
+                    },
+                    all: X.all,
+                    race: X.race,
+                    allSettled: X.allSettled,
+                    any: X.any,
+                    resolve: X.resolve,
+                    reject: X.reject
+                } : {}, o && h(p, o), ++f.ref, p.finalize = function() {
+                    --this.parent.ref || this.parent.finalize()
+                }, d = pr(p, a, l, d), p.ref === 0 && p.finalize(), d
+            }
+
+            function Lr() {
+                return qe.id || (qe.id = ++Nh), ++qe.awaits, qe.echoes += dc, qe.id
+            }
+
+            function jt() {
+                return !!qe.awaits && (--qe.awaits == 0 && (qe.id = 0), qe.echoes = qe.awaits * dc, !0)
+            }
+
+            function Ii(a) {
+                return qe.echoes && a && a.constructor === dr ? (Lr(), a.then(function(o) {
+                    return jt(), o
+                }, function(o) {
+                    return jt(), Me(o)
+                })) : a
+            }
+
+            function Mh() {
+                var a = Pi[Pi.length - 1];
+                Pi.pop(), Gt(a, !1)
+            }
+
+            function Gt(a, o) {
+                var l, d = ae;
+                (o ? !qe.echoes || ki++ && a === ae : !ki || --ki && a === ae) || queueMicrotask(o ? (function(f) {
+                    ++Ci, qe.echoes && --qe.echoes != 0 || (qe.echoes = qe.awaits = qe.id = 0), Pi.push(ae), Gt(f, !0)
+                }).bind(null, a) : Mh), a !== ae && (ae = a, d === Jt && (Jt.env = pc()), Va && (l = Jt.env.Promise, o = a.env, (d.global || a.global) && (Object.defineProperty(s, "Promise", o.PromiseProp), l.all = o.all, l.race = o.race, l.resolve = o.resolve, l.reject = o.reject, o.allSettled && (l.allSettled = o.allSettled), o.any && (l.any = o.any))))
+            }
+
+            function pc() {
+                var a = s.Promise;
+                return Va ? {
+                    Promise: a,
+                    PromiseProp: Object.getOwnPropertyDescriptor(s, "Promise"),
+                    all: a.all,
+                    race: a.race,
+                    allSettled: a.allSettled,
+                    any: a.any,
+                    resolve: a.resolve,
+                    reject: a.reject
+                } : {}
+            }
+
+            function pr(a, o, l, d, f) {
+                var p = ae;
+                try {
+                    return Gt(a, !0), o(l, d, f)
+                } finally {
+                    Gt(p, !1)
+                }
+            }
+
+            function mc(a, o, l, d) {
+                return typeof a != "function" ? a : function() {
+                    var f = ae;
+                    l && Lr(), Gt(o, !0);
+                    try {
+                        return a.apply(this, arguments)
+                    } finally {
+                        Gt(f, !1), d && queueMicrotask(jt)
+                    }
+                }
+            }
+
+            function rs(a) {
+                Promise === dr && qe.echoes === 0 ? ki === 0 ? a() : enqueueNativeMicroTask(a) : setTimeout(a, 0)
+            }("" + pt).indexOf("[native code]") === -1 && (Lr = jt = Ce);
+            var Me = X.reject,
+                mr = "￿",
+                It = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.",
+                yc = "String expected.",
+                Ur = [],
+                Ri = "__dbnames",
+                ns = "readonly",
+                is = "readwrite";
+
+            function yr(a, o) {
+                return a ? o ? function() {
+                    return a.apply(this, arguments) && o.apply(this, arguments)
+                } : a : o
+            }
+            var vc = {
+                type: 3,
+                lower: -1 / 0,
+                lowerOpen: !1,
+                upper: [
+                    []
+                ],
+                upperOpen: !1
+            };
+
+            function Di(a) {
+                return typeof a != "string" || /\./.test(a) ? function(o) {
+                    return o
+                } : function(o) {
+                    return o[a] === void 0 && a in o && delete(o = oe(o))[a], o
+                }
+            }
+
+            function gc() {
+                throw se.Type()
+            }
+
+            function be(a, o) {
+                try {
+                    var l = wc(a),
+                        d = wc(o);
+                    if (l !== d) return l === "Array" ? 1 : d === "Array" ? -1 : l === "binary" ? 1 : d === "binary" ? -1 : l === "string" ? 1 : d === "string" ? -1 : l === "Date" ? 1 : d !== "Date" ? NaN : -1;
+                    switch (l) {
+                        case "number":
+                        case "Date":
+                        case "string":
+                            return o < a ? 1 : a < o ? -1 : 0;
+                        case "binary":
+                            return function(f, p) {
+                                for (var g = f.length, E = p.length, k = g < E ? g : E, I = 0; I < k; ++I)
+                                    if (f[I] !== p[I]) return f[I] < p[I] ? -1 : 1;
+                                return g === E ? 0 : g < E ? -1 : 1
+                            }(bc(a), bc(o));
+                        case "Array":
+                            return function(f, p) {
+                                for (var g = f.length, E = p.length, k = g < E ? g : E, I = 0; I < k; ++I) {
+                                    var K = be(f[I], p[I]);
+                                    if (K !== 0) return K
+                                }
+                                return g === E ? 0 : g < E ? -1 : 1
+                            }(a, o)
+                    }
+                } catch {}
+                return NaN
+            }
+
+            function wc(a) {
+                var o = typeof a;
+                return o != "object" ? o : ArrayBuffer.isView(a) ? "binary" : (a = Pe(a), a === "ArrayBuffer" ? "binary" : a)
+            }
+
+            function bc(a) {
+                return a instanceof Uint8Array ? a : ArrayBuffer.isView(a) ? new Uint8Array(a.buffer, a.byteOffset, a.byteLength) : new Uint8Array(a)
+            }
+            var Sc = (Ke.prototype._trans = function(a, o, l) {
+                var d = this._tx || ae.trans,
+                    f = this.name,
+                    p = _t && typeof console < "u" && console.createTask && console.createTask("Dexie: ".concat(a === "readonly" ? "read" : "write", " ").concat(this.name));
+
+                function g(I, K, _) {
+                    if (!_.schema[f]) throw new se.NotFound("Table " + f + " not part of transaction");
+                    return o(_.idbtrans, _)
+                }
+                var E = Mr();
+                try {
+                    var k = d && d.db._novip === this.db._novip ? d === ae.trans ? d._promise(a, g, l) : zt(function() {
+                        return d._promise(a, g, l)
+                    }, {
+                        trans: d,
+                        transless: ae.transless || ae
+                    }) : function I(K, _, O, C) {
+                        if (K.idbdb && (K._state.openComplete || ae.letThrough || K._vip)) {
+                            var D = K._createTransaction(_, O, K._dbSchema);
+                            try {
+                                D.create(), K._state.PR1398_maxLoop = 3
+                            } catch (x) {
+                                return x.name === ja.InvalidState && K.isOpen() && 0 < --K._state.PR1398_maxLoop ? (console.warn("Dexie: Need to reopen db"), K.close({
+                                    disableAutoOpen: !1
+                                }), K.open().then(function() {
+                                    return I(K, _, O, C)
+                                })) : Me(x)
+                            }
+                            return D._promise(_, function(x, R) {
+                                return zt(function() {
+                                    return ae.trans = D, C(x, R, D)
+                                })
+                            }).then(function(x) {
+                                if (_ === "readwrite") try {
+                                    D.idbtrans.commit()
+                                } catch {}
+                                return _ === "readonly" ? x : D._completion.then(function() {
+                                    return x
+                                })
+                            })
+                        }
+                        if (K._state.openComplete) return Me(new se.DatabaseClosed(K._state.dbOpenError));
+                        if (!K._state.isBeingOpened) {
+                            if (!K._state.autoOpen) return Me(new se.DatabaseClosed);
+                            K.open().catch(Ce)
+                        }
+                        return K._state.dbReadyPromise.then(function() {
+                            return I(K, _, O, C)
+                        })
+                    }(this.db, a, [this.name], g);
+                    return p && (k._consoleTask = p, k = k.catch(function(I) {
+                        return console.trace(I), Me(I)
+                    })), k
+                } finally {
+                    E && Fr()
+                }
+            }, Ke.prototype.get = function(a, o) {
+                var l = this;
+                return a && a.constructor === Object ? this.where(a).first(o) : a == null ? Me(new se.Type("Invalid argument to Table.get()")) : this._trans("readonly", function(d) {
+                    return l.core.get({
+                        trans: d,
+                        key: a
+                    }).then(function(f) {
+                        return l.hook.reading.fire(f)
+                    })
+                }).then(o)
+            }, Ke.prototype.where = function(a) {
+                if (typeof a == "string") return new this.db.WhereClause(this, a);
+                if (u(a)) return new this.db.WhereClause(this, "[".concat(a.join("+"), "]"));
+                var o = c(a);
+                if (o.length === 1) return this.where(o[0]).equals(a[o[0]]);
+                var l = this.schema.indexes.concat(this.schema.primKey).filter(function(E) {
+                    if (E.compound && o.every(function(I) {
+                            return 0 <= E.keyPath.indexOf(I)
+                        })) {
+                        for (var k = 0; k < o.length; ++k)
+                            if (o.indexOf(E.keyPath[k]) === -1) return !1;
+                        return !0
+                    }
+                    return !1
+                }).sort(function(E, k) {
+                    return E.keyPath.length - k.keyPath.length
+                })[0];
+                if (l && this.db._maxKey !== mr) {
+                    var p = l.keyPath.slice(0, o.length);
+                    return this.where(p).equals(p.map(function(k) {
+                        return a[k]
+                    }))
+                }!l && _t && console.warn("The query ".concat(JSON.stringify(a), " on ").concat(this.name, " would benefit from a ") + "compound index [".concat(o.join("+"), "]"));
+                var d = this.schema.idxByName;
+
+                function f(E, k) {
+                    return be(E, k) === 0
+                }
+                var g = o.reduce(function(_, k) {
+                        var I = _[0],
+                            K = _[1],
+                            _ = d[k],
+                            O = a[k];
+                        return [I || _, I || !_ ? yr(K, _ && _.multi ? function(C) {
+                            return C = Q(C, k), u(C) && C.some(function(D) {
+                                return f(O, D)
+                            })
+                        } : function(C) {
+                            return f(O, Q(C, k))
+                        }) : K]
+                    }, [null, null]),
+                    p = g[0],
+                    g = g[1];
+                return p ? this.where(p.name).equals(a[p.keyPath]).filter(g) : l ? this.filter(g) : this.where(o).equals("")
+            }, Ke.prototype.filter = function(a) {
+                return this.toCollection().and(a)
+            }, Ke.prototype.count = function(a) {
+                return this.toCollection().count(a)
+            }, Ke.prototype.offset = function(a) {
+                return this.toCollection().offset(a)
+            }, Ke.prototype.limit = function(a) {
+                return this.toCollection().limit(a)
+            }, Ke.prototype.each = function(a) {
+                return this.toCollection().each(a)
+            }, Ke.prototype.toArray = function(a) {
+                return this.toCollection().toArray(a)
+            }, Ke.prototype.toCollection = function() {
+                return new this.db.Collection(new this.db.WhereClause(this))
+            }, Ke.prototype.orderBy = function(a) {
+                return new this.db.Collection(new this.db.WhereClause(this, u(a) ? "[".concat(a.join("+"), "]") : a))
+            }, Ke.prototype.reverse = function() {
+                return this.toCollection().reverse()
+            }, Ke.prototype.mapToClass = function(a) {
+                var o, l = this.db,
+                    d = this.name;
+
+                function f() {
+                    return o !== null && o.apply(this, arguments) || this
+                }(this.schema.mappedClass = a).prototype instanceof gc && (function(k, I) {
+                    if (typeof I != "function" && I !== null) throw new TypeError("Class extends value " + String(I) + " is not a constructor or null");
+
+                    function K() {
+                        this.constructor = k
+                    }
+                    r(k, I), k.prototype = I === null ? Object.create(I) : (K.prototype = I.prototype, new K)
+                }(f, o = a), Object.defineProperty(f.prototype, "db", {
+                    get: function() {
+                        return l
+                    },
+                    enumerable: !1,
+                    configurable: !0
+                }), f.prototype.table = function() {
+                    return d
+                }, a = f);
+                for (var p = new Set, g = a.prototype; g; g = v(g)) Object.getOwnPropertyNames(g).forEach(function(k) {
+                    return p.add(k)
+                });
+
+                function E(k) {
+                    if (!k) return k;
+                    var I, K = Object.create(a.prototype);
+                    for (I in k)
+                        if (!p.has(I)) try {
+                            K[I] = k[I]
+                        } catch {}
+                    return K
+                }
+                return this.schema.readHook && this.hook.reading.unsubscribe(this.schema.readHook), this.schema.readHook = E, this.hook("reading", E), a
+            }, Ke.prototype.defineClass = function() {
+                return this.mapToClass(function(a) {
+                    h(this, a)
+                })
+            }, Ke.prototype.add = function(a, o) {
+                var l = this,
+                    d = this.schema.primKey,
+                    f = d.auto,
+                    p = d.keyPath,
+                    g = a;
+                return p && f && (g = Di(p)(a)), this._trans("readwrite", function(E) {
+                    return l.core.mutate({
+                        trans: E,
+                        type: "add",
+                        keys: o != null ? [o] : null,
+                        values: [g]
+                    })
+                }).then(function(E) {
+                    return E.numFailures ? X.reject(E.failures[0]) : E.lastResult
+                }).then(function(E) {
+                    if (p) try {
+                        W(a, p, E)
+                    } catch {}
+                    return E
+                })
+            }, Ke.prototype.update = function(a, o) {
+                return typeof a != "object" || u(a) ? this.where(":id").equals(a).modify(o) : (a = Q(a, this.schema.primKey.keyPath), a === void 0 ? Me(new se.InvalidArgument("Given object does not contain its primary key")) : this.where(":id").equals(a).modify(o))
+            }, Ke.prototype.put = function(a, o) {
+                var l = this,
+                    d = this.schema.primKey,
+                    f = d.auto,
+                    p = d.keyPath,
+                    g = a;
+                return p && f && (g = Di(p)(a)), this._trans("readwrite", function(E) {
+                    return l.core.mutate({
+                        trans: E,
+                        type: "put",
+                        values: [g],
+                        keys: o != null ? [o] : null
+                    })
+                }).then(function(E) {
+                    return E.numFailures ? X.reject(E.failures[0]) : E.lastResult
+                }).then(function(E) {
+                    if (p) try {
+                        W(a, p, E)
+                    } catch {}
+                    return E
+                })
+            }, Ke.prototype.delete = function(a) {
+                var o = this;
+                return this._trans("readwrite", function(l) {
+                    return o.core.mutate({
+                        trans: l,
+                        type: "delete",
+                        keys: [a]
+                    })
+                }).then(function(l) {
+                    return l.numFailures ? X.reject(l.failures[0]) : void 0
+                })
+            }, Ke.prototype.clear = function() {
+                var a = this;
+                return this._trans("readwrite", function(o) {
+                    return a.core.mutate({
+                        trans: o,
+                        type: "deleteRange",
+                        range: vc
+                    })
+                }).then(function(o) {
+                    return o.numFailures ? X.reject(o.failures[0]) : void 0
+                })
+            }, Ke.prototype.bulkGet = function(a) {
+                var o = this;
+                return this._trans("readonly", function(l) {
+                    return o.core.getMany({
+                        keys: a,
+                        trans: l
+                    }).then(function(d) {
+                        return d.map(function(f) {
+                            return o.hook.reading.fire(f)
+                        })
+                    })
+                })
+            }, Ke.prototype.bulkAdd = function(a, o, l) {
+                var d = this,
+                    f = Array.isArray(o) ? o : void 0,
+                    p = (l = l || (f ? void 0 : o)) ? l.allKeys : void 0;
+                return this._trans("readwrite", function(g) {
+                    var I = d.schema.primKey,
+                        E = I.auto,
+                        I = I.keyPath;
+                    if (I && f) throw new se.InvalidArgument("bulkAdd(): keys argument invalid on tables with inbound keys");
+                    if (f && f.length !== a.length) throw new se.InvalidArgument("Arguments objects and keys must have the same length");
+                    var k = a.length,
+                        I = I && E ? a.map(Di(I)) : a;
+                    return d.core.mutate({
+                        trans: g,
+                        type: "add",
+                        keys: f,
+                        values: I,
+                        wantResults: p
+                    }).then(function(D) {
+                        var _ = D.numFailures,
+                            O = D.results,
+                            C = D.lastResult,
+                            D = D.failures;
+                        if (_ === 0) return p ? O : C;
+                        throw new Ht("".concat(d.name, ".bulkAdd(): ").concat(_, " of ").concat(k, " operations failed"), D)
+                    })
+                })
+            }, Ke.prototype.bulkPut = function(a, o, l) {
+                var d = this,
+                    f = Array.isArray(o) ? o : void 0,
+                    p = (l = l || (f ? void 0 : o)) ? l.allKeys : void 0;
+                return this._trans("readwrite", function(g) {
+                    var I = d.schema.primKey,
+                        E = I.auto,
+                        I = I.keyPath;
+                    if (I && f) throw new se.InvalidArgument("bulkPut(): keys argument invalid on tables with inbound keys");
+                    if (f && f.length !== a.length) throw new se.InvalidArgument("Arguments objects and keys must have the same length");
+                    var k = a.length,
+                        I = I && E ? a.map(Di(I)) : a;
+                    return d.core.mutate({
+                        trans: g,
+                        type: "put",
+                        keys: f,
+                        values: I,
+                        wantResults: p
+                    }).then(function(D) {
+                        var _ = D.numFailures,
+                            O = D.results,
+                            C = D.lastResult,
+                            D = D.failures;
+                        if (_ === 0) return p ? O : C;
+                        throw new Ht("".concat(d.name, ".bulkPut(): ").concat(_, " of ").concat(k, " operations failed"), D)
+                    })
+                })
+            }, Ke.prototype.bulkUpdate = function(a) {
+                var o = this,
+                    l = this.core,
+                    d = a.map(function(g) {
+                        return g.key
+                    }),
+                    f = a.map(function(g) {
+                        return g.changes
+                    }),
+                    p = [];
+                return this._trans("readwrite", function(g) {
+                    return l.getMany({
+                        trans: g,
+                        keys: d,
+                        cache: "clone"
+                    }).then(function(E) {
+                        var k = [],
+                            I = [];
+                        a.forEach(function(_, O) {
+                            var C = _.key,
+                                D = _.changes,
+                                x = E[O];
+                            if (x) {
+                                for (var R = 0, A = Object.keys(D); R < A.length; R++) {
+                                    var N = A[R],
+                                        B = D[N];
+                                    if (N === o.schema.primKey.keyPath) {
+                                        if (be(B, C) !== 0) throw new se.Constraint("Cannot update primary key in bulkUpdate()")
+                                    } else W(x, N, B)
+                                }
+                                p.push(O), k.push(C), I.push(x)
+                            }
+                        });
+                        var K = k.length;
+                        return l.mutate({
+                            trans: g,
+                            type: "put",
+                            keys: k,
+                            values: I,
+                            updates: {
+                                keys: d,
+                                changeSpecs: f
+                            }
+                        }).then(function(_) {
+                            var O = _.numFailures,
+                                C = _.failures;
+                            if (O === 0) return K;
+                            for (var D = 0, x = Object.keys(C); D < x.length; D++) {
+                                var R, A = x[D],
+                                    N = p[Number(A)];
+                                N != null && (R = C[A], delete C[A], C[N] = R)
+                            }
+                            throw new Ht("".concat(o.name, ".bulkUpdate(): ").concat(O, " of ").concat(K, " operations failed"), C)
+                        })
+                    })
+                })
+            }, Ke.prototype.bulkDelete = function(a) {
+                var o = this,
+                    l = a.length;
+                return this._trans("readwrite", function(d) {
+                    return o.core.mutate({
+                        trans: d,
+                        type: "delete",
+                        keys: a
+                    })
+                }).then(function(g) {
+                    var f = g.numFailures,
+                        p = g.lastResult,
+                        g = g.failures;
+                    if (f === 0) return p;
+                    throw new Ht("".concat(o.name, ".bulkDelete(): ").concat(f, " of ").concat(l, " operations failed"), g)
+                })
+            }, Ke);
+
+            function Ke() {}
+
+            function wn(a) {
+                function o(g, E) {
+                    if (E) {
+                        for (var k = arguments.length, I = new Array(k - 1); --k;) I[k - 1] = arguments[k];
+                        return l[g].subscribe.apply(null, I), a
+                    }
+                    if (typeof g == "string") return l[g]
+                }
+                var l = {};
+                o.addEventType = p;
+                for (var d = 1, f = arguments.length; d < f; ++d) p(arguments[d]);
+                return o;
+
+                function p(g, E, k) {
+                    if (typeof g != "object") {
+                        var I;
+                        E = E || Oh;
+                        var K = {
+                            subscribers: [],
+                            fire: k = k || Ce,
+                            subscribe: function(_) {
+                                K.subscribers.indexOf(_) === -1 && (K.subscribers.push(_), K.fire = E(K.fire, _))
+                            },
+                            unsubscribe: function(_) {
+                                K.subscribers = K.subscribers.filter(function(O) {
+                                    return O !== _
+                                }), K.fire = K.subscribers.reduce(E, k)
+                            }
+                        };
+                        return l[g] = o[g] = K
+                    }
+                    c(I = g).forEach(function(_) {
+                        var O = I[_];
+                        if (u(O)) p(_, I[_][0], I[_][1]);
+                        else {
+                            if (O !== "asap") throw new se.InvalidArgument("Invalid event config");
+                            var C = p(_, pn, function() {
+                                for (var D = arguments.length, x = new Array(D); D--;) x[D] = arguments[D];
+                                C.subscribers.forEach(function(R) {
+                                    H(function() {
+                                        R.apply(null, x)
+                                    })
+                                })
+                            })
+                        }
+                    })
+                }
+            }
+
+            function bn(a, o) {
+                return P(o).from({
+                    prototype: a
+                }), o
+            }
+
+            function Wr(a, o) {
+                return !(a.filter || a.algorithm || a.or) && (o ? a.justLimit : !a.replayFilter)
+            }
+
+            function as(a, o) {
+                a.filter = yr(a.filter, o)
+            }
+
+            function ss(a, o, l) {
+                var d = a.replayFilter;
+                a.replayFilter = d ? function() {
+                    return yr(d(), o())
+                } : o, a.justLimit = l && !d
+            }
+
+            function Ki(a, o) {
+                if (a.isPrimKey) return o.primaryKey;
+                var l = o.getIndexByKeyPath(a.index);
+                if (!l) throw new se.Schema("KeyPath " + a.index + " on object store " + o.name + " is not indexed");
+                return l
+            }
+
+            function Ec(a, o, l) {
+                var d = Ki(a, o.schema);
+                return o.openCursor({
+                    trans: l,
+                    values: !a.keysOnly,
+                    reverse: a.dir === "prev",
+                    unique: !!a.unique,
+                    query: {
+                        index: d,
+                        range: a.range
+                    }
+                })
+            }
+
+            function xi(a, o, l, d) {
+                var f = a.replayFilter ? yr(a.filter, a.replayFilter()) : a.filter;
+                if (a.or) {
+                    var p = {},
+                        g = function(E, k, I) {
+                            var K, _;
+                            f && !f(k, I, function(O) {
+                                return k.stop(O)
+                            }, function(O) {
+                                return k.fail(O)
+                            }) || ((_ = "" + (K = k.primaryKey)) == "[object ArrayBuffer]" && (_ = "" + new Uint8Array(K)), y(p, _) || (p[_] = !0, o(E, k, I)))
+                        };
+                    return Promise.all([a.or._iterate(g, l), _c(Ec(a, d, l), a.algorithm, g, !a.keysOnly && a.valueMapper)])
+                }
+                return _c(Ec(a, d, l), yr(a.algorithm, f), o, !a.keysOnly && a.valueMapper)
+            }
+
+            function _c(a, o, l, d) {
+                var f = xe(d ? function(p, g, E) {
+                    return l(d(p), g, E)
+                } : l);
+                return a.then(function(p) {
+                    if (p) return p.start(function() {
+                        var g = function() {
+                            return p.continue()
+                        };
+                        o && !o(p, function(E) {
+                            return g = E
+                        }, function(E) {
+                            p.stop(E), g = Ce
+                        }, function(E) {
+                            p.fail(E), g = Ce
+                        }) || f(p.value, p, function(E) {
+                            return g = E
+                        }), g()
+                    })
+                })
+            }
+            var Rt = Symbol(),
+                Sn = (Pc.prototype.execute = function(a) {
+                    if (this.add !== void 0) {
+                        var o = this.add;
+                        if (u(o)) return i(i([], u(a) ? a : [], !0), o).sort();
+                        if (typeof o == "number") return (Number(a) || 0) + o;
+                        if (typeof o == "bigint") try {
+                            return BigInt(a) + o
+                        } catch {
+                            return BigInt(0) + o
+                        }
+                        throw new TypeError("Invalid term ".concat(o))
+                    }
+                    if (this.remove !== void 0) {
+                        var l = this.remove;
+                        if (u(l)) return u(a) ? a.filter(function(d) {
+                            return !l.includes(d)
+                        }).sort() : [];
+                        if (typeof l == "number") return Number(a) - l;
+                        if (typeof l == "bigint") try {
+                            return BigInt(a) - l
+                        } catch {
+                            return BigInt(0) - l
+                        }
+                        throw new TypeError("Invalid subtrahend ".concat(l))
+                    }
+                    return o = (o = this.replacePrefix) === null || o === void 0 ? void 0 : o[0], o && typeof a == "string" && a.startsWith(o) ? this.replacePrefix[1] + a.substring(o.length) : a
+                }, Pc);
+
+            function Pc(a) {
+                Object.assign(this, a)
+            }
+            var Fh = (Ee.prototype._read = function(a, o) {
+                var l = this._ctx;
+                return l.error ? l.table._trans(null, Me.bind(null, l.error)) : l.table._trans("readonly", a).then(o)
+            }, Ee.prototype._write = function(a) {
+                var o = this._ctx;
+                return o.error ? o.table._trans(null, Me.bind(null, o.error)) : o.table._trans("readwrite", a, "locked")
+            }, Ee.prototype._addAlgorithm = function(a) {
+                var o = this._ctx;
+                o.algorithm = yr(o.algorithm, a)
+            }, Ee.prototype._iterate = function(a, o) {
+                return xi(this._ctx, a, o, this._ctx.table.core)
+            }, Ee.prototype.clone = function(a) {
+                var o = Object.create(this.constructor.prototype),
+                    l = Object.create(this._ctx);
+                return a && h(l, a), o._ctx = l, o
+            }, Ee.prototype.raw = function() {
+                return this._ctx.valueMapper = null, this
+            }, Ee.prototype.each = function(a) {
+                var o = this._ctx;
+                return this._read(function(l) {
+                    return xi(o, a, l, o.table.core)
+                })
+            }, Ee.prototype.count = function(a) {
+                var o = this;
+                return this._read(function(l) {
+                    var d = o._ctx,
+                        f = d.table.core;
+                    if (Wr(d, !0)) return f.count({
+                        trans: l,
+                        query: {
+                            index: Ki(d, f.schema),
+                            range: d.range
+                        }
+                    }).then(function(g) {
+                        return Math.min(g, d.limit)
+                    });
+                    var p = 0;
+                    return xi(d, function() {
+                        return ++p, !1
+                    }, l, f).then(function() {
+                        return p
+                    })
+                }).then(a)
+            }, Ee.prototype.sortBy = function(a, o) {
+                var l = a.split(".").reverse(),
+                    d = l[0],
+                    f = l.length - 1;
+
+                function p(k, I) {
+                    return I ? p(k[l[I]], I - 1) : k[d]
+                }
+                var g = this._ctx.dir === "next" ? 1 : -1;
+
+                function E(k, I) {
+                    return be(p(k, f), p(I, f)) * g
+                }
+                return this.toArray(function(k) {
+                    return k.sort(E)
+                }).then(o)
+            }, Ee.prototype.toArray = function(a) {
+                var o = this;
+                return this._read(function(l) {
+                    var d = o._ctx;
+                    if (d.dir === "next" && Wr(d, !0) && 0 < d.limit) {
+                        var f = d.valueMapper,
+                            p = Ki(d, d.table.core.schema);
+                        return d.table.core.query({
+                            trans: l,
+                            limit: d.limit,
+                            values: !0,
+                            query: {
+                                index: p,
+                                range: d.range
+                            }
+                        }).then(function(E) {
+                            return E = E.result, f ? E.map(f) : E
+                        })
+                    }
+                    var g = [];
+                    return xi(d, function(E) {
+                        return g.push(E)
+                    }, l, d.table.core).then(function() {
+                        return g
+                    })
+                }, a)
+            }, Ee.prototype.offset = function(a) {
+                var o = this._ctx;
+                return a <= 0 || (o.offset += a, Wr(o) ? ss(o, function() {
+                    var l = a;
+                    return function(d, f) {
+                        return l === 0 || (l === 1 ? --l : f(function() {
+                            d.advance(l), l = 0
+                        }), !1)
+                    }
+                }) : ss(o, function() {
+                    var l = a;
+                    return function() {
+                        return --l < 0
+                    }
+                })), this
+            }, Ee.prototype.limit = function(a) {
+                return this._ctx.limit = Math.min(this._ctx.limit, a), ss(this._ctx, function() {
+                    var o = a;
+                    return function(l, d, f) {
+                        return --o <= 0 && d(f), 0 <= o
+                    }
+                }, !0), this
+            }, Ee.prototype.until = function(a, o) {
+                return as(this._ctx, function(l, d, f) {
+                    return !a(l.value) || (d(f), o)
+                }), this
+            }, Ee.prototype.first = function(a) {
+                return this.limit(1).toArray(function(o) {
+                    return o[0]
+                }).then(a)
+            }, Ee.prototype.last = function(a) {
+                return this.reverse().first(a)
+            }, Ee.prototype.filter = function(a) {
+                var o;
+                return as(this._ctx, function(l) {
+                    return a(l.value)
+                }), (o = this._ctx).isMatch = yr(o.isMatch, a), this
+            }, Ee.prototype.and = function(a) {
+                return this.filter(a)
+            }, Ee.prototype.or = function(a) {
+                return new this.db.WhereClause(this._ctx.table, a, this)
+            }, Ee.prototype.reverse = function() {
+                return this._ctx.dir = this._ctx.dir === "prev" ? "next" : "prev", this._ondirectionchange && this._ondirectionchange(this._ctx.dir), this
+            }, Ee.prototype.desc = function() {
+                return this.reverse()
+            }, Ee.prototype.eachKey = function(a) {
+                var o = this._ctx;
+                return o.keysOnly = !o.isMatch, this.each(function(l, d) {
+                    a(d.key, d)
+                })
+            }, Ee.prototype.eachUniqueKey = function(a) {
+                return this._ctx.unique = "unique", this.eachKey(a)
+            }, Ee.prototype.eachPrimaryKey = function(a) {
+                var o = this._ctx;
+                return o.keysOnly = !o.isMatch, this.each(function(l, d) {
+                    a(d.primaryKey, d)
+                })
+            }, Ee.prototype.keys = function(a) {
+                var o = this._ctx;
+                o.keysOnly = !o.isMatch;
+                var l = [];
+                return this.each(function(d, f) {
+                    l.push(f.key)
+                }).then(function() {
+                    return l
+                }).then(a)
+            }, Ee.prototype.primaryKeys = function(a) {
+                var o = this._ctx;
+                if (o.dir === "next" && Wr(o, !0) && 0 < o.limit) return this._read(function(d) {
+                    var f = Ki(o, o.table.core.schema);
+                    return o.table.core.query({
+                        trans: d,
+                        values: !1,
+                        limit: o.limit,
+                        query: {
+                            index: f,
+                            range: o.range
+                        }
+                    })
+                }).then(function(d) {
+                    return d.result
+                }).then(a);
+                o.keysOnly = !o.isMatch;
+                var l = [];
+                return this.each(function(d, f) {
+                    l.push(f.primaryKey)
+                }).then(function() {
+                    return l
+                }).then(a)
+            }, Ee.prototype.uniqueKeys = function(a) {
+                return this._ctx.unique = "unique", this.keys(a)
+            }, Ee.prototype.firstKey = function(a) {
+                return this.limit(1).keys(function(o) {
+                    return o[0]
+                }).then(a)
+            }, Ee.prototype.lastKey = function(a) {
+                return this.reverse().firstKey(a)
+            }, Ee.prototype.distinct = function() {
+                var a = this._ctx,
+                    a = a.index && a.table.schema.idxByName[a.index];
+                if (!a || !a.multi) return this;
+                var o = {};
+                return as(this._ctx, function(f) {
+                    var d = f.primaryKey.toString(),
+                        f = y(o, d);
+                    return o[d] = !0, !f
+                }), this
+            }, Ee.prototype.modify = function(a) {
+                var o = this,
+                    l = this._ctx;
+                return this._write(function(d) {
+                    var f, p, g;
+                    g = typeof a == "function" ? a : (f = c(a), p = f.length, function(R) {
+                        for (var A = !1, N = 0; N < p; ++N) {
+                            var B = f[N],
+                                L = a[B],
+                                $ = Q(R, B);
+                            L instanceof Sn ? (W(R, B, L.execute($)), A = !0) : $ !== L && (W(R, B, L), A = !0)
+                        }
+                        return A
+                    });
+                    var E = l.table.core,
+                        _ = E.schema.primaryKey,
+                        k = _.outbound,
+                        I = _.extractKey,
+                        K = 200,
+                        _ = o.db._options.modifyChunkSize;
+                    _ && (K = typeof _ == "object" ? _[E.name] || _["*"] || 200 : _);
+
+                    function O(R, B) {
+                        var N = B.failures,
+                            B = B.numFailures;
+                        D += R - B;
+                        for (var L = 0, $ = c(N); L < $.length; L++) {
+                            var G = $[L];
+                            C.push(N[G])
+                        }
+                    }
+                    var C = [],
+                        D = 0,
+                        x = [];
+                    return o.clone().primaryKeys().then(function(R) {
+                        function A(B) {
+                            var L = Math.min(K, R.length - B);
+                            return E.getMany({
+                                trans: d,
+                                keys: R.slice(B, B + L),
+                                cache: "immutable"
+                            }).then(function($) {
+                                for (var G = [], q = [], J = k ? [] : null, V = [], j = 0; j < L; ++j) {
+                                    var Z = $[j],
+                                        he = {
+                                            value: oe(Z),
+                                            primKey: R[B + j]
+                                        };
+                                    g.call(he, he.value, he) !== !1 && (he.value == null ? V.push(R[B + j]) : k || be(I(Z), I(he.value)) === 0 ? (q.push(he.value), k && J.push(R[B + j])) : (V.push(R[B + j]), G.push(he.value)))
+                                }
+                                return Promise.resolve(0 < G.length && E.mutate({
+                                    trans: d,
+                                    type: "add",
+                                    values: G
+                                }).then(function(pe) {
+                                    for (var me in pe.failures) V.splice(parseInt(me), 1);
+                                    O(G.length, pe)
+                                })).then(function() {
+                                    return (0 < q.length || N && typeof a == "object") && E.mutate({
+                                        trans: d,
+                                        type: "put",
+                                        keys: J,
+                                        values: q,
+                                        criteria: N,
+                                        changeSpec: typeof a != "function" && a,
+                                        isAdditionalChunk: 0 < B
+                                    }).then(function(pe) {
+                                        return O(q.length, pe)
+                                    })
+                                }).then(function() {
+                                    return (0 < V.length || N && a === os) && E.mutate({
+                                        trans: d,
+                                        type: "delete",
+                                        keys: V,
+                                        criteria: N,
+                                        isAdditionalChunk: 0 < B
+                                    }).then(function(pe) {
+                                        return O(V.length, pe)
+                                    })
+                                }).then(function() {
+                                    return R.length > B + L && A(B + K)
+                                })
+                            })
+                        }
+                        var N = Wr(l) && l.limit === 1 / 0 && (typeof a != "function" || a === os) && {
+                            index: l.index,
+                            range: l.range
+                        };
+                        return A(0).then(function() {
+                            if (0 < C.length) throw new ft("Error modifying one or more objects", C, D, x);
+                            return R.length
+                        })
+                    })
+                })
+            }, Ee.prototype.delete = function() {
+                var a = this._ctx,
+                    o = a.range;
+                return Wr(a) && (a.isPrimKey || o.type === 3) ? this._write(function(l) {
+                    var d = a.table.core.schema.primaryKey,
+                        f = o;
+                    return a.table.core.count({
+                        trans: l,
+                        query: {
+                            index: d,
+                            range: f
+                        }
+                    }).then(function(p) {
+                        return a.table.core.mutate({
+                            trans: l,
+                            type: "deleteRange",
+                            range: f
+                        }).then(function(g) {
+                            var E = g.failures;
+                            if (g.lastResult, g.results, g = g.numFailures, g) throw new ft("Could not delete some values", Object.keys(E).map(function(k) {
+                                return E[k]
+                            }), p - g);
+                            return p - g
+                        })
+                    })
+                }) : this.modify(os)
+            }, Ee);
+
+            function Ee() {}
+            var os = function(a, o) {
+                return o.value = null
+            };
+
+            function Lh(a, o) {
+                return a < o ? -1 : a === o ? 0 : 1
+            }
+
+            function Uh(a, o) {
+                return o < a ? -1 : a === o ? 0 : 1
+            }
+
+            function at(a, o, l) {
+                return a = a instanceof Cc ? new a.Collection(a) : a, a._ctx.error = new(l || TypeError)(o), a
+            }
+
+            function $r(a) {
+                return new a.Collection(a, function() {
+                    return kc("")
+                }).limit(0)
+            }
+
+            function Oi(a, o, l, d) {
+                var f, p, g, E, k, I, K, _ = l.length;
+                if (!l.every(function(D) {
+                        return typeof D == "string"
+                    })) return at(a, yc);
+
+                function O(D) {
+                    f = D === "next" ? function(R) {
+                        return R.toUpperCase()
+                    } : function(R) {
+                        return R.toLowerCase()
+                    }, p = D === "next" ? function(R) {
+                        return R.toLowerCase()
+                    } : function(R) {
+                        return R.toUpperCase()
+                    }, g = D === "next" ? Lh : Uh;
+                    var x = l.map(function(R) {
+                        return {
+                            lower: p(R),
+                            upper: f(R)
+                        }
+                    }).sort(function(R, A) {
+                        return g(R.lower, A.lower)
+                    });
+                    E = x.map(function(R) {
+                        return R.upper
+                    }), k = x.map(function(R) {
+                        return R.lower
+                    }), K = (I = D) === "next" ? "" : d
+                }
+                O("next"), a = new a.Collection(a, function() {
+                    return Vt(E[0], k[_ - 1] + d)
+                }), a._ondirectionchange = function(D) {
+                    O(D)
+                };
+                var C = 0;
+                return a._addAlgorithm(function(D, x, R) {
+                    var A = D.key;
+                    if (typeof A != "string") return !1;
+                    var N = p(A);
+                    if (o(N, k, C)) return !0;
+                    for (var B = null, L = C; L < _; ++L) {
+                        var $ = function(G, q, J, V, j, Z) {
+                            for (var he = Math.min(G.length, V.length), pe = -1, me = 0; me < he; ++me) {
+                                var st = q[me];
+                                if (st !== V[me]) return j(G[me], J[me]) < 0 ? G.substr(0, me) + J[me] + J.substr(me + 1) : j(G[me], V[me]) < 0 ? G.substr(0, me) + V[me] + J.substr(me + 1) : 0 <= pe ? G.substr(0, pe) + q[pe] + J.substr(pe + 1) : null;
+                                j(G[me], st) < 0 && (pe = me)
+                            }
+                            return he < V.length && Z === "next" ? G + J.substr(G.length) : he < G.length && Z === "prev" ? G.substr(0, J.length) : pe < 0 ? null : G.substr(0, pe) + V[pe] + J.substr(pe + 1)
+                        }(A, N, E[L], k[L], g, I);
+                        $ === null && B === null ? C = L + 1 : (B === null || 0 < g(B, $)) && (B = $)
+                    }
+                    return x(B !== null ? function() {
+                        D.continue(B + K)
+                    } : R), !1
+                }), a
+            }
+
+            function Vt(a, o, l, d) {
+                return {
+                    type: 2,
+                    lower: a,
+                    upper: o,
+                    lowerOpen: l,
+                    upperOpen: d
+                }
+            }
+
+            function kc(a) {
+                return {
+                    type: 1,
+                    lower: a,
+                    upper: a
+                }
+            }
+            var Cc = (Object.defineProperty(He.prototype, "Collection", {
+                get: function() {
+                    return this._ctx.table.db.Collection
+                },
+                enumerable: !1,
+                configurable: !0
+            }), He.prototype.between = function(a, o, l, d) {
+                l = l !== !1, d = d === !0;
+                try {
+                    return 0 < this._cmp(a, o) || this._cmp(a, o) === 0 && (l || d) && (!l || !d) ? $r(this) : new this.Collection(this, function() {
+                        return Vt(a, o, !l, !d)
+                    })
+                } catch {
+                    return at(this, It)
+                }
+            }, He.prototype.equals = function(a) {
+                return a == null ? at(this, It) : new this.Collection(this, function() {
+                    return kc(a)
+                })
+            }, He.prototype.above = function(a) {
+                return a == null ? at(this, It) : new this.Collection(this, function() {
+                    return Vt(a, void 0, !0)
+                })
+            }, He.prototype.aboveOrEqual = function(a) {
+                return a == null ? at(this, It) : new this.Collection(this, function() {
+                    return Vt(a, void 0, !1)
+                })
+            }, He.prototype.below = function(a) {
+                return a == null ? at(this, It) : new this.Collection(this, function() {
+                    return Vt(void 0, a, !1, !0)
+                })
+            }, He.prototype.belowOrEqual = function(a) {
+                return a == null ? at(this, It) : new this.Collection(this, function() {
+                    return Vt(void 0, a)
+                })
+            }, He.prototype.startsWith = function(a) {
+                return typeof a != "string" ? at(this, yc) : this.between(a, a + mr, !0, !0)
+            }, He.prototype.startsWithIgnoreCase = function(a) {
+                return a === "" ? this.startsWith(a) : Oi(this, function(o, l) {
+                    return o.indexOf(l[0]) === 0
+                }, [a], mr)
+            }, He.prototype.equalsIgnoreCase = function(a) {
+                return Oi(this, function(o, l) {
+                    return o === l[0]
+                }, [a], "")
+            }, He.prototype.anyOfIgnoreCase = function() {
+                var a = ne.apply(ve, arguments);
+                return a.length === 0 ? $r(this) : Oi(this, function(o, l) {
+                    return l.indexOf(o) !== -1
+                }, a, "")
+            }, He.prototype.startsWithAnyOfIgnoreCase = function() {
+                var a = ne.apply(ve, arguments);
+                return a.length === 0 ? $r(this) : Oi(this, function(o, l) {
+                    return l.some(function(d) {
+                        return o.indexOf(d) === 0
+                    })
+                }, a, mr)
+            }, He.prototype.anyOf = function() {
+                var a = this,
+                    o = ne.apply(ve, arguments),
+                    l = this._cmp;
+                try {
+                    o.sort(l)
+                } catch {
+                    return at(this, It)
+                }
+                if (o.length === 0) return $r(this);
+                var d = new this.Collection(this, function() {
+                    return Vt(o[0], o[o.length - 1])
+                });
+                d._ondirectionchange = function(p) {
+                    l = p === "next" ? a._ascending : a._descending, o.sort(l)
+                };
+                var f = 0;
+                return d._addAlgorithm(function(p, g, E) {
+                    for (var k = p.key; 0 < l(k, o[f]);)
+                        if (++f === o.length) return g(E), !1;
+                    return l(k, o[f]) === 0 || (g(function() {
+                        p.continue(o[f])
+                    }), !1)
+                }), d
+            }, He.prototype.notEqual = function(a) {
+                return this.inAnyRange([
+                    [-1 / 0, a],
+                    [a, this.db._maxKey]
+                ], {
+                    includeLowers: !1,
+                    includeUppers: !1
+                })
+            }, He.prototype.noneOf = function() {
+                var a = ne.apply(ve, arguments);
+                if (a.length === 0) return new this.Collection(this);
+                try {
+                    a.sort(this._ascending)
+                } catch {
+                    return at(this, It)
+                }
+                var o = a.reduce(function(l, d) {
+                    return l ? l.concat([
+                        [l[l.length - 1][1], d]
+                    ]) : [
+                        [-1 / 0, d]
+                    ]
+                }, null);
+                return o.push([a[a.length - 1], this.db._maxKey]), this.inAnyRange(o, {
+                    includeLowers: !1,
+                    includeUppers: !1
+                })
+            }, He.prototype.inAnyRange = function(A, o) {
+                var l = this,
+                    d = this._cmp,
+                    f = this._ascending,
+                    p = this._descending,
+                    g = this._min,
+                    E = this._max;
+                if (A.length === 0) return $r(this);
+                if (!A.every(function(N) {
+                        return N[0] !== void 0 && N[1] !== void 0 && f(N[0], N[1]) <= 0
+                    })) return at(this, "First argument to inAnyRange() must be an Array of two-value Arrays [lower,upper] where upper must not be lower than lower", se.InvalidArgument);
+                var k = !o || o.includeLowers !== !1,
+                    I = o && o.includeUppers === !0,
+                    K, _ = f;
+
+                function O(N, B) {
+                    return _(N[0], B[0])
+                }
+                try {
+                    (K = A.reduce(function(N, B) {
+                        for (var L = 0, $ = N.length; L < $; ++L) {
+                            var G = N[L];
+                            if (d(B[0], G[1]) < 0 && 0 < d(B[1], G[0])) {
+                                G[0] = g(G[0], B[0]), G[1] = E(G[1], B[1]);
+                                break
+                            }
+                        }
+                        return L === $ && N.push(B), N
+                    }, [])).sort(O)
+                } catch {
+                    return at(this, It)
+                }
+                var C = 0,
+                    D = I ? function(N) {
+                        return 0 < f(N, K[C][1])
+                    } : function(N) {
+                        return 0 <= f(N, K[C][1])
+                    },
+                    x = k ? function(N) {
+                        return 0 < p(N, K[C][0])
+                    } : function(N) {
+                        return 0 <= p(N, K[C][0])
+                    },
+                    R = D,
+                    A = new this.Collection(this, function() {
+                        return Vt(K[0][0], K[K.length - 1][1], !k, !I)
+                    });
+                return A._ondirectionchange = function(N) {
+                    _ = N === "next" ? (R = D, f) : (R = x, p), K.sort(O)
+                }, A._addAlgorithm(function(N, B, L) {
+                    for (var $, G = N.key; R(G);)
+                        if (++C === K.length) return B(L), !1;
+                    return !D($ = G) && !x($) || (l._cmp(G, K[C][1]) === 0 || l._cmp(G, K[C][0]) === 0 || B(function() {
+                        _ === f ? N.continue(K[C][0]) : N.continue(K[C][1])
+                    }), !1)
+                }), A
+            }, He.prototype.startsWithAnyOf = function() {
+                var a = ne.apply(ve, arguments);
+                return a.every(function(o) {
+                    return typeof o == "string"
+                }) ? a.length === 0 ? $r(this) : this.inAnyRange(a.map(function(o) {
+                    return [o, o + mr]
+                })) : at(this, "startsWithAnyOf() only works with strings")
+            }, He);
+
+            function He() {}
+
+            function Pt(a) {
+                return xe(function(o) {
+                    return En(o), a(o.target.error), !1
+                })
+            }
+
+            function En(a) {
+                a.stopPropagation && a.stopPropagation(), a.preventDefault && a.preventDefault()
+            }
+            var _n = "storagemutated",
+                cs = "x-storagemutated-1",
+                Yt = wn(null, _n),
+                Wh = (kt.prototype._lock = function() {
+                    return z(!ae.global), ++this._reculock, this._reculock !== 1 || ae.global || (ae.lockOwnerFor = this), this
+                }, kt.prototype._unlock = function() {
+                    if (z(!ae.global), --this._reculock == 0)
+                        for (ae.global || (ae.lockOwnerFor = null); 0 < this._blockedFuncs.length && !this._locked();) {
+                            var a = this._blockedFuncs.shift();
+                            try {
+                                pr(a[1], a[0])
+                            } catch {}
+                        }
+                    return this
+                }, kt.prototype._locked = function() {
+                    return this._reculock && ae.lockOwnerFor !== this
+                }, kt.prototype.create = function(a) {
+                    var o = this;
+                    if (!this.mode) return this;
+                    var l = this.db.idbdb,
+                        d = this.db._state.dbOpenError;
+                    if (z(!this.idbtrans), !a && !l) switch (d && d.name) {
+                        case "DatabaseClosedError":
+                            throw new se.DatabaseClosed(d);
+                        case "MissingAPIError":
+                            throw new se.MissingAPI(d.message, d);
+                        default:
+                            throw new se.OpenFailed(d)
+                    }
+                    if (!this.active) throw new se.TransactionInactive;
+                    return z(this._completion._state === null), (a = this.idbtrans = a || (this.db.core || l).transaction(this.storeNames, this.mode, {
+                        durability: this.chromeTransactionDurability
+                    })).onerror = xe(function(f) {
+                        En(f), o._reject(a.error)
+                    }), a.onabort = xe(function(f) {
+                        En(f), o.active && o._reject(new se.Abort(a.error)), o.active = !1, o.on("abort").fire(f)
+                    }), a.oncomplete = xe(function() {
+                        o.active = !1, o._resolve(), "mutatedParts" in a && Yt.storagemutated.fire(a.mutatedParts)
+                    }), this
+                }, kt.prototype._promise = function(a, o, l) {
+                    var d = this;
+                    if (a === "readwrite" && this.mode !== "readwrite") return Me(new se.ReadOnly("Transaction is readonly"));
+                    if (!this.active) return Me(new se.TransactionInactive);
+                    if (this._locked()) return new X(function(p, g) {
+                        d._blockedFuncs.push([function() {
+                            d._promise(a, o, l).then(p, g)
+                        }, ae])
+                    });
+                    if (l) return zt(function() {
+                        var p = new X(function(g, E) {
+                            d._lock();
+                            var k = o(g, E, d);
+                            k && k.then && k.then(g, E)
+                        });
+                        return p.finally(function() {
+                            return d._unlock()
+                        }), p._lib = !0, p
+                    });
+                    var f = new X(function(p, g) {
+                        var E = o(p, g, d);
+                        E && E.then && E.then(p, g)
+                    });
+                    return f._lib = !0, f
+                }, kt.prototype._root = function() {
+                    return this.parent ? this.parent._root() : this
+                }, kt.prototype.waitFor = function(a) {
+                    var o, l = this._root(),
+                        d = X.resolve(a);
+                    l._waitingFor ? l._waitingFor = l._waitingFor.then(function() {
+                        return d
+                    }) : (l._waitingFor = d, l._waitingQueue = [], o = l.idbtrans.objectStore(l.storeNames[0]), function p() {
+                        for (++l._spinCount; l._waitingQueue.length;) l._waitingQueue.shift()();
+                        l._waitingFor && (o.get(-1 / 0).onsuccess = p)
+                    }());
+                    var f = l._waitingFor;
+                    return new X(function(p, g) {
+                        d.then(function(E) {
+                            return l._waitingQueue.push(xe(p.bind(null, E)))
+                        }, function(E) {
+                            return l._waitingQueue.push(xe(g.bind(null, E)))
+                        }).finally(function() {
+                            l._waitingFor === f && (l._waitingFor = null)
+                        })
+                    })
+                }, kt.prototype.abort = function() {
+                    this.active && (this.active = !1, this.idbtrans && this.idbtrans.abort(), this._reject(new se.Abort))
+                }, kt.prototype.table = function(a) {
+                    var o = this._memoizedTables || (this._memoizedTables = {});
+                    if (y(o, a)) return o[a];
+                    var l = this.schema[a];
+                    if (!l) throw new se.NotFound("Table " + a + " not part of transaction");
+                    return l = new this.db.Table(a, l, this), l.core = this.db.core.table(a), o[a] = l
+                }, kt);
+
+            function kt() {}
+
+            function us(a, o, l, d, f, p, g) {
+                return {
+                    name: a,
+                    keyPath: o,
+                    unique: l,
+                    multi: d,
+                    auto: f,
+                    compound: p,
+                    src: (l && !g ? "&" : "") + (d ? "*" : "") + (f ? "++" : "") + Ic(o)
+                }
+            }
+
+            function Ic(a) {
+                return typeof a == "string" ? a : a ? "[" + [].join.call(a, "+") + "]" : ""
+            }
+
+            function ls(a, o, l) {
+                return {
+                    name: a,
+                    primKey: o,
+                    indexes: l,
+                    mappedClass: null,
+                    idxByName: (d = function(f) {
+                        return [f.name, f]
+                    }, l.reduce(function(f, p, g) {
+                        return g = d(p, g), g && (f[g[0]] = g[1]), f
+                    }, {}))
+                };
+                var d
+            }
+            var Pn = function(a) {
+                try {
+                    return a.only([
+                        []
+                    ]), Pn = function() {
+                        return [
+                            []
+                        ]
+                    }, [
+                        []
+                    ]
+                } catch {
+                    return Pn = function() {
+                        return mr
+                    }, mr
+                }
+            };
+
+            function ds(a) {
+                return a == null ? function() {} : typeof a == "string" ? (o = a).split(".").length === 1 ? function(l) {
+                    return l[o]
+                } : function(l) {
+                    return Q(l, o)
+                } : function(l) {
+                    return Q(l, a)
+                };
+                var o
+            }
+
+            function Rc(a) {
+                return [].slice.call(a)
+            }
+            var $h = 0;
+
+            function kn(a) {
+                return a == null ? ":id" : typeof a == "string" ? a : "[".concat(a.join("+"), "]")
+            }
+
+            function qh(a, o, k) {
+                function d(R) {
+                    if (R.type === 3) return null;
+                    if (R.type === 4) throw new Error("Cannot convert never type to IDBKeyRange");
+                    var C = R.lower,
+                        D = R.upper,
+                        x = R.lowerOpen,
+                        R = R.upperOpen;
+                    return C === void 0 ? D === void 0 ? null : o.upperBound(D, !!R) : D === void 0 ? o.lowerBound(C, !!x) : o.bound(C, D, !!x, !!R)
+                }
+
+                function f(O) {
+                    var C, D = O.name;
+                    return {
+                        name: D,
+                        schema: O,
+                        mutate: function(x) {
+                            var R = x.trans,
+                                A = x.type,
+                                N = x.keys,
+                                B = x.values,
+                                L = x.range;
+                            return new Promise(function($, G) {
+                                $ = xe($);
+                                var q = R.objectStore(D),
+                                    J = q.keyPath == null,
+                                    V = A === "put" || A === "add";
+                                if (!V && A !== "delete" && A !== "deleteRange") throw new Error("Invalid operation type: " + A);
+                                var j, Z = (N || B || {
+                                    length: 1
+                                }).length;
+                                if (N && B && N.length !== B.length) throw new Error("Given keys array must have same length as given values array.");
+                                if (Z === 0) return $({
+                                    numFailures: 0,
+                                    failures: {},
+                                    results: [],
+                                    lastResult: void 0
+                                });
+
+                                function he(Qe) {
+                                    ++st, En(Qe)
+                                }
+                                var pe = [],
+                                    me = [],
+                                    st = 0;
+                                if (A === "deleteRange") {
+                                    if (L.type === 4) return $({
+                                        numFailures: st,
+                                        failures: me,
+                                        results: [],
+                                        lastResult: void 0
+                                    });
+                                    L.type === 3 ? pe.push(j = q.clear()) : pe.push(j = q.delete(d(L)))
+                                } else {
+                                    var J = V ? J ? [B, N] : [B, null] : [N, null],
+                                        le = J[0],
+                                        Ge = J[1];
+                                    if (V)
+                                        for (var Ve = 0; Ve < Z; ++Ve) pe.push(j = Ge && Ge[Ve] !== void 0 ? q[A](le[Ve], Ge[Ve]) : q[A](le[Ve])), j.onerror = he;
+                                    else
+                                        for (Ve = 0; Ve < Z; ++Ve) pe.push(j = q[A](le[Ve])), j.onerror = he
+                                }
+
+                                function Ji(Qe) {
+                                    Qe = Qe.target.result, pe.forEach(function(wr, Ds) {
+                                        return wr.error != null && (me[Ds] = wr.error)
+                                    }), $({
+                                        numFailures: st,
+                                        failures: me,
+                                        results: A === "delete" ? N : pe.map(function(wr) {
+                                            return wr.result
+                                        }),
+                                        lastResult: Qe
+                                    })
+                                }
+                                j.onerror = function(Qe) {
+                                    he(Qe), Ji(Qe)
+                                }, j.onsuccess = Ji
+                            })
+                        },
+                        getMany: function(x) {
+                            var R = x.trans,
+                                A = x.keys;
+                            return new Promise(function(N, B) {
+                                N = xe(N);
+                                for (var L, $ = R.objectStore(D), G = A.length, q = new Array(G), J = 0, V = 0, j = function(pe) {
+                                        pe = pe.target, q[pe._pos] = pe.result, ++V === J && N(q)
+                                    }, Z = Pt(B), he = 0; he < G; ++he) A[he] != null && ((L = $.get(A[he]))._pos = he, L.onsuccess = j, L.onerror = Z, ++J);
+                                J === 0 && N(q)
+                            })
+                        },
+                        get: function(x) {
+                            var R = x.trans,
+                                A = x.key;
+                            return new Promise(function(N, B) {
+                                N = xe(N);
+                                var L = R.objectStore(D).get(A);
+                                L.onsuccess = function($) {
+                                    return N($.target.result)
+                                }, L.onerror = Pt(B)
+                            })
+                        },
+                        query: (C = I, function(x) {
+                            return new Promise(function(R, A) {
+                                R = xe(R);
+                                var N, B, L, J = x.trans,
+                                    $ = x.values,
+                                    G = x.limit,
+                                    j = x.query,
+                                    q = G === 1 / 0 ? void 0 : G,
+                                    V = j.index,
+                                    j = j.range,
+                                    J = J.objectStore(D),
+                                    V = V.isPrimaryKey ? J : J.index(V.name),
+                                    j = d(j);
+                                if (G === 0) return R({
+                                    result: []
+                                });
+                                C ? ((q = $ ? V.getAll(j, q) : V.getAllKeys(j, q)).onsuccess = function(Z) {
+                                    return R({
+                                        result: Z.target.result
+                                    })
+                                }, q.onerror = Pt(A)) : (N = 0, B = !$ && "openKeyCursor" in V ? V.openKeyCursor(j) : V.openCursor(j), L = [], B.onsuccess = function(Z) {
+                                    var he = B.result;
+                                    return he ? (L.push($ ? he.value : he.primaryKey), ++N === G ? R({
+                                        result: L
+                                    }) : void he.continue()) : R({
+                                        result: L
+                                    })
+                                }, B.onerror = Pt(A))
+                            })
+                        }),
+                        openCursor: function(x) {
+                            var R = x.trans,
+                                A = x.values,
+                                N = x.query,
+                                B = x.reverse,
+                                L = x.unique;
+                            return new Promise(function($, G) {
+                                $ = xe($);
+                                var V = N.index,
+                                    q = N.range,
+                                    J = R.objectStore(D),
+                                    J = V.isPrimaryKey ? J : J.index(V.name),
+                                    V = B ? L ? "prevunique" : "prev" : L ? "nextunique" : "next",
+                                    j = !A && "openKeyCursor" in J ? J.openKeyCursor(d(q), V) : J.openCursor(d(q), V);
+                                j.onerror = Pt(G), j.onsuccess = xe(function(Z) {
+                                    var he, pe, me, st, le = j.result;
+                                    le ? (le.___id = ++$h, le.done = !1, he = le.continue.bind(le), pe = (pe = le.continuePrimaryKey) && pe.bind(le), me = le.advance.bind(le), st = function() {
+                                        throw new Error("Cursor not stopped")
+                                    }, le.trans = R, le.stop = le.continue = le.continuePrimaryKey = le.advance = function() {
+                                        throw new Error("Cursor not started")
+                                    }, le.fail = xe(G), le.next = function() {
+                                        var Ge = this,
+                                            Ve = 1;
+                                        return this.start(function() {
+                                            return Ve-- ? Ge.continue() : Ge.stop()
+                                        }).then(function() {
+                                            return Ge
+                                        })
+                                    }, le.start = function(Ge) {
+                                        function Ve() {
+                                            if (j.result) try {
+                                                Ge()
+                                            } catch (Qe) {
+                                                le.fail(Qe)
+                                            } else le.done = !0, le.start = function() {
+                                                throw new Error("Cursor behind last entry")
+                                            }, le.stop()
+                                        }
+                                        var Ji = new Promise(function(Qe, wr) {
+                                            Qe = xe(Qe), j.onerror = Pt(wr), le.fail = wr, le.stop = function(Ds) {
+                                                le.stop = le.continue = le.continuePrimaryKey = le.advance = st, Qe(Ds)
+                                            }
+                                        });
+                                        return j.onsuccess = xe(function(Qe) {
+                                            j.onsuccess = Ve, Ve()
+                                        }), le.continue = he, le.continuePrimaryKey = pe, le.advance = me, Ve(), Ji
+                                    }, $(le)) : $(null)
+                                }, G)
+                            })
+                        },
+                        count: function(x) {
+                            var R = x.query,
+                                A = x.trans,
+                                N = R.index,
+                                B = R.range;
+                            return new Promise(function(L, $) {
+                                var G = A.objectStore(D),
+                                    q = N.isPrimaryKey ? G : G.index(N.name),
+                                    G = d(B),
+                                    q = G ? q.count(G) : q.count();
+                                q.onsuccess = xe(function(J) {
+                                    return L(J.target.result)
+                                }), q.onerror = Pt($)
+                            })
+                        }
+                    }
+                }
+                var p, g, E, K = (g = k, E = Rc((p = a).objectStoreNames), {
+                        schema: {
+                            name: p.name,
+                            tables: E.map(function(O) {
+                                return g.objectStore(O)
+                            }).map(function(O) {
+                                var C = O.keyPath,
+                                    R = O.autoIncrement,
+                                    D = u(C),
+                                    x = {},
+                                    R = {
+                                        name: O.name,
+                                        primaryKey: {
+                                            name: null,
+                                            isPrimaryKey: !0,
+                                            outbound: C == null,
+                                            compound: D,
+                                            keyPath: C,
+                                            autoIncrement: R,
+                                            unique: !0,
+                                            extractKey: ds(C)
+                                        },
+                                        indexes: Rc(O.indexNames).map(function(A) {
+                                            return O.index(A)
+                                        }).map(function(L) {
+                                            var N = L.name,
+                                                B = L.unique,
+                                                $ = L.multiEntry,
+                                                L = L.keyPath,
+                                                $ = {
+                                                    name: N,
+                                                    compound: u(L),
+                                                    keyPath: L,
+                                                    unique: B,
+                                                    multiEntry: $,
+                                                    extractKey: ds(L)
+                                                };
+                                            return x[kn(L)] = $
+                                        }),
+                                        getIndexByKeyPath: function(A) {
+                                            return x[kn(A)]
+                                        }
+                                    };
+                                return x[":id"] = R.primaryKey, C != null && (x[kn(C)] = R.primaryKey), R
+                            })
+                        },
+                        hasGetAll: 0 < E.length && "getAll" in g.objectStore(E[0]) && !(typeof navigator < "u" && /Safari/.test(navigator.userAgent) && !/(Chrome\/|Edge\/)/.test(navigator.userAgent) && [].concat(navigator.userAgent.match(/Safari\/(\d*)/))[1] < 604)
+                    }),
+                    k = K.schema,
+                    I = K.hasGetAll,
+                    K = k.tables.map(f),
+                    _ = {};
+                return K.forEach(function(O) {
+                    return _[O.name] = O
+                }), {
+                    stack: "dbcore",
+                    transaction: a.transaction.bind(a),
+                    table: function(O) {
+                        if (!_[O]) throw new Error("Table '".concat(O, "' not found"));
+                        return _[O]
+                    },
+                    MIN_KEY: -1 / 0,
+                    MAX_KEY: Pn(o),
+                    schema: k
+                }
+            }
+
+            function Hh(a, o, l, d) {
+                var f = l.IDBKeyRange;
+                return l.indexedDB, {
+                    dbcore: (d = qh(o, f, d), a.dbcore.reduce(function(p, g) {
+                        return g = g.create, n(n({}, p), g(p))
+                    }, d))
+                }
+            }
+
+            function Ti(a, d) {
+                var l = d.db,
+                    d = Hh(a._middlewares, l, a._deps, d);
+                a.core = d.dbcore, a.tables.forEach(function(f) {
+                    var p = f.name;
+                    a.core.schema.tables.some(function(g) {
+                        return g.name === p
+                    }) && (f.core = a.core.table(p), a[p] instanceof a.Table && (a[p].core = f.core))
+                })
+            }
+
+            function Ai(a, o, l, d) {
+                l.forEach(function(f) {
+                    var p = d[f];
+                    o.forEach(function(g) {
+                        var E = function k(I, K) {
+                            return T(I, K) || (I = v(I)) && k(I, K)
+                        }(g, f);
+                        (!E || "value" in E && E.value === void 0) && (g === a.Transaction.prototype || g instanceof a.Transaction ? b(g, f, {
+                            get: function() {
+                                return this.table(f)
+                            },
+                            set: function(k) {
+                                S(this, f, {
+                                    value: k,
+                                    writable: !0,
+                                    configurable: !0,
+                                    enumerable: !0
+                                })
+                            }
+                        }) : g[f] = new a.Table(f, p))
+                    })
+                })
+            }
+
+            function hs(a, o) {
+                o.forEach(function(l) {
+                    for (var d in l) l[d] instanceof a.Table && delete l[d]
+                })
+            }
+
+            function Jh(a, o) {
+                return a._cfg.version - o._cfg.version
+            }
+
+            function zh(a, o, l, d) {
+                var f = a._dbSchema;
+                l.objectStoreNames.contains("$meta") && !f.$meta && (f.$meta = ls("$meta", Kc("")[0], []), a._storeNames.push("$meta"));
+                var p = a._createTransaction("readwrite", a._storeNames, f);
+                p.create(l), p._completion.catch(d);
+                var g = p._reject.bind(p),
+                    E = ae.transless || ae;
+                zt(function() {
+                    return ae.trans = p, ae.transless = E, o !== 0 ? (Ti(a, l), I = o, ((k = p).storeNames.includes("$meta") ? k.table("$meta").get("version").then(function(K) {
+                        return K ?? I
+                    }) : X.resolve(I)).then(function(K) {
+                        return O = K, C = p, D = l, x = [], K = (_ = a)._versions, R = _._dbSchema = Bi(0, _.idbdb, D), (K = K.filter(function(A) {
+                            return A._cfg.version >= O
+                        })).length !== 0 ? (K.forEach(function(A) {
+                            x.push(function() {
+                                var N = R,
+                                    B = A._cfg.dbschema;
+                                Mi(_, N, D), Mi(_, B, D), R = _._dbSchema = B;
+                                var L = fs(N, B);
+                                L.add.forEach(function(V) {
+                                    ps(D, V[0], V[1].primKey, V[1].indexes)
+                                }), L.change.forEach(function(V) {
+                                    if (V.recreate) throw new se.Upgrade("Not yet support for changing primary key");
+                                    var j = D.objectStore(V.name);
+                                    V.add.forEach(function(Z) {
+                                        return Ni(j, Z)
+                                    }), V.change.forEach(function(Z) {
+                                        j.deleteIndex(Z.name), Ni(j, Z)
+                                    }), V.del.forEach(function(Z) {
+                                        return j.deleteIndex(Z)
+                                    })
+                                });
+                                var $ = A._cfg.contentUpgrade;
+                                if ($ && A._cfg.version > O) {
+                                    Ti(_, D), C._memoizedTables = {};
+                                    var G = ie(B);
+                                    L.del.forEach(function(V) {
+                                        G[V] = N[V]
+                                    }), hs(_, [_.Transaction.prototype]), Ai(_, [_.Transaction.prototype], c(G), G), C.schema = G;
+                                    var q, J = we($);
+                                    return J && Lr(), L = X.follow(function() {
+                                        var V;
+                                        (q = $(C)) && J && (V = jt.bind(null, null), q.then(V, V))
+                                    }), q && typeof q.then == "function" ? X.resolve(q) : L.then(function() {
+                                        return q
+                                    })
+                                }
+                            }), x.push(function(N) {
+                                var B, L, $ = A._cfg.dbschema;
+                                B = $, L = N, [].slice.call(L.db.objectStoreNames).forEach(function(G) {
+                                    return B[G] == null && L.db.deleteObjectStore(G)
+                                }), hs(_, [_.Transaction.prototype]), Ai(_, [_.Transaction.prototype], _._storeNames, _._dbSchema), C.schema = _._dbSchema
+                            }), x.push(function(N) {
+                                _.idbdb.objectStoreNames.contains("$meta") && (Math.ceil(_.idbdb.version / 10) === A._cfg.version ? (_.idbdb.deleteObjectStore("$meta"), delete _._dbSchema.$meta, _._storeNames = _._storeNames.filter(function(B) {
+                                    return B !== "$meta"
+                                })) : N.objectStore("$meta").put(A._cfg.version, "version"))
+                            })
+                        }), function A() {
+                            return x.length ? X.resolve(x.shift()(C.idbtrans)).then(A) : X.resolve()
+                        }().then(function() {
+                            Dc(R, D)
+                        })) : X.resolve();
+                        var _, O, C, D, x, R
+                    }).catch(g)) : (c(f).forEach(function(K) {
+                        ps(l, K, f[K].primKey, f[K].indexes)
+                    }), Ti(a, l), void X.follow(function() {
+                        return a.on.populate.fire(p)
+                    }).catch(g));
+                    var k, I
+                })
+            }
+
+            function jh(a, o) {
+                Dc(a._dbSchema, o), o.db.version % 10 != 0 || o.objectStoreNames.contains("$meta") || o.db.createObjectStore("$meta").add(Math.ceil(o.db.version / 10 - 1), "version");
+                var l = Bi(0, a.idbdb, o);
+                Mi(a, a._dbSchema, o);
+                for (var d = 0, f = fs(l, a._dbSchema).change; d < f.length; d++) {
+                    var p = function(g) {
+                        if (g.change.length || g.recreate) return console.warn("Unable to patch indexes of table ".concat(g.name, " because it has changes on the type of index or primary key.")), {
+                            value: void 0
+                        };
+                        var E = o.objectStore(g.name);
+                        g.add.forEach(function(k) {
+                            _t && console.debug("Dexie upgrade patch: Creating missing index ".concat(g.name, ".").concat(k.src)), Ni(E, k)
+                        })
+                    }(f[d]);
+                    if (typeof p == "object") return p.value
+                }
+            }
+
+            function fs(a, o) {
+                var l, d = {
+                    del: [],
+                    add: [],
+                    change: []
+                };
+                for (l in a) o[l] || d.del.push(l);
+                for (l in o) {
+                    var f = a[l],
+                        p = o[l];
+                    if (f) {
+                        var g = {
+                            name: l,
+                            def: p,
+                            recreate: !1,
+                            del: [],
+                            add: [],
+                            change: []
+                        };
+                        if ("" + (f.primKey.keyPath || "") != "" + (p.primKey.keyPath || "") || f.primKey.auto !== p.primKey.auto) g.recreate = !0, d.change.push(g);
+                        else {
+                            var E = f.idxByName,
+                                k = p.idxByName,
+                                I = void 0;
+                            for (I in E) k[I] || g.del.push(I);
+                            for (I in k) {
+                                var K = E[I],
+                                    _ = k[I];
+                                K ? K.src !== _.src && g.change.push(_) : g.add.push(_)
+                            }(0 < g.del.length || 0 < g.add.length || 0 < g.change.length) && d.change.push(g)
+                        }
+                    } else d.add.push([l, p])
+                }
+                return d
+            }
+
+            function ps(a, o, l, d) {
+                var f = a.db.createObjectStore(o, l.keyPath ? {
+                    keyPath: l.keyPath,
+                    autoIncrement: l.auto
+                } : {
+                    autoIncrement: l.auto
+                });
+                return d.forEach(function(p) {
+                    return Ni(f, p)
+                }), f
+            }
+
+            function Dc(a, o) {
+                c(a).forEach(function(l) {
+                    o.db.objectStoreNames.contains(l) || (_t && console.debug("Dexie: Creating missing table", l), ps(o, l, a[l].primKey, a[l].indexes))
+                })
+            }
+
+            function Ni(a, o) {
+                a.createIndex(o.name, o.keyPath, {
+                    unique: o.unique,
+                    multiEntry: o.multi
+                })
+            }
+
+            function Bi(a, o, l) {
+                var d = {};
+                return U(o.objectStoreNames, 0).forEach(function(f) {
+                    for (var p = l.objectStore(f), g = us(Ic(I = p.keyPath), I || "", !0, !1, !!p.autoIncrement, I && typeof I != "string", !0), E = [], k = 0; k < p.indexNames.length; ++k) {
+                        var K = p.index(p.indexNames[k]),
+                            I = K.keyPath,
+                            K = us(K.name, I, !!K.unique, !!K.multiEntry, !1, I && typeof I != "string", !1);
+                        E.push(K)
+                    }
+                    d[f] = ls(f, g, E)
+                }), d
+            }
+
+            function Mi(a, o, l) {
+                for (var d = l.db.objectStoreNames, f = 0; f < d.length; ++f) {
+                    var p = d[f],
+                        g = l.objectStore(p);
+                    a._hasGetAll = "getAll" in g;
+                    for (var E = 0; E < g.indexNames.length; ++E) {
+                        var k = g.indexNames[E],
+                            I = g.index(k).keyPath,
+                            K = typeof I == "string" ? I : "[" + U(I).join("+") + "]";
+                        !o[p] || (I = o[p].idxByName[K]) && (I.name = k, delete o[p].idxByName[K], o[p].idxByName[k] = I)
+                    }
+                }
+                typeof navigator < "u" && /Safari/.test(navigator.userAgent) && !/(Chrome\/|Edge\/)/.test(navigator.userAgent) && s.WorkerGlobalScope && s instanceof s.WorkerGlobalScope && [].concat(navigator.userAgent.match(/Safari\/(\d*)/))[1] < 604 && (a._hasGetAll = !1)
+            }
+
+            function Kc(a) {
+                return a.split(",").map(function(o, l) {
+                    var d = (o = o.trim()).replace(/([&*]|\+\+)/g, ""),
+                        f = /^\[/.test(d) ? d.match(/^\[(.*)\]$/)[1].split("+") : d;
+                    return us(d, f || null, /\&/.test(o), /\*/.test(o), /\+\+/.test(o), u(f), l === 0)
+                })
+            }
+            var Gh = (Fi.prototype._parseStoresSpec = function(a, o) {
+                c(a).forEach(function(l) {
+                    if (a[l] !== null) {
+                        var d = Kc(a[l]),
+                            f = d.shift();
+                        if (f.unique = !0, f.multi) throw new se.Schema("Primary key cannot be multi-valued");
+                        d.forEach(function(p) {
+                            if (p.auto) throw new se.Schema("Only primary key can be marked as autoIncrement (++)");
+                            if (!p.keyPath) throw new se.Schema("Index must have a name and cannot be an empty string")
+                        }), o[l] = ls(l, f, d)
+                    }
+                })
+            }, Fi.prototype.stores = function(l) {
+                var o = this.db;
+                this._cfg.storesSource = this._cfg.storesSource ? h(this._cfg.storesSource, l) : l;
+                var l = o._versions,
+                    d = {},
+                    f = {};
+                return l.forEach(function(p) {
+                    h(d, p._cfg.storesSource), f = p._cfg.dbschema = {}, p._parseStoresSpec(d, f)
+                }), o._dbSchema = f, hs(o, [o._allTables, o, o.Transaction.prototype]), Ai(o, [o._allTables, o, o.Transaction.prototype, this._cfg.tables], c(f), f), o._storeNames = c(f), this
+            }, Fi.prototype.upgrade = function(a) {
+                return this._cfg.contentUpgrade = Ga(this._cfg.contentUpgrade || Ce, a), this
+            }, Fi);
+
+            function Fi() {}
+
+            function ms(a, o) {
+                var l = a._dbNamesDB;
+                return l || (l = a._dbNamesDB = new Dt(Ri, {
+                    addons: [],
+                    indexedDB: a,
+                    IDBKeyRange: o
+                })).version(1).stores({
+                    dbnames: "name"
+                }), l.table("dbnames")
+            }
+
+            function ys(a) {
+                return a && typeof a.databases == "function"
+            }
+
+            function vs(a) {
+                return zt(function() {
+                    return ae.letThrough = !0, a()
+                })
+            }
+
+            function gs(a) {
+                return !("from" in a)
+            }
+            var je = function(a, o) {
+                if (!this) {
+                    var l = new je;
+                    return a && "d" in a && h(l, a), l
+                }
+                h(this, arguments.length ? {
+                    d: 1,
+                    from: a,
+                    to: 1 < arguments.length ? o : a
+                } : {
+                    d: 0
+                })
+            };
+
+            function Cn(a, o, l) {
+                var d = be(o, l);
+                if (!isNaN(d)) {
+                    if (0 < d) throw RangeError();
+                    if (gs(a)) return h(a, {
+                        from: o,
+                        to: l,
+                        d: 1
+                    });
+                    var f = a.l,
+                        d = a.r;
+                    if (be(l, a.from) < 0) return f ? Cn(f, o, l) : a.l = {
+                        from: o,
+                        to: l,
+                        d: 1,
+                        l: null,
+                        r: null
+                    }, Oc(a);
+                    if (0 < be(o, a.to)) return d ? Cn(d, o, l) : a.r = {
+                        from: o,
+                        to: l,
+                        d: 1,
+                        l: null,
+                        r: null
+                    }, Oc(a);
+                    be(o, a.from) < 0 && (a.from = o, a.l = null, a.d = d ? d.d + 1 : 1), 0 < be(l, a.to) && (a.to = l, a.r = null, a.d = a.l ? a.l.d + 1 : 1), l = !a.r, f && !a.l && In(a, f), d && l && In(a, d)
+                }
+            }
+
+            function In(a, o) {
+                gs(o) || function l(d, k) {
+                    var p = k.from,
+                        g = k.to,
+                        E = k.l,
+                        k = k.r;
+                    Cn(d, p, g), E && l(d, E), k && l(d, k)
+                }(a, o)
+            }
+
+            function xc(a, o) {
+                var l = Li(o),
+                    d = l.next();
+                if (d.done) return !1;
+                for (var f = d.value, p = Li(a), g = p.next(f.from), E = g.value; !d.done && !g.done;) {
+                    if (be(E.from, f.to) <= 0 && 0 <= be(E.to, f.from)) return !0;
+                    be(f.from, E.from) < 0 ? f = (d = l.next(E.from)).value : E = (g = p.next(f.from)).value
+                }
+                return !1
+            }
+
+            function Li(a) {
+                var o = gs(a) ? null : {
+                    s: 0,
+                    n: a
+                };
+                return {
+                    next: function(l) {
+                        for (var d = 0 < arguments.length; o;) switch (o.s) {
+                            case 0:
+                                if (o.s = 1, d)
+                                    for (; o.n.l && be(l, o.n.from) < 0;) o = {
+                                        up: o,
+                                        n: o.n.l,
+                                        s: 1
+                                    };
+                                else
+                                    for (; o.n.l;) o = {
+                                        up: o,
+                                        n: o.n.l,
+                                        s: 1
+                                    };
+                            case 1:
+                                if (o.s = 2, !d || be(l, o.n.to) <= 0) return {
+                                    value: o.n,
+                                    done: !1
+                                };
+                            case 2:
+                                if (o.n.r) {
+                                    o.s = 3, o = {
+                                        up: o,
+                                        n: o.n.r,
+                                        s: 0
+                                    };
+                                    continue
+                                }
+                            case 3:
+                                o = o.up
+                        }
+                        return {
+                            done: !0
+                        }
+                    }
+                }
+            }
+
+            function Oc(a) {
+                var o, l, d = (((o = a.r) === null || o === void 0 ? void 0 : o.d) || 0) - (((l = a.l) === null || l === void 0 ? void 0 : l.d) || 0),
+                    f = 1 < d ? "r" : d < -1 ? "l" : "";
+                f && (o = f == "r" ? "l" : "r", l = n({}, a), d = a[f], a.from = d.from, a.to = d.to, a[f] = d[f], l[f] = d[o], (a[o] = l).d = Tc(l)), a.d = Tc(a)
+            }
+
+            function Tc(l) {
+                var o = l.r,
+                    l = l.l;
+                return (o ? l ? Math.max(o.d, l.d) : o.d : l ? l.d : 0) + 1
+            }
+
+            function Ui(a, o) {
+                return c(o).forEach(function(l) {
+                    a[l] ? In(a[l], o[l]) : a[l] = function d(f) {
+                        var p, g, E = {};
+                        for (p in f) y(f, p) && (g = f[p], E[p] = !g || typeof g != "object" || ue.has(g.constructor) ? g : d(g));
+                        return E
+                    }(o[l])
+                }), a
+            }
+
+            function ws(a, o) {
+                return a.all || o.all || Object.keys(a).some(function(l) {
+                    return o[l] && xc(o[l], a[l])
+                })
+            }
+            w(je.prototype, ((pt = {
+                add: function(a) {
+                    return In(this, a), this
+                },
+                addKey: function(a) {
+                    return Cn(this, a, a), this
+                },
+                addKeys: function(a) {
+                    var o = this;
+                    return a.forEach(function(l) {
+                        return Cn(o, l, l)
+                    }), this
+                },
+                hasKey: function(a) {
+                    var o = Li(this).next(a).value;
+                    return o && be(o.from, a) <= 0 && 0 <= be(o.to, a)
+                }
+            })[$e] = function() {
+                return Li(this)
+            }, pt));
+            var vr = {},
+                bs = {},
+                Ss = !1;
+
+            function Wi(a) {
+                Ui(bs, a), Ss || (Ss = !0, setTimeout(function() {
+                    Ss = !1, Es(bs, !(bs = {}))
+                }, 0))
+            }
+
+            function Es(a, o) {
+                o === void 0 && (o = !1);
+                var l = new Set;
+                if (a.all)
+                    for (var d = 0, f = Object.values(vr); d < f.length; d++) Ac(g = f[d], a, l, o);
+                else
+                    for (var p in a) {
+                        var g, E = /^idb\:\/\/(.*)\/(.*)\//.exec(p);
+                        E && (p = E[1], E = E[2], (g = vr["idb://".concat(p, "/").concat(E)]) && Ac(g, a, l, o))
+                    }
+                l.forEach(function(k) {
+                    return k()
+                })
+            }
+
+            function Ac(a, o, l, d) {
+                for (var f = [], p = 0, g = Object.entries(a.queries.query); p < g.length; p++) {
+                    for (var E = g[p], k = E[0], I = [], K = 0, _ = E[1]; K < _.length; K++) {
+                        var O = _[K];
+                        ws(o, O.obsSet) ? O.subscribers.forEach(function(R) {
+                            return l.add(R)
+                        }) : d && I.push(O)
+                    }
+                    d && f.push([k, I])
+                }
+                if (d)
+                    for (var C = 0, D = f; C < D.length; C++) {
+                        var x = D[C],
+                            k = x[0],
+                            I = x[1];
+                        a.queries.query[k] = I
+                    }
+            }
+
+            function Vh(a) {
+                var o = a._state,
+                    l = a._deps.indexedDB;
+                if (o.isBeingOpened || a.idbdb) return o.dbReadyPromise.then(function() {
+                    return o.dbOpenError ? Me(o.dbOpenError) : a
+                });
+                o.isBeingOpened = !0, o.dbOpenError = null, o.openComplete = !1;
+                var d = o.openCanceller,
+                    f = Math.round(10 * a.verno),
+                    p = !1;
+
+                function g() {
+                    if (o.openCanceller !== d) throw new se.DatabaseClosed("db.open() was cancelled")
+                }
+
+                function E() {
+                    return new X(function(O, C) {
+                        if (g(), !l) throw new se.MissingAPI;
+                        var D = a.name,
+                            x = o.autoSchema || !f ? l.open(D) : l.open(D, f);
+                        if (!x) throw new se.MissingAPI;
+                        x.onerror = Pt(C), x.onblocked = xe(a._fireOnBlocked), x.onupgradeneeded = xe(function(R) {
+                            var A;
+                            K = x.transaction, o.autoSchema && !a._options.allowEmptyDB ? (x.onerror = En, K.abort(), x.result.close(), (A = l.deleteDatabase(D)).onsuccess = A.onerror = xe(function() {
+                                C(new se.NoSuchDatabase("Database ".concat(D, " doesnt exist")))
+                            })) : (K.onerror = Pt(C), R = R.oldVersion > Math.pow(2, 62) ? 0 : R.oldVersion, _ = R < 1, a.idbdb = x.result, p && jh(a, K), zh(a, R / 10, K, C))
+                        }, C), x.onsuccess = xe(function() {
+                            K = null;
+                            var R, A, N, B, L, $ = a.idbdb = x.result,
+                                G = U($.objectStoreNames);
+                            if (0 < G.length) try {
+                                var q = $.transaction((B = G).length === 1 ? B[0] : B, "readonly");
+                                if (o.autoSchema) A = $, N = q, (R = a).verno = A.version / 10, N = R._dbSchema = Bi(0, A, N), R._storeNames = U(A.objectStoreNames, 0), Ai(R, [R._allTables], c(N), N);
+                                else if (Mi(a, a._dbSchema, q), ((L = fs(Bi(0, (L = a).idbdb, q), L._dbSchema)).add.length || L.change.some(function(J) {
+                                        return J.add.length || J.change.length
+                                    })) && !p) return console.warn("Dexie SchemaDiff: Schema was extended without increasing the number passed to db.version(). Dexie will add missing parts and increment native version number to workaround this."), $.close(), f = $.version + 1, p = !0, O(E());
+                                Ti(a, q)
+                            } catch {}
+                            Ur.push(a), $.onversionchange = xe(function(J) {
+                                o.vcFired = !0, a.on("versionchange").fire(J)
+                            }), $.onclose = xe(function(J) {
+                                a.on("close").fire(J)
+                            }), _ && (L = a._deps, q = D, $ = L.indexedDB, L = L.IDBKeyRange, ys($) || q === Ri || ms($, L).put({
+                                name: q
+                            }).catch(Ce)), O()
+                        }, C)
+                    }).catch(function(O) {
+                        switch (O == null ? void 0 : O.name) {
+                            case "UnknownError":
+                                if (0 < o.PR1398_maxLoop) return o.PR1398_maxLoop--, console.warn("Dexie: Workaround for Chrome UnknownError on open()"), E();
+                                break;
+                            case "VersionError":
+                                if (0 < f) return f = 0, E()
+                        }
+                        return X.reject(O)
+                    })
+                }
+                var k, I = o.dbReadyResolve,
+                    K = null,
+                    _ = !1;
+                return X.race([d, (typeof navigator > "u" ? X.resolve() : !navigator.userAgentData && /Safari\//.test(navigator.userAgent) && !/Chrom(e|ium)\//.test(navigator.userAgent) && indexedDB.databases ? new Promise(function(O) {
+                    function C() {
+                        return indexedDB.databases().finally(O)
+                    }
+                    k = setInterval(C, 100), C()
+                }).finally(function() {
+                    return clearInterval(k)
+                }) : Promise.resolve()).then(E)]).then(function() {
+                    return g(), o.onReadyBeingFired = [], X.resolve(vs(function() {
+                        return a.on.ready.fire(a.vip)
+                    })).then(function O() {
+                        if (0 < o.onReadyBeingFired.length) {
+                            var C = o.onReadyBeingFired.reduce(Ga, Ce);
+                            return o.onReadyBeingFired = [], X.resolve(vs(function() {
+                                return C(a.vip)
+                            })).then(O)
+                        }
+                    })
+                }).finally(function() {
+                    o.openCanceller === d && (o.onReadyBeingFired = null, o.isBeingOpened = !1)
+                }).catch(function(O) {
+                    o.dbOpenError = O;
+                    try {
+                        K && K.abort()
+                    } catch {}
+                    return d === o.openCanceller && a._close(), Me(O)
+                }).finally(function() {
+                    o.openComplete = !0, I()
+                }).then(function() {
+                    var O;
+                    return _ && (O = {}, a.tables.forEach(function(C) {
+                        C.schema.indexes.forEach(function(D) {
+                            D.name && (O["idb://".concat(a.name, "/").concat(C.name, "/").concat(D.name)] = new je(-1 / 0, [
+                                [
+                                    []
+                                ]
+                            ]))
+                        }), O["idb://".concat(a.name, "/").concat(C.name, "/")] = O["idb://".concat(a.name, "/").concat(C.name, "/:dels")] = new je(-1 / 0, [
+                            [
+                                []
+                            ]
+                        ])
+                    }), Yt(_n).fire(O), Es(O, !0)), a
+                })
+            }
+
+            function _s(a) {
+                function o(p) {
+                    return a.next(p)
+                }
+                var l = f(o),
+                    d = f(function(p) {
+                        return a.throw(p)
+                    });
+
+                function f(p) {
+                    return function(k) {
+                        var E = p(k),
+                            k = E.value;
+                        return E.done ? k : k && typeof k.then == "function" ? k.then(l, d) : u(k) ? Promise.all(k).then(l, d) : l(k)
+                    }
+                }
+                return f(o)()
+            }
+
+            function $i(a, o, l) {
+                for (var d = u(a) ? a.slice() : [a], f = 0; f < l; ++f) d.push(o);
+                return d
+            }
+            var Yh = {
+                stack: "dbcore",
+                name: "VirtualIndexMiddleware",
+                level: 1,
+                create: function(a) {
+                    return n(n({}, a), {
+                        table: function(o) {
+                            var l = a.table(o),
+                                d = l.schema,
+                                f = {},
+                                p = [];
+
+                            function g(_, O, C) {
+                                var D = kn(_),
+                                    x = f[D] = f[D] || [],
+                                    R = _ == null ? 0 : typeof _ == "string" ? 1 : _.length,
+                                    A = 0 < O,
+                                    A = n(n({}, C), {
+                                        name: A ? "".concat(D, "(virtual-from:").concat(C.name, ")") : C.name,
+                                        lowLevelIndex: C,
+                                        isVirtual: A,
+                                        keyTail: O,
+                                        keyLength: R,
+                                        extractKey: ds(_),
+                                        unique: !A && C.unique
+                                    });
+                                return x.push(A), A.isPrimaryKey || p.push(A), 1 < R && g(R === 2 ? _[0] : _.slice(0, R - 1), O + 1, C), x.sort(function(N, B) {
+                                    return N.keyTail - B.keyTail
+                                }), A
+                            }
+                            o = g(d.primaryKey.keyPath, 0, d.primaryKey), f[":id"] = [o];
+                            for (var E = 0, k = d.indexes; E < k.length; E++) {
+                                var I = k[E];
+                                g(I.keyPath, 0, I)
+                            }
+
+                            function K(_) {
+                                var O, C = _.query.index;
+                                return C.isVirtual ? n(n({}, _), {
+                                    query: {
+                                        index: C.lowLevelIndex,
+                                        range: (O = _.query.range, C = C.keyTail, {
+                                            type: O.type === 1 ? 2 : O.type,
+                                            lower: $i(O.lower, O.lowerOpen ? a.MAX_KEY : a.MIN_KEY, C),
+                                            lowerOpen: !0,
+                                            upper: $i(O.upper, O.upperOpen ? a.MIN_KEY : a.MAX_KEY, C),
+                                            upperOpen: !0
+                                        })
+                                    }
+                                }) : _
+                            }
+                            return n(n({}, l), {
+                                schema: n(n({}, d), {
+                                    primaryKey: o,
+                                    indexes: p,
+                                    getIndexByKeyPath: function(_) {
+                                        return (_ = f[kn(_)]) && _[0]
+                                    }
+                                }),
+                                count: function(_) {
+                                    return l.count(K(_))
+                                },
+                                query: function(_) {
+                                    return l.query(K(_))
+                                },
+                                openCursor: function(_) {
+                                    var O = _.query.index,
+                                        C = O.keyTail,
+                                        D = O.isVirtual,
+                                        x = O.keyLength;
+                                    return D ? l.openCursor(K(_)).then(function(A) {
+                                        return A && R(A)
+                                    }) : l.openCursor(_);
+
+                                    function R(A) {
+                                        return Object.create(A, {
+                                            continue: {
+                                                value: function(N) {
+                                                    N != null ? A.continue($i(N, _.reverse ? a.MAX_KEY : a.MIN_KEY, C)) : _.unique ? A.continue(A.key.slice(0, x).concat(_.reverse ? a.MIN_KEY : a.MAX_KEY, C)) : A.continue()
+                                                }
+                                            },
+                                            continuePrimaryKey: {
+                                                value: function(N, B) {
+                                                    A.continuePrimaryKey($i(N, a.MAX_KEY, C), B)
+                                                }
+                                            },
+                                            primaryKey: {
+                                                get: function() {
+                                                    return A.primaryKey
+                                                }
+                                            },
+                                            key: {
+                                                get: function() {
+                                                    var N = A.key;
+                                                    return x === 1 ? N[0] : N.slice(0, x)
+                                                }
+                                            },
+                                            value: {
+                                                get: function() {
+                                                    return A.value
+                                                }
+                                            }
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    })
+                }
+            };
+
+            function Ps(a, o, l, d) {
+                return l = l || {}, d = d || "", c(a).forEach(function(f) {
+                    var p, g, E;
+                    y(o, f) ? (p = a[f], g = o[f], typeof p == "object" && typeof g == "object" && p && g ? (E = Pe(p)) !== Pe(g) ? l[d + f] = o[f] : E === "Object" ? Ps(p, g, l, d + f + ".") : p !== g && (l[d + f] = o[f]) : p !== g && (l[d + f] = o[f])) : l[d + f] = void 0
+                }), c(o).forEach(function(f) {
+                    y(a, f) || (l[d + f] = o[f])
+                }), l
+            }
+
+            function ks(a, o) {
+                return o.type === "delete" ? o.keys : o.keys || o.values.map(a.extractKey)
+            }
+            var Qh = {
+                stack: "dbcore",
+                name: "HooksMiddleware",
+                level: 2,
+                create: function(a) {
+                    return n(n({}, a), {
+                        table: function(o) {
+                            var l = a.table(o),
+                                d = l.schema.primaryKey;
+                            return n(n({}, l), {
+                                mutate: function(f) {
+                                    var p = ae.trans,
+                                        g = p.table(o).hook,
+                                        E = g.deleting,
+                                        k = g.creating,
+                                        I = g.updating;
+                                    switch (f.type) {
+                                        case "add":
+                                            if (k.fire === Ce) break;
+                                            return p._promise("readwrite", function() {
+                                                return K(f)
+                                            }, !0);
+                                        case "put":
+                                            if (k.fire === Ce && I.fire === Ce) break;
+                                            return p._promise("readwrite", function() {
+                                                return K(f)
+                                            }, !0);
+                                        case "delete":
+                                            if (E.fire === Ce) break;
+                                            return p._promise("readwrite", function() {
+                                                return K(f)
+                                            }, !0);
+                                        case "deleteRange":
+                                            if (E.fire === Ce) break;
+                                            return p._promise("readwrite", function() {
+                                                return function _(O, C, D) {
+                                                    return l.query({
+                                                        trans: O,
+                                                        values: !1,
+                                                        query: {
+                                                            index: d,
+                                                            range: C
+                                                        },
+                                                        limit: D
+                                                    }).then(function(x) {
+                                                        var R = x.result;
+                                                        return K({
+                                                            type: "delete",
+                                                            keys: R,
+                                                            trans: O
+                                                        }).then(function(A) {
+                                                            return 0 < A.numFailures ? Promise.reject(A.failures[0]) : R.length < D ? {
+                                                                failures: [],
+                                                                numFailures: 0,
+                                                                lastResult: void 0
+                                                            } : _(O, n(n({}, C), {
+                                                                lower: R[R.length - 1],
+                                                                lowerOpen: !0
+                                                            }), D)
+                                                        })
+                                                    })
+                                                }(f.trans, f.range, 1e4)
+                                            }, !0)
+                                    }
+                                    return l.mutate(f);
+
+                                    function K(_) {
+                                        var O, C, D, x = ae.trans,
+                                            R = _.keys || ks(d, _);
+                                        if (!R) throw new Error("Keys missing");
+                                        return (_ = _.type === "add" || _.type === "put" ? n(n({}, _), {
+                                            keys: R
+                                        }) : n({}, _)).type !== "delete" && (_.values = i([], _.values)), _.keys && (_.keys = i([], _.keys)), O = l, D = R, ((C = _).type === "add" ? Promise.resolve([]) : O.getMany({
+                                            trans: C.trans,
+                                            keys: D,
+                                            cache: "immutable"
+                                        })).then(function(A) {
+                                            var N = R.map(function(B, L) {
+                                                var $, G, q, J = A[L],
+                                                    V = {
+                                                        onerror: null,
+                                                        onsuccess: null
+                                                    };
+                                                return _.type === "delete" ? E.fire.call(V, B, J, x) : _.type === "add" || J === void 0 ? ($ = k.fire.call(V, B, _.values[L], x), B == null && $ != null && (_.keys[L] = B = $, d.outbound || W(_.values[L], d.keyPath, B))) : ($ = Ps(J, _.values[L]), (G = I.fire.call(V, $, B, J, x)) && (q = _.values[L], Object.keys(G).forEach(function(j) {
+                                                    y(q, j) ? q[j] = G[j] : W(q, j, G[j])
+                                                }))), V
+                                            });
+                                            return l.mutate(_).then(function(B) {
+                                                for (var L = B.failures, $ = B.results, G = B.numFailures, B = B.lastResult, q = 0; q < R.length; ++q) {
+                                                    var J = ($ || R)[q],
+                                                        V = N[q];
+                                                    J == null ? V.onerror && V.onerror(L[q]) : V.onsuccess && V.onsuccess(_.type === "put" && A[q] ? _.values[q] : J)
+                                                }
+                                                return {
+                                                    failures: L,
+                                                    results: $,
+                                                    numFailures: G,
+                                                    lastResult: B
+                                                }
+                                            }).catch(function(B) {
+                                                return N.forEach(function(L) {
+                                                    return L.onerror && L.onerror(B)
+                                                }), Promise.reject(B)
+                                            })
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    })
+                }
+            };
+
+            function Nc(a, o, l) {
+                try {
+                    if (!o || o.keys.length < a.length) return null;
+                    for (var d = [], f = 0, p = 0; f < o.keys.length && p < a.length; ++f) be(o.keys[f], a[p]) === 0 && (d.push(l ? oe(o.values[f]) : o.values[f]), ++p);
+                    return d.length === a.length ? d : null
+                } catch {
+                    return null
+                }
+            }
+            var Xh = {
+                stack: "dbcore",
+                level: -1,
+                create: function(a) {
+                    return {
+                        table: function(o) {
+                            var l = a.table(o);
+                            return n(n({}, l), {
+                                getMany: function(d) {
+                                    if (!d.cache) return l.getMany(d);
+                                    var f = Nc(d.keys, d.trans._cache, d.cache === "clone");
+                                    return f ? X.resolve(f) : l.getMany(d).then(function(p) {
+                                        return d.trans._cache = {
+                                            keys: d.keys,
+                                            values: d.cache === "clone" ? oe(p) : p
+                                        }, p
+                                    })
+                                },
+                                mutate: function(d) {
+                                    return d.type !== "add" && (d.trans._cache = null), l.mutate(d)
+                                }
+                            })
+                        }
+                    }
+                }
+            };
+
+            function Bc(a, o) {
+                return a.trans.mode === "readonly" && !!a.subscr && !a.trans.explicit && a.trans.db._options.cache !== "disabled" && !o.schema.primaryKey.outbound
+            }
+
+            function Mc(a, o) {
+                switch (a) {
+                    case "query":
+                        return o.values && !o.unique;
+                    case "get":
+                    case "getMany":
+                    case "count":
+                    case "openCursor":
+                        return !1
+                }
+            }
+            var Zh = {
+                stack: "dbcore",
+                level: 0,
+                name: "Observability",
+                create: function(a) {
+                    var o = a.schema.name,
+                        l = new je(a.MIN_KEY, a.MAX_KEY);
+                    return n(n({}, a), {
+                        transaction: function(d, f, p) {
+                            if (ae.subscr && f !== "readonly") throw new se.ReadOnly("Readwrite transaction in liveQuery context. Querier source: ".concat(ae.querier));
+                            return a.transaction(d, f, p)
+                        },
+                        table: function(d) {
+                            var f = a.table(d),
+                                p = f.schema,
+                                g = p.primaryKey,
+                                _ = p.indexes,
+                                E = g.extractKey,
+                                k = g.outbound,
+                                I = g.autoIncrement && _.filter(function(C) {
+                                    return C.compound && C.keyPath.includes(g.keyPath)
+                                }),
+                                K = n(n({}, f), {
+                                    mutate: function(C) {
+                                        function D(j) {
+                                            return j = "idb://".concat(o, "/").concat(d, "/").concat(j), B[j] || (B[j] = new je)
+                                        }
+                                        var x, R, A, N = C.trans,
+                                            B = C.mutatedParts || (C.mutatedParts = {}),
+                                            L = D(""),
+                                            $ = D(":dels"),
+                                            G = C.type,
+                                            V = C.type === "deleteRange" ? [C.range] : C.type === "delete" ? [C.keys] : C.values.length < 50 ? [ks(g, C).filter(function(j) {
+                                                return j
+                                            }), C.values] : [],
+                                            q = V[0],
+                                            J = V[1],
+                                            V = C.trans._cache;
+                                        return u(q) ? (L.addKeys(q), (V = G === "delete" || q.length === J.length ? Nc(q, V) : null) || $.addKeys(q), (V || J) && (x = D, R = V, A = J, p.indexes.forEach(function(j) {
+                                            var Z = x(j.name || "");
+
+                                            function he(me) {
+                                                return me != null ? j.extractKey(me) : null
+                                            }
+
+                                            function pe(me) {
+                                                return j.multiEntry && u(me) ? me.forEach(function(st) {
+                                                    return Z.addKey(st)
+                                                }) : Z.addKey(me)
+                                            }(R || A).forEach(function(me, Ge) {
+                                                var le = R && he(R[Ge]),
+                                                    Ge = A && he(A[Ge]);
+                                                be(le, Ge) !== 0 && (le != null && pe(le), Ge != null && pe(Ge))
+                                            })
+                                        }))) : q ? (J = {
+                                            from: (J = q.lower) !== null && J !== void 0 ? J : a.MIN_KEY,
+                                            to: (J = q.upper) !== null && J !== void 0 ? J : a.MAX_KEY
+                                        }, $.add(J), L.add(J)) : (L.add(l), $.add(l), p.indexes.forEach(function(j) {
+                                            return D(j.name).add(l)
+                                        })), f.mutate(C).then(function(j) {
+                                            return !q || C.type !== "add" && C.type !== "put" || (L.addKeys(j.results), I && I.forEach(function(Z) {
+                                                for (var he = C.values.map(function(le) {
+                                                        return Z.extractKey(le)
+                                                    }), pe = Z.keyPath.findIndex(function(le) {
+                                                        return le === g.keyPath
+                                                    }), me = 0, st = j.results.length; me < st; ++me) he[me][pe] = j.results[me];
+                                                D(Z.name).addKeys(he)
+                                            })), N.mutatedParts = Ui(N.mutatedParts || {}, B), j
+                                        })
+                                    }
+                                }),
+                                _ = function(D) {
+                                    var x = D.query,
+                                        D = x.index,
+                                        x = x.range;
+                                    return [D, new je((D = x.lower) !== null && D !== void 0 ? D : a.MIN_KEY, (x = x.upper) !== null && x !== void 0 ? x : a.MAX_KEY)]
+                                },
+                                O = {
+                                    get: function(C) {
+                                        return [g, new je(C.key)]
+                                    },
+                                    getMany: function(C) {
+                                        return [g, new je().addKeys(C.keys)]
+                                    },
+                                    count: _,
+                                    query: _,
+                                    openCursor: _
+                                };
+                            return c(O).forEach(function(C) {
+                                K[C] = function(D) {
+                                    var x = ae.subscr,
+                                        R = !!x,
+                                        A = Bc(ae, f) && Mc(C, D) ? D.obsSet = {} : x;
+                                    if (R) {
+                                        var N = function(J) {
+                                                return J = "idb://".concat(o, "/").concat(d, "/").concat(J), A[J] || (A[J] = new je)
+                                            },
+                                            B = N(""),
+                                            L = N(":dels"),
+                                            x = O[C](D),
+                                            R = x[0],
+                                            x = x[1];
+                                        if ((C === "query" && R.isPrimaryKey && !D.values ? L : N(R.name || "")).add(x), !R.isPrimaryKey) {
+                                            if (C !== "count") {
+                                                var $ = C === "query" && k && D.values && f.query(n(n({}, D), {
+                                                    values: !1
+                                                }));
+                                                return f[C].apply(this, arguments).then(function(J) {
+                                                    if (C === "query") {
+                                                        if (k && D.values) return $.then(function(he) {
+                                                            return he = he.result, B.addKeys(he), J
+                                                        });
+                                                        var V = D.values ? J.result.map(E) : J.result;
+                                                        (D.values ? B : L).addKeys(V)
+                                                    } else if (C === "openCursor") {
+                                                        var j = J,
+                                                            Z = D.values;
+                                                        return j && Object.create(j, {
+                                                            key: {
+                                                                get: function() {
+                                                                    return L.addKey(j.primaryKey), j.key
+                                                                }
+                                                            },
+                                                            primaryKey: {
+                                                                get: function() {
+                                                                    var he = j.primaryKey;
+                                                                    return L.addKey(he), he
+                                                                }
+                                                            },
+                                                            value: {
+                                                                get: function() {
+                                                                    return Z && B.addKey(j.primaryKey), j.value
+                                                                }
+                                                            }
+                                                        })
+                                                    }
+                                                    return J
+                                                })
+                                            }
+                                            L.add(l)
+                                        }
+                                    }
+                                    return f[C].apply(this, arguments)
+                                }
+                            }), K
+                        }
+                    })
+                }
+            };
+
+            function Fc(a, o, l) {
+                if (l.numFailures === 0) return o;
+                if (o.type === "deleteRange") return null;
+                var d = o.keys ? o.keys.length : "values" in o && o.values ? o.values.length : 1;
+                return l.numFailures === d ? null : (o = n({}, o), u(o.keys) && (o.keys = o.keys.filter(function(f, p) {
+                    return !(p in l.failures)
+                })), "values" in o && u(o.values) && (o.values = o.values.filter(function(f, p) {
+                    return !(p in l.failures)
+                })), o)
+            }
+
+            function Cs(a, o) {
+                return l = a, ((d = o).lower === void 0 || (d.lowerOpen ? 0 < be(l, d.lower) : 0 <= be(l, d.lower))) && (a = a, (o = o).upper === void 0 || (o.upperOpen ? be(a, o.upper) < 0 : be(a, o.upper) <= 0));
+                var l, d
+            }
+
+            function Lc(a, o, O, d, f, p) {
+                if (!O || O.length === 0) return a;
+                var g = o.query.index,
+                    E = g.multiEntry,
+                    k = o.query.range,
+                    I = d.schema.primaryKey.extractKey,
+                    K = g.extractKey,
+                    _ = (g.lowLevelIndex || g).extractKey,
+                    O = O.reduce(function(C, D) {
+                        var x = C,
+                            R = [];
+                        if (D.type === "add" || D.type === "put")
+                            for (var A = new je, N = D.values.length - 1; 0 <= N; --N) {
+                                var B, L = D.values[N],
+                                    $ = I(L);
+                                A.hasKey($) || (B = K(L), (E && u(B) ? B.some(function(j) {
+                                    return Cs(j, k)
+                                }) : Cs(B, k)) && (A.addKey($), R.push(L)))
+                            }
+                        switch (D.type) {
+                            case "add":
+                                var G = new je().addKeys(o.values ? C.map(function(Z) {
+                                        return I(Z)
+                                    }) : C),
+                                    x = C.concat(o.values ? R.filter(function(Z) {
+                                        return Z = I(Z), !G.hasKey(Z) && (G.addKey(Z), !0)
+                                    }) : R.map(function(Z) {
+                                        return I(Z)
+                                    }).filter(function(Z) {
+                                        return !G.hasKey(Z) && (G.addKey(Z), !0)
+                                    }));
+                                break;
+                            case "put":
+                                var q = new je().addKeys(D.values.map(function(Z) {
+                                    return I(Z)
+                                }));
+                                x = C.filter(function(Z) {
+                                    return !q.hasKey(o.values ? I(Z) : Z)
+                                }).concat(o.values ? R : R.map(function(Z) {
+                                    return I(Z)
+                                }));
+                                break;
+                            case "delete":
+                                var J = new je().addKeys(D.keys);
+                                x = C.filter(function(Z) {
+                                    return !J.hasKey(o.values ? I(Z) : Z)
+                                });
+                                break;
+                            case "deleteRange":
+                                var V = D.range;
+                                x = C.filter(function(Z) {
+                                    return !Cs(I(Z), V)
+                                })
+                        }
+                        return x
+                    }, a);
+                return O === a ? a : (O.sort(function(C, D) {
+                    return be(_(C), _(D)) || be(I(C), I(D))
+                }), o.limit && o.limit < 1 / 0 && (O.length > o.limit ? O.length = o.limit : a.length === o.limit && O.length < o.limit && (f.dirty = !0)), p ? Object.freeze(O) : O)
+            }
+
+            function Uc(a, o) {
+                return be(a.lower, o.lower) === 0 && be(a.upper, o.upper) === 0 && !!a.lowerOpen == !!o.lowerOpen && !!a.upperOpen == !!o.upperOpen
+            }
+
+            function ef(a, o) {
+                return function(l, d, f, p) {
+                    if (l === void 0) return d !== void 0 ? -1 : 0;
+                    if (d === void 0) return 1;
+                    if ((d = be(l, d)) === 0) {
+                        if (f && p) return 0;
+                        if (f) return 1;
+                        if (p) return -1
+                    }
+                    return d
+                }(a.lower, o.lower, a.lowerOpen, o.lowerOpen) <= 0 && 0 <= function(l, d, f, p) {
+                    if (l === void 0) return d !== void 0 ? 1 : 0;
+                    if (d === void 0) return -1;
+                    if ((d = be(l, d)) === 0) {
+                        if (f && p) return 0;
+                        if (f) return -1;
+                        if (p) return 1
+                    }
+                    return d
+                }(a.upper, o.upper, a.upperOpen, o.upperOpen)
+            }
+
+            function tf(a, o, l, d) {
+                a.subscribers.add(l), d.addEventListener("abort", function() {
+                    var f, p;
+                    a.subscribers.delete(l), a.subscribers.size === 0 && (f = a, p = o, setTimeout(function() {
+                        f.subscribers.size === 0 && fe(p, f)
+                    }, 3e3))
+                })
+            }
+            var rf = {
+                stack: "dbcore",
+                level: 0,
+                name: "Cache",
+                create: function(a) {
+                    var o = a.schema.name;
+                    return n(n({}, a), {
+                        transaction: function(l, d, f) {
+                            var p, g, E = a.transaction(l, d, f);
+                            return d === "readwrite" && (g = (p = new AbortController).signal, f = function(k) {
+                                return function() {
+                                    if (p.abort(), d === "readwrite") {
+                                        for (var I = new Set, K = 0, _ = l; K < _.length; K++) {
+                                            var O = _[K],
+                                                C = vr["idb://".concat(o, "/").concat(O)];
+                                            if (C) {
+                                                var D = a.table(O),
+                                                    x = C.optimisticOps.filter(function(Z) {
+                                                        return Z.trans === E
+                                                    });
+                                                if (E._explicit && k && E.mutatedParts)
+                                                    for (var R = 0, A = Object.values(C.queries.query); R < A.length; R++)
+                                                        for (var N = 0, B = (G = A[R]).slice(); N < B.length; N++) ws((q = B[N]).obsSet, E.mutatedParts) && (fe(G, q), q.subscribers.forEach(function(Z) {
+                                                            return I.add(Z)
+                                                        }));
+                                                else if (0 < x.length) {
+                                                    C.optimisticOps = C.optimisticOps.filter(function(Z) {
+                                                        return Z.trans !== E
+                                                    });
+                                                    for (var L = 0, $ = Object.values(C.queries.query); L < $.length; L++)
+                                                        for (var G, q, J, V = 0, j = (G = $[L]).slice(); V < j.length; V++)(q = j[V]).res != null && E.mutatedParts && (k && !q.dirty ? (J = Object.isFrozen(q.res), J = Lc(q.res, q.req, x, D, q, J), q.dirty ? (fe(G, q), q.subscribers.forEach(function(Z) {
+                                                            return I.add(Z)
+                                                        })) : J !== q.res && (q.res = J, q.promise = X.resolve({
+                                                            result: J
+                                                        }))) : (q.dirty && fe(G, q), q.subscribers.forEach(function(Z) {
+                                                            return I.add(Z)
+                                                        })))
+                                                }
+                                            }
+                                        }
+                                        I.forEach(function(Z) {
+                                            return Z()
+                                        })
+                                    }
+                                }
+                            }, E.addEventListener("abort", f(!1), {
+                                signal: g
+                            }), E.addEventListener("error", f(!1), {
+                                signal: g
+                            }), E.addEventListener("complete", f(!0), {
+                                signal: g
+                            })), E
+                        },
+                        table: function(l) {
+                            var d = a.table(l),
+                                f = d.schema.primaryKey;
+                            return n(n({}, d), {
+                                mutate: function(p) {
+                                    var g = ae.trans;
+                                    if (f.outbound || g.db._options.cache === "disabled" || g.explicit || g.idbtrans.mode !== "readwrite") return d.mutate(p);
+                                    var E = vr["idb://".concat(o, "/").concat(l)];
+                                    return E ? (g = d.mutate(p), p.type !== "add" && p.type !== "put" || !(50 <= p.values.length || ks(f, p).some(function(k) {
+                                        return k == null
+                                    })) ? (E.optimisticOps.push(p), p.mutatedParts && Wi(p.mutatedParts), g.then(function(k) {
+                                        0 < k.numFailures && (fe(E.optimisticOps, p), (k = Fc(0, p, k)) && E.optimisticOps.push(k), p.mutatedParts && Wi(p.mutatedParts))
+                                    }), g.catch(function() {
+                                        fe(E.optimisticOps, p), p.mutatedParts && Wi(p.mutatedParts)
+                                    })) : g.then(function(k) {
+                                        var I = Fc(0, n(n({}, p), {
+                                            values: p.values.map(function(K, _) {
+                                                var O;
+                                                return k.failures[_] ? K : (K = (O = f.keyPath) !== null && O !== void 0 && O.includes(".") ? oe(K) : n({}, K), W(K, f.keyPath, k.results[_]), K)
+                                            })
+                                        }), k);
+                                        E.optimisticOps.push(I), queueMicrotask(function() {
+                                            return p.mutatedParts && Wi(p.mutatedParts)
+                                        })
+                                    }), g) : d.mutate(p)
+                                },
+                                query: function(p) {
+                                    if (!Bc(ae, d) || !Mc("query", p)) return d.query(p);
+                                    var g = ((I = ae.trans) === null || I === void 0 ? void 0 : I.db._options.cache) === "immutable",
+                                        _ = ae,
+                                        E = _.requery,
+                                        k = _.signal,
+                                        I = function(D, x, R, A) {
+                                            var N = vr["idb://".concat(D, "/").concat(x)];
+                                            if (!N) return [];
+                                            if (!(x = N.queries[R])) return [null, !1, N, null];
+                                            var B = x[(A.query ? A.query.index.name : null) || ""];
+                                            if (!B) return [null, !1, N, null];
+                                            switch (R) {
+                                                case "query":
+                                                    var L = B.find(function($) {
+                                                        return $.req.limit === A.limit && $.req.values === A.values && Uc($.req.query.range, A.query.range)
+                                                    });
+                                                    return L ? [L, !0, N, B] : [B.find(function($) {
+                                                        return ("limit" in $.req ? $.req.limit : 1 / 0) >= A.limit && (!A.values || $.req.values) && ef($.req.query.range, A.query.range)
+                                                    }), !1, N, B];
+                                                case "count":
+                                                    return L = B.find(function($) {
+                                                        return Uc($.req.query.range, A.query.range)
+                                                    }), [L, !!L, N, B]
+                                            }
+                                        }(o, l, "query", p),
+                                        K = I[0],
+                                        _ = I[1],
+                                        O = I[2],
+                                        C = I[3];
+                                    return K && _ ? K.obsSet = p.obsSet : (_ = d.query(p).then(function(D) {
+                                        var x = D.result;
+                                        if (K && (K.res = x), g) {
+                                            for (var R = 0, A = x.length; R < A; ++R) Object.freeze(x[R]);
+                                            Object.freeze(x)
+                                        } else D.result = oe(x);
+                                        return D
+                                    }).catch(function(D) {
+                                        return C && K && fe(C, K), Promise.reject(D)
+                                    }), K = {
+                                        obsSet: p.obsSet,
+                                        promise: _,
+                                        subscribers: new Set,
+                                        type: "query",
+                                        req: p,
+                                        dirty: !1
+                                    }, C ? C.push(K) : (C = [K], (O = O || (vr["idb://".concat(o, "/").concat(l)] = {
+                                        queries: {
+                                            query: {},
+                                            count: {}
+                                        },
+                                        objs: new Map,
+                                        optimisticOps: [],
+                                        unsignaledParts: {}
+                                    })).queries.query[p.query.index.name || ""] = C)), tf(K, C, E, k), K.promise.then(function(D) {
+                                        return {
+                                            result: Lc(D.result, p, O == null ? void 0 : O.optimisticOps, d, K, g)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            };
+
+            function qi(a, o) {
+                return new Proxy(a, {
+                    get: function(l, d, f) {
+                        return d === "db" ? o : Reflect.get(l, d, f)
+                    }
+                })
+            }
+            var Dt = (Fe.prototype.version = function(a) {
+                if (isNaN(a) || a < .1) throw new se.Type("Given version is not a positive number");
+                if (a = Math.round(10 * a) / 10, this.idbdb || this._state.isBeingOpened) throw new se.Schema("Cannot add version when database is open");
+                this.verno = Math.max(this.verno, a);
+                var o = this._versions,
+                    l = o.filter(function(d) {
+                        return d._cfg.version === a
+                    })[0];
+                return l || (l = new this.Version(a), o.push(l), o.sort(Jh), l.stores({}), this._state.autoSchema = !1, l)
+            }, Fe.prototype._whenReady = function(a) {
+                var o = this;
+                return this.idbdb && (this._state.openComplete || ae.letThrough || this._vip) ? a() : new X(function(l, d) {
+                    if (o._state.openComplete) return d(new se.DatabaseClosed(o._state.dbOpenError));
+                    if (!o._state.isBeingOpened) {
+                        if (!o._state.autoOpen) return void d(new se.DatabaseClosed);
+                        o.open().catch(Ce)
+                    }
+                    o._state.dbReadyPromise.then(l, d)
+                }).then(a)
+            }, Fe.prototype.use = function(a) {
+                var o = a.stack,
+                    l = a.create,
+                    d = a.level,
+                    f = a.name;
+                return f && this.unuse({
+                    stack: o,
+                    name: f
+                }), a = this._middlewares[o] || (this._middlewares[o] = []), a.push({
+                    stack: o,
+                    create: l,
+                    level: d ?? 10,
+                    name: f
+                }), a.sort(function(p, g) {
+                    return p.level - g.level
+                }), this
+            }, Fe.prototype.unuse = function(a) {
+                var o = a.stack,
+                    l = a.name,
+                    d = a.create;
+                return o && this._middlewares[o] && (this._middlewares[o] = this._middlewares[o].filter(function(f) {
+                    return d ? f.create !== d : !!l && f.name !== l
+                })), this
+            }, Fe.prototype.open = function() {
+                var a = this;
+                return pr(Jt, function() {
+                    return Vh(a)
+                })
+            }, Fe.prototype._close = function() {
+                var a = this._state,
+                    o = Ur.indexOf(this);
+                if (0 <= o && Ur.splice(o, 1), this.idbdb) {
+                    try {
+                        this.idbdb.close()
+                    } catch {}
+                    this.idbdb = null
+                }
+                a.isBeingOpened || (a.dbReadyPromise = new X(function(l) {
+                    a.dbReadyResolve = l
+                }), a.openCanceller = new X(function(l, d) {
+                    a.cancelOpen = d
+                }))
+            }, Fe.prototype.close = function(l) {
+                var o = (l === void 0 ? {
+                        disableAutoOpen: !0
+                    } : l).disableAutoOpen,
+                    l = this._state;
+                o ? (l.isBeingOpened && l.cancelOpen(new se.DatabaseClosed), this._close(), l.autoOpen = !1, l.dbOpenError = new se.DatabaseClosed) : (this._close(), l.autoOpen = this._options.autoOpen || l.isBeingOpened, l.openComplete = !1, l.dbOpenError = null)
+            }, Fe.prototype.delete = function(a) {
+                var o = this;
+                a === void 0 && (a = {
+                    disableAutoOpen: !0
+                });
+                var l = 0 < arguments.length && typeof arguments[0] != "object",
+                    d = this._state;
+                return new X(function(f, p) {
+                    function g() {
+                        o.close(a);
+                        var E = o._deps.indexedDB.deleteDatabase(o.name);
+                        E.onsuccess = xe(function() {
+                            var k, I, K;
+                            k = o._deps, I = o.name, K = k.indexedDB, k = k.IDBKeyRange, ys(K) || I === Ri || ms(K, k).delete(I).catch(Ce), f()
+                        }), E.onerror = Pt(p), E.onblocked = o._fireOnBlocked
+                    }
+                    if (l) throw new se.InvalidArgument("Invalid closeOptions argument to db.delete()");
+                    d.isBeingOpened ? d.dbReadyPromise.then(g) : g()
+                })
+            }, Fe.prototype.backendDB = function() {
+                return this.idbdb
+            }, Fe.prototype.isOpen = function() {
+                return this.idbdb !== null
+            }, Fe.prototype.hasBeenClosed = function() {
+                var a = this._state.dbOpenError;
+                return a && a.name === "DatabaseClosed"
+            }, Fe.prototype.hasFailed = function() {
+                return this._state.dbOpenError !== null
+            }, Fe.prototype.dynamicallyOpened = function() {
+                return this._state.autoSchema
+            }, Object.defineProperty(Fe.prototype, "tables", {
+                get: function() {
+                    var a = this;
+                    return c(this._allTables).map(function(o) {
+                        return a._allTables[o]
+                    })
+                },
+                enumerable: !1,
+                configurable: !0
+            }), Fe.prototype.transaction = function() {
+                var a = (function(o, l, d) {
+                    var f = arguments.length;
+                    if (f < 2) throw new se.InvalidArgument("Too few arguments");
+                    for (var p = new Array(f - 1); --f;) p[f - 1] = arguments[f];
+                    return d = p.pop(), [o, Se(p), d]
+                }).apply(this, arguments);
+                return this._transaction.apply(this, a)
+            }, Fe.prototype._transaction = function(a, o, l) {
+                var d = this,
+                    f = ae.trans;
+                f && f.db === this && a.indexOf("!") === -1 || (f = null);
+                var p, g, E = a.indexOf("?") !== -1;
+                a = a.replace("!", "").replace("?", "");
+                try {
+                    if (g = o.map(function(I) {
+                            if (I = I instanceof d.Table ? I.name : I, typeof I != "string") throw new TypeError("Invalid table argument to Dexie.transaction(). Only Table or String are allowed");
+                            return I
+                        }), a == "r" || a === ns) p = ns;
+                    else {
+                        if (a != "rw" && a != is) throw new se.InvalidArgument("Invalid transaction mode: " + a);
+                        p = is
+                    }
+                    if (f) {
+                        if (f.mode === ns && p === is) {
+                            if (!E) throw new se.SubTransaction("Cannot enter a sub-transaction with READWRITE mode when parent transaction is READONLY");
+                            f = null
+                        }
+                        f && g.forEach(function(I) {
+                            if (f && f.storeNames.indexOf(I) === -1) {
+                                if (!E) throw new se.SubTransaction("Table " + I + " not included in parent transaction.");
+                                f = null
+                            }
+                        }), E && f && !f.active && (f = null)
+                    }
+                } catch (I) {
+                    return f ? f._promise(null, function(K, _) {
+                        _(I)
+                    }) : Me(I)
+                }
+                var k = (function I(K, _, O, C, D) {
+                    return X.resolve().then(function() {
+                        var x = ae.transless || ae,
+                            R = K._createTransaction(_, O, K._dbSchema, C);
+                        if (R.explicit = !0, x = {
+                                trans: R,
+                                transless: x
+                            }, C) R.idbtrans = C.idbtrans;
+                        else try {
+                            R.create(), R.idbtrans._explicit = !0, K._state.PR1398_maxLoop = 3
+                        } catch (B) {
+                            return B.name === ja.InvalidState && K.isOpen() && 0 < --K._state.PR1398_maxLoop ? (console.warn("Dexie: Need to reopen db"), K.close({
+                                disableAutoOpen: !1
+                            }), K.open().then(function() {
+                                return I(K, _, O, null, D)
+                            })) : Me(B)
+                        }
+                        var A, N = we(D);
+                        return N && Lr(), x = X.follow(function() {
+                            var B;
+                            (A = D.call(R, R)) && (N ? (B = jt.bind(null, null), A.then(B, B)) : typeof A.next == "function" && typeof A.throw == "function" && (A = _s(A)))
+                        }, x), (A && typeof A.then == "function" ? X.resolve(A).then(function(B) {
+                            return R.active ? B : Me(new se.PrematureCommit("Transaction committed too early. See http://bit.ly/2kdckMn"))
+                        }) : x.then(function() {
+                            return A
+                        })).then(function(B) {
+                            return C && R._resolve(), R._completion.then(function() {
+                                return B
+                            })
+                        }).catch(function(B) {
+                            return R._reject(B), Me(B)
+                        })
+                    })
+                }).bind(null, this, p, g, f, l);
+                return f ? f._promise(p, k, "lock") : ae.trans ? pr(ae.transless, function() {
+                    return d._whenReady(k)
+                }) : this._whenReady(k)
+            }, Fe.prototype.table = function(a) {
+                if (!y(this._allTables, a)) throw new se.InvalidTable("Table ".concat(a, " does not exist"));
+                return this._allTables[a]
+            }, Fe);
+
+            function Fe(a, o) {
+                var l = this;
+                this._middlewares = {}, this.verno = 0;
+                var d = Fe.dependencies;
+                this._options = o = n({
+                    addons: Fe.addons,
+                    autoOpen: !0,
+                    indexedDB: d.indexedDB,
+                    IDBKeyRange: d.IDBKeyRange,
+                    cache: "cloned"
+                }, o), this._deps = {
+                    indexedDB: o.indexedDB,
+                    IDBKeyRange: o.IDBKeyRange
+                }, d = o.addons, this._dbSchema = {}, this._versions = [], this._storeNames = [], this._allTables = {}, this.idbdb = null, this._novip = this;
+                var f, p, g, E, k, I = {
+                    dbOpenError: null,
+                    isBeingOpened: !1,
+                    onReadyBeingFired: null,
+                    openComplete: !1,
+                    dbReadyResolve: Ce,
+                    dbReadyPromise: null,
+                    cancelOpen: Ce,
+                    openCanceller: null,
+                    autoSchema: !0,
+                    PR1398_maxLoop: 3,
+                    autoOpen: o.autoOpen
+                };
+                I.dbReadyPromise = new X(function(_) {
+                    I.dbReadyResolve = _
+                }), I.openCanceller = new X(function(_, O) {
+                    I.cancelOpen = O
+                }), this._state = I, this.name = a, this.on = wn(this, "populate", "blocked", "versionchange", "close", {
+                    ready: [Ga, Ce]
+                }), this.on.ready.subscribe = M(this.on.ready.subscribe, function(_) {
+                    return function(O, C) {
+                        Fe.vip(function() {
+                            var D, x = l._state;
+                            x.openComplete ? (x.dbOpenError || X.resolve().then(O), C && _(O)) : x.onReadyBeingFired ? (x.onReadyBeingFired.push(O), C && _(O)) : (_(O), D = l, C || _(function R() {
+                                D.on.ready.unsubscribe(O), D.on.ready.unsubscribe(R)
+                            }))
+                        })
+                    }
+                }), this.Collection = (f = this, bn(Fh.prototype, function(A, R) {
+                    this.db = f;
+                    var C = vc,
+                        D = null;
+                    if (R) try {
+                        C = R()
+                    } catch (N) {
+                        D = N
+                    }
+                    var x = A._ctx,
+                        R = x.table,
+                        A = R.hook.reading.fire;
+                    this._ctx = {
+                        table: R,
+                        index: x.index,
+                        isPrimKey: !x.index || R.schema.primKey.keyPath && x.index === R.schema.primKey.name,
+                        range: C,
+                        keysOnly: !1,
+                        dir: "next",
+                        unique: "",
+                        algorithm: null,
+                        filter: null,
+                        replayFilter: null,
+                        justLimit: !0,
+                        isMatch: null,
+                        offset: 0,
+                        limit: 1 / 0,
+                        error: D,
+                        or: x.or,
+                        valueMapper: A !== pn ? A : null
+                    }
+                })), this.Table = (p = this, bn(Sc.prototype, function(_, O, C) {
+                    this.db = p, this._tx = C, this.name = _, this.schema = O, this.hook = p._allTables[_] ? p._allTables[_].hook : wn(null, {
+                        creating: [Dh, Ce],
+                        reading: [Rh, pn],
+                        updating: [xh, Ce],
+                        deleting: [Kh, Ce]
+                    })
+                })), this.Transaction = (g = this, bn(Wh.prototype, function(_, O, C, D, x) {
+                    var R = this;
+                    this.db = g, this.mode = _, this.storeNames = O, this.schema = C, this.chromeTransactionDurability = D, this.idbtrans = null, this.on = wn(this, "complete", "error", "abort"), this.parent = x || null, this.active = !0, this._reculock = 0, this._blockedFuncs = [], this._resolve = null, this._reject = null, this._waitingFor = null, this._waitingQueue = null, this._spinCount = 0, this._completion = new X(function(A, N) {
+                        R._resolve = A, R._reject = N
+                    }), this._completion.then(function() {
+                        R.active = !1, R.on.complete.fire()
+                    }, function(A) {
+                        var N = R.active;
+                        return R.active = !1, R.on.error.fire(A), R.parent ? R.parent._reject(A) : N && R.idbtrans && R.idbtrans.abort(), Me(A)
+                    })
+                })), this.Version = (E = this, bn(Gh.prototype, function(_) {
+                    this.db = E, this._cfg = {
+                        version: _,
+                        storesSource: null,
+                        dbschema: {},
+                        tables: {},
+                        contentUpgrade: null
+                    }
+                })), this.WhereClause = (k = this, bn(Cc.prototype, function(_, O, C) {
+                    if (this.db = k, this._ctx = {
+                            table: _,
+                            index: O === ":id" ? null : O,
+                            or: C
+                        }, this._cmp = this._ascending = be, this._descending = function(D, x) {
+                            return be(x, D)
+                        }, this._max = function(D, x) {
+                            return 0 < be(D, x) ? D : x
+                        }, this._min = function(D, x) {
+                            return be(D, x) < 0 ? D : x
+                        }, this._IDBKeyRange = k._deps.IDBKeyRange, !this._IDBKeyRange) throw new se.MissingAPI
+                })), this.on("versionchange", function(_) {
+                    0 < _.newVersion ? console.warn("Another connection wants to upgrade database '".concat(l.name, "'. Closing db now to resume the upgrade.")) : console.warn("Another connection wants to delete database '".concat(l.name, "'. Closing db now to resume the delete request.")), l.close({
+                        disableAutoOpen: !1
+                    })
+                }), this.on("blocked", function(_) {
+                    !_.newVersion || _.newVersion < _.oldVersion ? console.warn("Dexie.delete('".concat(l.name, "') was blocked")) : console.warn("Upgrade '".concat(l.name, "' blocked by other connection holding version ").concat(_.oldVersion / 10))
+                }), this._maxKey = Pn(o.IDBKeyRange), this._createTransaction = function(_, O, C, D) {
+                    return new l.Transaction(_, O, C, l._options.chromeTransactionDurability, D)
+                }, this._fireOnBlocked = function(_) {
+                    l.on("blocked").fire(_), Ur.filter(function(O) {
+                        return O.name === l.name && O !== l && !O._state.vcFired
+                    }).map(function(O) {
+                        return O.on("versionchange").fire(_)
+                    })
+                }, this.use(Xh), this.use(rf), this.use(Zh), this.use(Yh), this.use(Qh);
+                var K = new Proxy(this, {
+                    get: function(_, O, C) {
+                        if (O === "_vip") return !0;
+                        if (O === "table") return function(x) {
+                            return qi(l.table(x), K)
+                        };
+                        var D = Reflect.get(_, O, C);
+                        return D instanceof Sc ? qi(D, K) : O === "tables" ? D.map(function(x) {
+                            return qi(x, K)
+                        }) : O === "_createTransaction" ? function() {
+                            return qi(D.apply(this, arguments), K)
+                        } : D
+                    }
+                });
+                this.vip = K, d.forEach(function(_) {
+                    return _(l)
+                })
+            }
+            var Hi, pt = typeof Symbol < "u" && "observable" in Symbol ? Symbol.observable : "@@observable",
+                nf = (Is.prototype.subscribe = function(a, o, l) {
+                    return this._subscribe(a && typeof a != "function" ? a : {
+                        next: a,
+                        error: o,
+                        complete: l
+                    })
+                }, Is.prototype[pt] = function() {
+                    return this
+                }, Is);
+
+            function Is(a) {
+                this._subscribe = a
+            }
+            try {
+                Hi = {
+                    indexedDB: s.indexedDB || s.mozIndexedDB || s.webkitIndexedDB || s.msIndexedDB,
+                    IDBKeyRange: s.IDBKeyRange || s.webkitIDBKeyRange
+                }
+            } catch {
+                Hi = {
+                    indexedDB: null,
+                    IDBKeyRange: null
+                }
+            }
+
+            function Wc(a) {
+                var o, l = !1,
+                    d = new nf(function(f) {
+                        var p = we(a),
+                            g, E = !1,
+                            k = {},
+                            I = {},
+                            K = {
+                                get closed() {
+                                    return E
+                                },
+                                unsubscribe: function() {
+                                    E || (E = !0, g && g.abort(), _ && Yt.storagemutated.unsubscribe(C))
+                                }
+                            };
+                        f.start && f.start(K);
+                        var _ = !1,
+                            O = function() {
+                                return rs(D)
+                            },
+                            C = function(x) {
+                                Ui(k, x), ws(I, k) && O()
+                            },
+                            D = function() {
+                                var x, R, A;
+                                !E && Hi.indexedDB && (k = {}, x = {}, g && g.abort(), g = new AbortController, A = function(N) {
+                                    var B = Mr();
+                                    try {
+                                        p && Lr();
+                                        var L = zt(a, N);
+                                        return L = p ? L.finally(jt) : L
+                                    } finally {
+                                        B && Fr()
+                                    }
+                                }(R = {
+                                    subscr: x,
+                                    signal: g.signal,
+                                    requery: O,
+                                    querier: a,
+                                    trans: null
+                                }), Promise.resolve(A).then(function(N) {
+                                    l = !0, o = N, E || R.signal.aborted || (k = {}, function(B) {
+                                        for (var L in B)
+                                            if (y(B, L)) return;
+                                        return 1
+                                    }(I = x) || _ || (Yt(_n, C), _ = !0), rs(function() {
+                                        return !E && f.next && f.next(N)
+                                    }))
+                                }, function(N) {
+                                    l = !1, ["DatabaseClosedError", "AbortError"].includes(N == null ? void 0 : N.name) || E || rs(function() {
+                                        E || f.error && f.error(N)
+                                    })
+                                }))
+                            };
+                        return setTimeout(O, 0), K
+                    });
+                return d.hasValue = function() {
+                    return l
+                }, d.getValue = function() {
+                    return o
+                }, d
+            }
+            var gr = Dt;
+
+            function Rs(a) {
+                var o = Qt;
+                try {
+                    Qt = !0, Yt.storagemutated.fire(a), Es(a, !0)
+                } finally {
+                    Qt = o
+                }
+            }
+            w(gr, n(n({}, wi), {
+                delete: function(a) {
+                    return new gr(a, {
+                        addons: []
+                    }).delete()
+                },
+                exists: function(a) {
+                    return new gr(a, {
+                        addons: []
+                    }).open().then(function(o) {
+                        return o.close(), !0
+                    }).catch("NoSuchDatabaseError", function() {
+                        return !1
+                    })
+                },
+                getDatabaseNames: function(a) {
+                    try {
+                        return o = gr.dependencies, l = o.indexedDB, o = o.IDBKeyRange, (ys(l) ? Promise.resolve(l.databases()).then(function(d) {
+                            return d.map(function(f) {
+                                return f.name
+                            }).filter(function(f) {
+                                return f !== Ri
+                            })
+                        }) : ms(l, o).toCollection().primaryKeys()).then(a)
+                    } catch {
+                        return Me(new se.MissingAPI)
+                    }
+                    var o, l
+                },
+                defineClass: function() {
+                    return function(a) {
+                        h(this, a)
+                    }
+                },
+                ignoreTransaction: function(a) {
+                    return ae.trans ? pr(ae.transless, a) : a()
+                },
+                vip: vs,
+                async: function(a) {
+                    return function() {
+                        try {
+                            var o = _s(a.apply(this, arguments));
+                            return o && typeof o.then == "function" ? o : X.resolve(o)
+                        } catch (l) {
+                            return Me(l)
+                        }
+                    }
+                },
+                spawn: function(a, o, l) {
+                    try {
+                        var d = _s(a.apply(l, o || []));
+                        return d && typeof d.then == "function" ? d : X.resolve(d)
+                    } catch (f) {
+                        return Me(f)
+                    }
+                },
+                currentTransaction: {
+                    get: function() {
+                        return ae.trans || null
+                    }
+                },
+                waitFor: function(a, o) {
+                    return o = X.resolve(typeof a == "function" ? gr.ignoreTransaction(a) : a).timeout(o || 6e4), ae.trans ? ae.trans.waitFor(o) : o
+                },
+                Promise: X,
+                debug: {
+                    get: function() {
+                        return _t
+                    },
+                    set: function(a) {
+                        lc(a)
+                    }
+                },
+                derive: P,
+                extend: h,
+                props: w,
+                override: M,
+                Events: wn,
+                on: Yt,
+                liveQuery: Wc,
+                extendObservabilitySet: Ui,
+                getByKeyPath: Q,
+                setByKeyPath: W,
+                delByKeyPath: function(a, o) {
+                    typeof o == "string" ? W(a, o, void 0) : "length" in o && [].map.call(o, function(l) {
+                        W(a, l, void 0)
+                    })
+                },
+                shallowClone: ie,
+                deepClone: oe,
+                getObjectDiff: Ps,
+                cmp: be,
+                asap: H,
+                minKey: -1 / 0,
+                addons: [],
+                connections: Ur,
+                errnames: ja,
+                dependencies: Hi,
+                cache: vr,
+                semVer: "4.0.10",
+                version: "4.0.10".split(".").map(function(a) {
+                    return parseInt(a)
+                }).reduce(function(a, o, l) {
+                    return a + o / Math.pow(10, 2 * l)
+                })
+            })), gr.maxKey = Pn(gr.dependencies.IDBKeyRange), typeof dispatchEvent < "u" && typeof addEventListener < "u" && (Yt(_n, function(a) {
+                Qt || (a = new CustomEvent(cs, {
+                    detail: a
+                }), Qt = !0, dispatchEvent(a), Qt = !1)
+            }), addEventListener(cs, function(a) {
+                a = a.detail, Qt || Rs(a)
+            }));
+            var qr, Qt = !1,
+                $c = function() {};
+            return typeof BroadcastChannel < "u" && (($c = function() {
+                (qr = new BroadcastChannel(cs)).onmessage = function(a) {
+                    return a.data && Rs(a.data)
+                }
+            })(), typeof qr.unref == "function" && qr.unref(), Yt(_n, function(a) {
+                Qt || qr.postMessage(a)
+            })), typeof addEventListener < "u" && (addEventListener("pagehide", function(a) {
+                if (!Dt.disableBfCache && a.persisted) {
+                    _t && console.debug("Dexie: handling persisted pagehide"), qr != null && qr.close();
+                    for (var o = 0, l = Ur; o < l.length; o++) l[o].close({
+                        disableAutoOpen: !1
+                    })
+                }
+            }), addEventListener("pageshow", function(a) {
+                !Dt.disableBfCache && a.persisted && (_t && console.debug("Dexie: handling persisted pageshow"), $c(), Rs({
+                    all: new je(-1 / 0, [
+                        []
+                    ])
+                }))
+            })), X.rejectionMapper = function(a, o) {
+                return !a || a instanceof ge || a instanceof TypeError || a instanceof SyntaxError || !a.name || !uc[a.name] ? a : (o = new uc[a.name](o || a.message, a), "stack" in a && b(o, "stack", {
+                    get: function() {
+                        return this.inner.stack
+                    }
+                }), o)
+            }, lc(_t), n(Dt, Object.freeze({
+                __proto__: null,
+                Dexie: Dt,
+                liveQuery: Wc,
+                Entity: gc,
+                cmp: be,
+                PropModSymbol: Rt,
+                PropModification: Sn,
+                replacePrefix: function(a, o) {
+                    return new Sn({
+                        replacePrefix: [a, o]
+                    })
+                },
+                add: function(a) {
+                    return new Sn({
+                        add: a
+                    })
+                },
+                remove: function(a) {
+                    return new Sn({
+                        remove: a
+                    })
+                },
+                default: Dt,
+                RangeSet: je,
+                mergeRanges: In,
+                rangesOverlap: xc
+            }), {
+                default: Dt
+            }), Dt
+        })
+    }(aa)), aa.exports
+}
+var LS = FS();
+const yo = uf(LS),
+    Gu = Symbol.for("Dexie"),
+    Ca = globalThis[Gu] || (globalThis[Gu] = yo);
+if (yo.semVer !== Ca.semVer) throw new Error(`Two different versions of Dexie loaded in the same app: ${yo.semVer} and ${Ca.semVer}`);
+const {
+    liveQuery: X_,
+    mergeRanges: Z_,
+    rangesOverlap: eP,
+    RangeSet: tP,
+    cmp: rP,
+    Entity: nP,
+    PropModSymbol: iP,
+    PropModification: aP,
+    replacePrefix: sP,
+    add: oP,
+    remove: cP
+} = Ca;
+var Ia = "docs",
+    US = "changes",
+    Vu = "attachments",
+    sh = "dexie",
+    Yu = new Map,
+    sa = new Map;
+
+function WS(e, t, r, n) {
+    var i = "rxdb-dexie-" + e + "--" + n.version + "--" + t,
+        s = ut(Yu, i, () => {
+            var c = (async () => {
+                var u = De(r);
+                u.autoOpen = !1;
+                var h = new Ca(i, u);
+                r.onCreate && await r.onCreate(h, i);
+                var v = {
+                    [Ia]: HS(n),
+                    [US]: "++sequence, id",
+                    [Vu]: "id"
+                };
+                return h.version(1).stores(v), await h.open(), {
+                    dexieDb: h,
+                    dexieTable: h[Ia],
+                    dexieAttachmentsTable: h[Vu],
+                    booleanIndexes: JS(n)
+                }
+            })();
+            return Yu.set(i, s), sa.set(s, 0), c
+        });
+    return s
+}
+async function $S(e) {
+    var t = await e,
+        r = sa.get(e),
+        n = r - 1;
+    n === 0 ? (t.dexieDb.close(), sa.delete(e)) : sa.set(e, n)
+}
+var vo = "__";
+
+function fn(e) {
+    var t = e.split(".");
+    if (t.length > 1) return t.map(n => fn(n)).join(".");
+    if (e.startsWith("|")) {
+        var r = e.substring(1);
+        return vo + r
+    } else return e
+}
+
+function oh(e) {
+    var t = e.split(".");
+    if (t.length > 1) return t.map(n => oh(n)).join(".");
+    if (e.startsWith(vo)) {
+        var r = e.substring(vo.length);
+        return "|" + r
+    } else return e
+}
+
+function qS(e, t) {
+    if (!t) return t;
+    var r = De(t);
+    return r = go(r), e.forEach(n => {
+        var i = sr(t, n),
+            s = i ? "1" : "0",
+            c = fn(n);
+        Al(r, c, s)
+    }), r
+}
+
+function ch(e, t) {
+    return t && (t = De(t), t = wo(t), e.forEach(r => {
+        var n = sr(t, r),
+            i = n === "1";
+        Al(t, r, i)
+    }), t)
+}
+
+function go(e) {
+    if (!e || typeof e == "string" || typeof e == "number" || typeof e == "boolean") return e;
+    if (Array.isArray(e)) return e.map(r => go(r));
+    if (typeof e == "object") {
+        var t = {};
+        return Object.entries(e).forEach(([r, n]) => {
+            typeof n == "object" && (n = go(n)), t[fn(r)] = n
+        }), t
+    }
+}
+
+function wo(e) {
+    if (!e || typeof e == "string" || typeof e == "number" || typeof e == "boolean") return e;
+    if (Array.isArray(e)) return e.map(r => wo(r));
+    if (typeof e == "object") {
+        var t = {};
+        return Object.entries(e).forEach(([r, n]) => {
+            (typeof n == "object" || Array.isArray(e)) && (n = wo(n)), t[oh(r)] = n
+        }), t
+    }
+}
+
+function HS(e) {
+    var t = [],
+        r = rt(e.primaryKey);
+    t.push([r]), t.push(["_deleted", r]), e.indexes && e.indexes.forEach(s => {
+        var c = an(s);
+        t.push(c)
+    }), t.push(["_meta.lwt", r]), t.push(["_meta.lwt"]), t = t.map(s => s.map(c => fn(c)));
+    var n = t.map(s => s.length === 1 ? s[0] : "[" + s.join("+") + "]");
+    n = n.filter((s, c, u) => u.indexOf(s) === c);
+    var i = n.join(", ");
+    return i
+}
+async function Qu(e, t) {
+    var r = await e,
+        n = await r.dexieTable.bulkGet(t);
+    return n.map(i => ch(r.booleanIndexes, i))
+}
+
+function Yi(e, t) {
+    return e + "||" + t
+}
+
+function JS(e) {
+    var t = new Set,
+        r = [];
+    return e.indexes ? (e.indexes.forEach(n => {
+        var i = an(n);
+        i.forEach(s => {
+            if (!t.has(s)) {
+                t.add(s);
+                var c = $t(e, s);
+                c.type === "boolean" && r.push(s)
+            }
+        })
+    }), r.push("_deleted"), Ip(r)) : r
+}
+
+function Xu(e) {
+    return e === St ? -1 / 0 : e
+}
+
+function Zu(e, t, r) {
+    if (e.includes(t)) {
+        var n = r === bt || r === !0 ? "1" : "0";
+        return n
+    } else return r
+}
+
+function uh(e, t, r) {
+    if (!r) {
+        if (typeof window > "u") throw new Error("IDBKeyRange missing");
+        r = window.IDBKeyRange
+    }
+    var n = t.startKeys.map((c, u) => {
+            var h = t.index[u];
+            return Zu(e, h, c)
+        }).map(Xu),
+        i = t.endKeys.map((c, u) => {
+            var h = t.index[u];
+            return Zu(e, h, c)
+        }).map(Xu),
+        s = r.bound(n, i, !t.inclusiveStart, !t.inclusiveEnd);
+    return s
+}
+async function el(e, t) {
+    var r = await e.internals,
+        n = t.query,
+        i = n.skip ? n.skip : 0,
+        s = n.limit ? n.limit : 1 / 0,
+        c = i + s,
+        u = t.queryPlan,
+        h = !1;
+    u.selectorSatisfiedByIndex || (h = pi(e.schema, t.query));
+    var v = uh(r.booleanIndexes, u, r.dexieDb._options.IDBKeyRange),
+        m = u.index,
+        y = [];
+    if (await r.dexieDb.transaction("r", r.dexieTable, async S => {
+            var b = S.idbtrans,
+                P = b.objectStore(Ia),
+                T, F;
+            F = "[" + m.map(M => fn(M)).join("+") + "]", T = P.index(F);
+            var U = T.openCursor(v);
+            await new Promise(M => {
+                U.onsuccess = function(z) {
+                    var H = z.target.result;
+                    if (H) {
+                        var Q = ch(r.booleanIndexes, H.value);
+                        (!h || h(Q)) && y.push(Q), u.sortSatisfiedByIndex && y.length === c ? M() : H.continue()
+                    } else M()
+                }
+            })
+        }), !u.sortSatisfiedByIndex) {
+        var w = Ua(e.schema, t.query);
+        y = y.sort(w)
+    }
+    return y = y.slice(i, c), {
+        documents: y
+    }
+}
+async function zS(e, t) {
+    var r = await e.internals,
+        n = t.queryPlan,
+        i = n.index,
+        s = uh(r.booleanIndexes, n, r.dexieDb._options.IDBKeyRange),
+        c = -1;
+    return await r.dexieDb.transaction("r", r.dexieTable, async u => {
+        var h = u.idbtrans,
+            v = h.objectStore(Ia),
+            m, y;
+        y = "[" + i.map(S => fn(S)).join("+") + "]", m = v.index(y);
+        var w = m.count(s);
+        c = await new Promise((S, b) => {
+            w.onsuccess = function() {
+                S(w.result)
+            }, w.onerror = P => b(P)
+        })
+    }), c
+}
+var jS = tt(),
+    Vs = !1,
+    GS = function() {
+        function e(r, n, i, s, c, u, h, v) {
+            this.changes$ = new nt, this.instanceId = jS++, this.storage = r, this.databaseName = n, this.collectionName = i, this.schema = s, this.internals = c, this.options = u, this.settings = h, this.devMode = v, this.primaryPath = rt(this.schema.primaryKey)
+        }
+        var t = e.prototype;
+        return t.bulkWrite = async function(n, i) {
+            br(this), !Vs && !await Nl() && console.warn(["-------------- RxDB Open Core RxStorage -------------------------------", "You are using the free Dexie.js based RxStorage implementation from RxDB https://rxdb.info/rx-storage-dexie.html?console=dexie ", "While this is a great option, we want to let you know that there are faster storage solutions available in our premium plugins.", "For professional users and production environments, we highly recommend considering these premium options to enhance performance and reliability.", " https://rxdb.info/premium/?console=dexie ", "If you already purchased premium access you can disable this log by calling the setPremiumFlag() function from rxdb-premium/plugins/shared.", "---------------------------------------------------------------------"].join(`
+`)), Vs = !0, n.forEach(m => {
+                if (!m.document._rev || m.previous && !m.previous._rev) throw ee("SNH", {
+                    args: {
+                        row: m
+                    }
+                })
+            });
+            var s = await this.internals,
+                c = {
+                    error: []
+                };
+            this.devMode && (n = n.map(m => {
+                var y = mi(m.document);
+                return {
+                    previous: m.previous,
+                    document: y
+                }
+            }));
+            var u = n.map(m => m.document[this.primaryPath]),
+                h;
+            if (await s.dexieDb.transaction("rw", s.dexieTable, s.dexieAttachmentsTable, async () => {
+                    var m = new Map,
+                        y = await Qu(this.internals, u);
+                    y.forEach(b => {
+                        var P = b;
+                        return P && m.set(P[this.primaryPath], P), P
+                    }), h = To(this, this.primaryPath, m, n, i), c.error = h.errors;
+                    var w = [];
+                    h.bulkInsertDocs.forEach(b => {
+                        w.push(b.document)
+                    }), h.bulkUpdateDocs.forEach(b => {
+                        w.push(b.document)
+                    }), w = w.map(b => qS(s.booleanIndexes, b)), w.length > 0 && await s.dexieTable.bulkPut(w);
+                    var S = [];
+                    h.attachmentsAdd.forEach(b => {
+                        S.push({
+                            id: Yi(b.documentId, b.attachmentId),
+                            data: b.attachmentData.data
+                        })
+                    }), h.attachmentsUpdate.forEach(b => {
+                        S.push({
+                            id: Yi(b.documentId, b.attachmentId),
+                            data: b.attachmentData.data
+                        })
+                    }), await s.dexieAttachmentsTable.bulkPut(S), await s.dexieAttachmentsTable.bulkDelete(h.attachmentsRemove.map(b => Yi(b.documentId, b.attachmentId)))
+                }), h = te(h), h.eventBulk.events.length > 0) {
+                var v = te(h.newestRow).document;
+                h.eventBulk.checkpoint = {
+                    id: v[this.primaryPath],
+                    lwt: v._meta.lwt
+                }, this.changes$.next(h.eventBulk)
+            }
+            return c
+        }, t.findDocumentsById = async function(n, i) {
+            br(this);
+            var s = await this.internals,
+                c = [];
+            return await s.dexieDb.transaction("r", s.dexieTable, async () => {
+                var u = await Qu(this.internals, n);
+                u.forEach(h => {
+                    h && (!h._deleted || i) && c.push(h)
+                })
+            }), c
+        }, t.query = function(n) {
+            return br(this), el(this, n)
+        }, t.count = async function(n) {
+            if (n.queryPlan.selectorSatisfiedByIndex) {
+                var i = await zS(this, n);
+                return {
+                    count: i,
+                    mode: "fast"
+                }
+            } else {
+                var s = await el(this, n);
+                return {
+                    count: s.documents.length,
+                    mode: "slow"
+                }
+            }
+        }, t.changeStream = function() {
+            return br(this), this.changes$.asObservable()
+        }, t.cleanup = async function(n) {
+            br(this);
+            var i = await this.internals;
+            return await i.dexieDb.transaction("rw", i.dexieTable, async () => {
+                var s = tt() - n,
+                    c = await i.dexieTable.where("_meta.lwt").below(s).toArray(),
+                    u = [];
+                c.forEach(h => {
+                    h._deleted === "1" && u.push(h[this.primaryPath])
+                }), await i.dexieTable.bulkDelete(u)
+            }), !0
+        }, t.getAttachmentData = async function(n, i, s) {
+            br(this);
+            var c = await this.internals,
+                u = Yi(n, i);
+            return await c.dexieDb.transaction("r", c.dexieAttachmentsTable, async () => {
+                var h = await c.dexieAttachmentsTable.get(u);
+                if (h) return h.data;
+                throw new Error("attachment missing documentId: " + n + " attachmentId: " + i)
+            })
+        }, t.remove = async function() {
+            br(this);
+            var n = await this.internals;
+            return await n.dexieTable.clear(), this.close()
+        }, t.close = function() {
+            return this.closed ? this.closed : (this.closed = (async () => {
+                this.changes$.complete(), await $S(this.internals)
+            })(), this.closed)
+        }, e
+    }();
+async function VS(e, t, r) {
+    var n = WS(t.databaseName, t.collectionName, r, t.schema),
+        i = new GS(e, t.databaseName, t.collectionName, t.schema, n, t.options, r, t.devMode);
+    return await Hd(sh, t, i), Promise.resolve(i)
+}
+
+function br(e) {
+    if (e.closed) throw new Error("RxStorageInstanceDexie is closed " + e.databaseName + "-" + e.collectionName)
+}
+var YS = function() {
+    function e(r) {
+        this.name = sh, this.rxdbVersion = Ro, this.settings = r
+    }
+    var t = e.prototype;
+    return t.createStorageInstance = function(n) {
+        if (No(n), n.schema.indexes) {
+            var i = n.schema.indexes.flat();
+            i.filter(s => !s.includes(".")).forEach(s => {
+                if (!n.schema.required || !n.schema.required.includes(s)) throw ee("DXE1", {
+                    field: s,
+                    schema: n.schema
+                })
+            })
+        }
+        return VS(this, n, this.settings)
+    }, e
+}();
+
+function QS(e = {}) {
+    var t = new YS(e);
+    return t
+}
+
+function XS(e, t, r, n, i) {
+    for (var s = i + 1; n <= i;) {
+        var c = n + i >>> 1,
+            u = e[c],
+            h = r !== void 0 ? r(u, t) : u - t;
+        h >= 0 ? (s = c, i = c - 1) : n = c + 1
+    }
+    return s
+}
+
+function ZS(e, t, r, n, i) {
+    for (var s = i + 1; n <= i;) {
+        var c = n + i >>> 1,
+            u = e[c],
+            h = r !== void 0 ? r(u, t) : u - t;
+        h > 0 ? (s = c, i = c - 1) : n = c + 1
+    }
+    return s
+}
+
+function eE(e, t, r, n, i) {
+    for (var s = n - 1; n <= i;) {
+        var c = n + i >>> 1,
+            u = e[c],
+            h = r !== void 0 ? r(u, t) : u - t;
+        h < 0 ? (s = c, n = c + 1) : i = c - 1
+    }
+    return s
+}
+
+function tE(e, t, r, n, i) {
+    for (var s = n - 1; n <= i;) {
+        var c = n + i >>> 1,
+            u = e[c],
+            h = r !== void 0 ? r(u, t) : u - t;
+        h <= 0 ? (s = c, n = c + 1) : i = c - 1
+    }
+    return s
+}
+
+function rE(e, t, r, n, i) {
+    for (; n <= i;) {
+        var s = n + i >>> 1,
+            c = e[s],
+            u = r !== void 0 ? r(c, t) : c - t;
+        if (u === 0) return s;
+        u <= 0 ? n = s + 1 : i = s - 1
+    }
+    return -1
+}
+
+function gi(e, t, r, n, i, s) {
+    return s(e, t, r, n === void 0 ? 0 : n | 0, i === void 0 ? e.length - 1 : i | 0)
+}
+
+function nE(e, t, r, n, i) {
+    return gi(e, t, r, n, i, XS)
+}
+
+function tl(e, t, r, n, i) {
+    return gi(e, t, r, n, i, ZS)
+}
+
+function iE(e, t, r, n, i) {
+    return gi(e, t, r, n, i, eE)
+}
+
+function aE(e, t, r, n, i) {
+    return gi(e, t, r, n, i, tE)
+}
+
+function lh(e, t, r, n, i) {
+    return gi(e, t, r, n, i, rE)
+}
+
+function dh(e, t, r) {
+    return [e, t, r].join("--memory--")
+}
+
+function Qi(e) {
+    if (e.internals.removed) throw new Error("removed already " + e.databaseName + " - " + e.collectionName + " - " + e.schema.version)
+}
+
+function Xi(e, t) {
+    return e + "||" + t
+}
+
+function sE(e, t) {
+    return e[0] < t[0] ? -1 : 1
+}
+
+function rl(e, t, r, n, i) {
+    t.documents.set(e, n);
+    for (var s = 0; s < r.length; ++s) {
+        var c = r[s],
+            u = c.docsWithIndex,
+            h = c.getIndexableString,
+            v = h(n),
+            m = cd(u, [v, n, e], sE, 0);
+        if (i) {
+            var y = h(i);
+            if (y === v) {
+                var w = u[m - 1];
+                if (w && w[2] === e) u.splice(m - 1, 1);
+                else {
+                    var S = u[m + 1];
+                    if (S[2] === e) u.splice(m + 1, 1);
+                    else throw ee("SNH", {
+                        document: n,
+                        args: {
+                            byIndex: c
+                        }
+                    })
+                }
+            } else {
+                var b = lh(u, [y], $n);
+                u.splice(b, 1)
+            }
+        }
+    }
+}
+
+function oE(e, t, r, n) {
+    var i = n[e];
+    r.documents.delete(i), Object.values(r.byIndex).forEach(s => {
+        var c = s.docsWithIndex,
+            u = s.getIndexableString(n),
+            h = lh(c, [u], $n);
+        c.splice(h, 1)
+    })
+}
+
+function $n(e, t) {
+    var r = e[0],
+        n = t[0];
+    return r < n ? -1 : r === n ? 0 : 1
+}
+
+function cE(e, t) {
+    var r = rt(t.primaryKey),
+        n = t.indexes ? t.indexes.map(i => an(i)) : [];
+    n.push(["_deleted", "_meta.lwt", r]), n.forEach(i => {
+        e.byIndex[bo(i)] = {
+            index: i,
+            docsWithIndex: [],
+            getIndexableString: Jd(t, i)
+        }
+    })
+}
+
+function bo(e) {
+    return e.join(",")
+}
+var nl = new Set,
+    uE = function() {
+        function e(r, n, i, s, c, u, h, v) {
+            this.closed = !1, this.categorizedByWriteInput = new WeakMap, this.storage = r, this.databaseName = n, this.collectionName = i, this.schema = s, this.internals = c, this.options = u, this.settings = h, this.devMode = v, nl.add(this), this.primaryPath = rt(this.schema.primaryKey)
+        }
+        var t = e.prototype;
+        return t.bulkWrite = function(n, i) {
+            this.ensurePersistence(), Qi(this);
+            var s = this.internals,
+                c = this.internals.documents,
+                u = this.primaryPath,
+                h = To(this, u, c, n, i),
+                v = h.errors,
+                m = Promise.resolve({
+                    error: v
+                });
+            if (this.categorizedByWriteInput.set(n, h), this.internals.ensurePersistenceTask = h, this.internals.ensurePersistenceIdlePromise || (this.internals.ensurePersistenceIdlePromise = un().then(() => {
+                    this.internals.ensurePersistenceIdlePromise = void 0, this.ensurePersistence()
+                })), h.eventBulk.events.length > 0) {
+                var y = te(h.newestRow).document;
+                h.eventBulk.checkpoint = {
+                    id: y[u],
+                    lwt: y._meta.lwt
+                }, s.changes$.next(h.eventBulk)
+            }
+            return m
+        }, t.ensurePersistence = function() {
+            if (this.internals.ensurePersistenceTask) {
+                var n = this.internals,
+                    i = this.internals.documents,
+                    s = this.primaryPath,
+                    c = this.internals.ensurePersistenceTask;
+                this.internals.ensurePersistenceTask = void 0;
+                for (var u = Object.values(this.internals.byIndex), h = c.bulkInsertDocs, v = 0; v < h.length; ++v) {
+                    var m = h[v],
+                        y = m.document,
+                        w = y[s];
+                    rl(w, n, u, y, void 0)
+                }
+                for (var S = c.bulkUpdateDocs, b = 0; b < S.length; ++b) {
+                    var P = S[b],
+                        T = P.document,
+                        F = T[s];
+                    rl(F, n, u, T, i.get(F))
+                }
+                if (this.schema.attachments) {
+                    var U = n.attachments;
+                    c.attachmentsAdd.forEach(M => {
+                        U.set(Xi(M.documentId, M.attachmentId), {
+                            writeData: M.attachmentData,
+                            digest: M.digest
+                        })
+                    }), this.schema.attachments && (c.attachmentsUpdate.forEach(M => {
+                        U.set(Xi(M.documentId, M.attachmentId), {
+                            writeData: M.attachmentData,
+                            digest: M.digest
+                        })
+                    }), c.attachmentsRemove.forEach(M => {
+                        U.delete(Xi(M.documentId, M.attachmentId))
+                    }))
+                }
+            }
+        }, t.findDocumentsById = function(n, i) {
+            this.ensurePersistence();
+            var s = this.internals.documents,
+                c = [];
+            if (s.size === 0) return Promise.resolve(c);
+            for (var u = 0; u < n.length; ++u) {
+                var h = n[u],
+                    v = s.get(h);
+                v && (!v._deleted || i) && c.push(v)
+            }
+            return Promise.resolve(c)
+        }, t.query = function(n) {
+            this.ensurePersistence();
+            var i = n.queryPlan,
+                s = n.query,
+                c = s.skip ? s.skip : 0,
+                u = s.limit ? s.limit : 1 / 0,
+                h = c + u,
+                v = !1;
+            i.selectorSatisfiedByIndex || (v = pi(this.schema, n.query));
+            var m = i.index,
+                y = !i.sortSatisfiedByIndex,
+                w = m,
+                S = i.startKeys,
+                b = ai(this.schema, w, S),
+                P = i.endKeys;
+            P = P;
+            var T = Ja(this.schema, w, P),
+                F = bo(w);
+            if (!this.internals.byIndex[F]) throw new Error("index does not exist " + F);
+            for (var U = this.internals.byIndex[F].docsWithIndex, M = (i.inclusiveStart ? nE : tl)(U, [b], $n), z = (i.inclusiveEnd ? aE : iE)(U, [T], $n), H = [], Q = !1; !Q;) {
+                var W = U[M];
+                if (!W || M > z) break;
+                var ie = W[1];
+                (!v || v(ie)) && H.push(ie), H.length >= h && !y && (Q = !0), M++
+            }
+            if (y) {
+                var de = Ua(this.schema, n.query);
+                H = H.sort(de)
+            }
+            return H = H.slice(c, h), Promise.resolve({
+                documents: H
+            })
+        }, t.count = async function(n) {
+            this.ensurePersistence();
+            var i = await this.query(n);
+            return {
+                count: i.documents.length,
+                mode: "fast"
+            }
+        }, t.cleanup = function(n) {
+            this.ensurePersistence();
+            for (var i = tt() - n, s = ["_deleted", "_meta.lwt", this.primaryPath], c = bo(s), u = this.internals.byIndex[c].docsWithIndex, h = ai(this.schema, s, [!0, 0, ""]), v = tl(u, [h], $n), m = !1; !m;) {
+                var y = u[v];
+                !y || y[1]._meta.lwt > i ? m = !0 : (oE(this.primaryPath, this.schema, this.internals, y[1]), v++)
+            }
+            return di
+        }, t.getAttachmentData = function(n, i, s) {
+            this.ensurePersistence(), Qi(this);
+            var c = Xi(n, i),
+                u = this.internals.attachments.get(c);
+            if (!s || !u || u.digest !== s) throw new Error("attachment does not exist: " + c);
+            return Promise.resolve(u.writeData.data)
+        }, t.changeStream = function() {
+            return Qi(this), this.internals.changes$.asObservable()
+        }, t.remove = async function() {
+            if (this.closed) throw new Error("closed");
+            this.ensurePersistence(), Qi(this), this.internals.removed = !0, this.storage.collectionStates.delete(dh(this.databaseName, this.collectionName, this.schema.version)), await this.close()
+        }, t.close = function() {
+            return nl.delete(this), this.ensurePersistence(), this.closed || (this.closed = !0, this.internals.refCount = this.internals.refCount - 1), Ze
+        }, e
+    }();
+
+function lE(e, t, r) {
+    var n = dh(t.databaseName, t.collectionName, t.schema.version),
+        i = e.collectionStates.get(n);
+    if (!i) i = {
+        id: ln(5),
+        schema: t.schema,
+        removed: !1,
+        refCount: 1,
+        documents: new Map,
+        attachments: t.schema.attachments ? new Map : void 0,
+        byIndex: {},
+        changes$: new nt
+    }, cE(i, t.schema), e.collectionStates.set(n, i);
+    else {
+        if (t.devMode && !Gn(i.schema, t.schema)) throw new Error("storage was already created with a different schema");
+        i.refCount = i.refCount + 1
+    }
+    var s = new uE(e, t.databaseName, t.collectionName, t.schema, i, t.options, r, t.devMode);
+    return Promise.resolve(s)
+}
+var dE = new Map;
+
+function hh(e = {}) {
+    var t = {
+        name: "memory",
+        rxdbVersion: Ro,
+        collectionStates: dE,
+        createStorageInstance(r) {
+            No(r);
+            var n = Object.assign({}, e, r.options);
+            return lE(this, r, n)
+        }
+    };
+    return t
+}
+
+function Ra(e, t) {
+    var r = tc(t);
+    return Tr(e.indexIdByName, r)
+}
+var hE = {
+    locale: null,
+    unique: !1
+};
+
+function fE(e, t) {
+    t.indexIds.forEach(r => {
+        e.createIndex(r, r, hE)
+    })
+}
+
+function pE(e, t, r, n) {
+    for (var i = {
+            i: r,
+            d: n,
+            i0: void 0,
+            i1: void 0,
+            i2: void 0,
+            i3: void 0,
+            i4: void 0,
+            i5: void 0,
+            i6: void 0,
+            i7: void 0
+        }, s = 0; s < e; ++s) {
+        var c = (0, t[s])(n);
+        i["i" + s] = c
+    }
+    return i
+}
+
+function mE(e) {
+    var t = {},
+        r = e.indexes ? e.indexes.map(i => Array.isArray(i) ? i.slice(0) : [i]) : [];
+    r.push(Ln);
+    var n = new Map;
+    return r.forEach((i, s) => {
+        var c = "i" + s,
+            u = tc(i);
+        if (n.has(u)) throw new Error("duplicate index " + u + " " + JSON.stringify(e, null, 4));
+        n.set(u, c), t[c] = Jd(e, i)
+    }), {
+        indexIdByName: n,
+        monadByIndexId: t
+    }
+}
+var yE = "documents",
+    vE = "wal",
+    gE = "attachments",
+    wE = {
+        durability: "relaxed"
+    },
+    fh = "indexeddb",
+    bE = 0;
+
+function oa(e, t) {
+    return e + "||" + t
+}
+var il = new Map;
+
+function ph(e, t) {
+    var r = ut(il, e, () => Ze);
+    return r = te(r).then(() => t()), il.set(e, r), r
+}
+async function SE(e, t, r) {
+    var n = bE++,
+        i = await CE(e, r.indexedDB),
+        s = async () => (await jn(0), ph(e.databaseName, () => new Promise((u, h) => {
+            var v = i.open(e.databaseName);
+            v.onerror = function(m) {
+                console.error(n + ": OPEN IDB DATABASE " + e.databaseName + " ERROR"), h(m)
+            }, v.onsuccess = function(m) {
+                var y = v.result;
+                u(y), mh(c, y)
+            }, vh(c, v)
+        }))), c = {
+            indexedDB: i,
+            debugId: n,
+            closed: !1,
+            storage: t,
+            settings: r,
+            refreshIDBDatabase: s,
+            creationPromise: s(),
+            name: e.databaseName,
+            refCount: 0,
+            storesToOpen: []
+        };
+    return c
+}
+
+function mh(e, t) {
+    t.onversionchange = r => {
+        e.closed || (t.close(), e.creationPromise = e.refreshIDBDatabase())
+    }
+}
+async function EE(e, t, r, n) {
+    var i = await ut(e.indexedDBStates, r.databaseName, () => SE(r, e, t));
+    return i.storesToOpen = i.storesToOpen.concat(n), i.refCount = i.refCount + 1, i.creationPromise.then(() => yh(te(i))).then(() => te(i))
+}
+async function yh(e) {
+    if (e.storesToOpen.length !== 0) return e.creationPromise = e.creationPromise.then(async t => {
+        var r = new Set(Array.from(t.objectStoreNames));
+        if (e.storesToOpen.filter(i => !r.has(rc(i.collectionName, i.schema).documentStore)).length === 0) return t;
+        var n = t.version + 1;
+        return t.close(), ph(e.name, () => new Promise((i, s) => {
+            var c = e.indexedDB.open(e.name, n);
+            c.onerror = function(u) {
+                console.error(e.debugId + ": ERROR openStoresOnExistingDatabase() openRequest: error "), s(u)
+            }, c.onsuccess = function(u) {
+                var h = c.result;
+                mh(e, h), i(h)
+            }, c.onblocked = u => {}, vh(e, c)
+        }))
+    }), e.creationPromise
+}
+
+function rc(e, t) {
+    var r = t.version;
+    return {
+        documentStore: e + "-" + r + "-" + yE,
+        writeAheadStore: e + "-" + r + "-" + vE,
+        attachmentsStore: e + "-" + r + "-" + gE
+    }
+}
+
+function vh(e, t) {
+    t.onupgradeneeded = function(r) {
+        var n = t.result;
+        e.storesToOpen.forEach(i => {
+            var s = n.objectStoreNames,
+                c = rc(i.collectionName, i.schema);
+            if (!s.contains(c.documentStore)) {
+                var u = n.createObjectStore(c.documentStore, {
+                    keyPath: "i",
+                    autoIncrement: !1
+                });
+                n.createObjectStore(c.writeAheadStore, {
+                    keyPath: "i",
+                    autoIncrement: !1
+                }), fE(u, i), i.schema.attachments && n.createObjectStore(c.attachmentsStore, {
+                    keyPath: "docIdWithAttachmentId",
+                    autoIncrement: !1
+                })
+            }
+        }), e.storesToOpen = []
+    }
+}
+async function _E(e) {
+    if (!e.closed && (e.refCount = e.refCount - 1, e.refCount === 0)) return e.closed = !0, e.storage.indexedDBStates.delete(e.name), e.creationPromise.then(t => t.close())
+}
+
+function Yr(e) {
+    if (e.closed) throw new Error("RxStorageInstanceIndexedDB is closed " + e.databaseName + "-" + e.collectionName)
+}
+async function gh(e, t) {
+    var r = e.primaryPath,
+        n = e.internals.indexIds.length,
+        i = e.internals.getIndexableStringByIndexNumber,
+        s = t.objectStore(e.internals.storeNames.writeAheadStore),
+        c = await new Promise((S, b) => {
+            var P = s.get("documents");
+            P.onerror = b, P.onsuccess = T => {
+                var F = P.result;
+                S(F ? JSON.parse(F.docsData) : void 0)
+            }
+        });
+    if (c && c.length > 0) {
+        for (var u, h = t.objectStore(e.internals.storeNames.documentStore), v = 0; v < c.length; ++v) {
+            var m = c[v],
+                y = m[r],
+                w = pE(n, i, y, m);
+            u = h.put(w)
+        }
+        await new Promise((S, b) => {
+            u.onerror = b, u.onsuccess = () => S(!0)
+        }), s.delete("documents")
+    }
+    return t
+}
+async function nc(e) {
+    var t, r = [e.internals.storeNames.documentStore, e.internals.storeNames.writeAheadStore];
+    e.schema.attachments && r.push(e.internals.storeNames.attachmentsStore);
+    for (var n = 100; n > 0;) {
+        var i = await e.internals.state.creationPromise;
+        n -= 1;
+        try {
+            t = i.transaction(r, "readwrite", wE);
+            break
+        } catch (s) {
+            if (s.name !== "InvalidStateError" && s.name !== "NotFoundError" || !(n > 0)) throw s;
+            s.name === "NotFoundError" ? await yh(e.internals.state) : e.internals.state.creationPromise = e.internals.state.refreshIDBDatabase()
+        }
+    }
+    return await gh(e, te(t)), te(t)
+}
+var PE = function() {
+    function e(t) {
+        this.allTasksRuns = [], this.instance = t, this.txPromise = nc(this.instance).then(r => gh(t, r))
+    }
+    return e.prototype.addTask = function(t) {
+        var r = this.txPromise.then(s => t(s)),
+            n = r.catch(() => null);
+        this.allTasksRuns.push(n);
+        var i = this.allTasksRuns.length;
+        return n.then(() => Promise.all(this.allTasksRuns)).then(() => {
+            this.allTasksRuns.length === i && (this.instance.openReadonlyTransaction = void 0)
+        }), r.catch(s => {
+            if (s.name === "TransactionInactiveError") return this.instance.openReadonlyTransaction = void 0, rr(this.instance, t);
+            throw s
+        })
+    }, e
+}();
+
+function rr(e, t) {
+    return e.openReadonlyTransaction || (e.openReadonlyTransaction = new PE(e)), e.openReadonlyTransaction.addTask(t)
+}
+
+function kE(e, t) {
+    var r = (e.settings.IDBKeyRange ? e.settings.IDBKeyRange : IDBKeyRange).lowerBound(St, !0),
+        n = t.getKey(r);
+    return new Promise(i => {
+        n.onsuccess = () => {
+            i(!!n.result)
+        }
+    })
+}
+
+function CE(e, t) {
+    return typeof t == "function" ? t(e) : t
+}
+async function al(e, t) {
+    return rr(e, async r => {
+        var n = t.queryPlan,
+            i = t.query,
+            s = i.skip ? i.skip : 0,
+            c = s + (i.limit ? i.limit : 1 / 0),
+            u = e.internals.storeNames.documentStore,
+            h = e.settings.batchSize ? e.settings.batchSize : 50,
+            v = !1;
+        n.selectorSatisfiedByIndex || (v = pi(e.schema, i));
+        var m = n.index,
+            y = !n.sortSatisfiedByIndex,
+            w = m,
+            S = n.startKeys,
+            b = ai(e.schema, w, S),
+            P = n.endKeys,
+            T = Ja(e.schema, w, P),
+            F = [],
+            U = r.objectStore(u),
+            M = Ra(e.internals, w),
+            z = U.index(M);
+        v || t.query.limit || (h = 1e5);
+        var H = !1;
+        if (await IE(e, n, z, h, b, T, M, W => {
+                for (var ie = 0; ie < W.length; ie++) {
+                    var de = W[ie].d;
+                    if (H || v && !v(de) || F.push(de), !y && F.length === c) {
+                        H = !0;
+                        break
+                    }
+                }
+                return !H
+            }), y) {
+            var Q = Ua(e.schema, i);
+            F = F.sort(Q)
+        }
+        return {
+            documents: F = F.slice(s, c)
+        }
+    })
+}
+async function IE(e, t, r, n, i, s, c, u) {
+    var h = e.settings.IDBKeyRange ? e.settings.IDBKeyRange : IDBKeyRange,
+        v = e.internals.getIndexableStringByIndexId[c];
+    if (typeof r.getAll == "function" && n !== 1)
+        for (var m, y = !0, w = !1, S = async function() {
+                m && (i = v(m.d));
+                var T = h.bound(i, s, !y || !t.inclusiveStart, !t.inclusiveEnd);
+                y = !1;
+                var F = r.getAll(T, n);
+                await new Promise((U, M) => {
+                    F.onerror = M, F.onsuccess = z => {
+                        var H = z.target.result;
+                        m = Aa(H), H.length !== 0 && u(H) === !1 && (w = !0), H.length < n && (w = !0), U()
+                    }
+                })
+            }; !w;) await S();
+    else {
+        var b = h.bound(i, s, !t.inclusiveStart, !t.inclusiveEnd),
+            P = r.openCursor(b);
+        await new Promise(T => {
+            P.onsuccess = function(F) {
+                var U = F.target.result;
+                if (U) {
+                    var M = U.value;
+                    u([M]) ? U.continue() : T()
+                } else T()
+            }
+        })
+    }
+}
+async function RE(e, t) {
+    return rr(e, async r => {
+        var n, i = t.queryPlan,
+            s = e.internals.storeNames.documentStore,
+            c = i.index,
+            u = c,
+            h = i.startKeys,
+            v = ai(e.schema, u, h),
+            m = i.endKeys,
+            y = Ja(e.schema, u, m),
+            w = r.objectStore(s);
+        n = c.length === 1 && c[0] === e.primaryPath ? Ra(e.internals, ["_deleted", e.primaryPath]) : Ra(e.internals, u);
+        var S = w.index(n),
+            b = (e.settings.IDBKeyRange ? e.settings.IDBKeyRange : IDBKeyRange).bound(v, y, !i.inclusiveStart, !i.inclusiveEnd),
+            P = S.count(b);
+        return {
+            count: await new Promise((T, F) => {
+                P.onsuccess = function() {
+                    T(P.result)
+                }, P.onerror = F
+            }),
+            mode: "fast"
+        }
+    })
+}
+
+function DE(e, t, r) {
+    var n = t.length;
+    if (n === 0) return Promise.resolve([]);
+    for (var i = new Array(n), s = 0; s < n; s++) {
+        var c = t[s];
+        i[s] = e.get(c)
+    }
+    var u = [],
+        h = te(Aa(i));
+    return new Promise((v, m) => {
+        h.onerror = m, h.onsuccess = () => {
+            for (var y = 0; y < n; y++) {
+                var w = i[y].result;
+                if (w) {
+                    var S = w.d;
+                    !r && S._deleted || u.push(S)
+                }
+            }
+            v(u)
+        }
+    })
+}
+
+function KE(e, t, r) {
+    var n = r.length,
+        i = new Map;
+    if (n === 0) return Promise.resolve(i);
+    for (var s = new Array(n), c = 0; c < n; c++) {
+        var u = r[c].document[e],
+            h = t.get(u);
+        s[c] = h
+    }
+    var v = te(Aa(s));
+    return new Promise((m, y) => {
+        v.onerror = y, v.onsuccess = () => {
+            for (var w = 0; w < n; w++) {
+                var S = s[w].result;
+                if (S) {
+                    var b = S.d,
+                        P = b[e];
+                    i.set(P, b)
+                }
+            }
+            m(i)
+        }
+    })
+}
+async function xE(e, t, r) {
+    var n = e.primaryPath,
+        i = e.internals,
+        s = e.internals.state;
+    await s.creationPromise;
+    var c = [i.storeNames.documentStore, i.storeNames.writeAheadStore];
+    e.schema.attachments && c.push(i.storeNames.attachmentsStore), Yr(e);
+    var u, h = await nc(e),
+        v = h.objectStore(i.storeNames.documentStore);
+    u = e.internals.minKnownDocsAmount === 0 && t.length > 30 && !await kE(e, v) ? new Map : await KE(n, v, t);
+    for (var m = To(e, n, u, t, r), y = m.errors, w = m.bulkInsertDocs, S = new Array(w.length), b = 0; b < w.length; ++b) {
+        var P = w[b].document;
+        S[b] = P
+    }
+    for (var T, F = m.bulkUpdateDocs, U = 0; U < F.length; ++U) {
+        var M = F[U].document;
+        S.push(M)
+    }
+    if (S.length > 0) {
+        var z = h.objectStore(i.storeNames.writeAheadStore).put({
+            i: "documents",
+            docsData: JSON.stringify(S)
+        });
+        await new Promise((W, ie) => {
+            z.onerror = ie, z.onsuccess = W
+        }), e.handleWalIdlePromise || jn(100).then(() => un()).then(async () => {
+            e.handleWalIdlePromise = void 0, e.closed || await rr(e, () => Ut)
+        })
+    }
+    if (e.schema.attachments) {
+        var H = h.objectStore(e.internals.storeNames.attachmentsStore);
+        m.attachmentsAdd.forEach(W => {
+            T = H.put({
+                docIdWithAttachmentId: oa(W.documentId, W.attachmentId),
+                length: W.attachmentData.length,
+                type: W.attachmentData.type,
+                data: W.attachmentData.data
+            })
+        }), m.attachmentsUpdate.forEach(W => {
+            T = H.put({
+                docIdWithAttachmentId: oa(W.documentId, W.attachmentId),
+                length: W.attachmentData.length,
+                type: W.attachmentData.type,
+                data: W.attachmentData.data
+            })
+        }), m.attachmentsRemove.forEach(W => {
+            T = H.delete(oa(W.documentId, W.attachmentId))
+        })
+    }
+    if (T && await new Promise((W, ie) => {
+            te(T).onerror = ie, te(T).onsuccess = W
+        }), h.commit && h.commit(), m.eventBulk.events.length > 0) {
+        var Q = te(m.newestRow).document;
+        m.eventBulk.checkpoint = {
+            id: Q[n],
+            lwt: Q._meta.lwt
+        }, e.changes$.next(m.eventBulk)
+    }
+    return {
+        error: y
+    }
+}
+var OE = tt(),
+    TE = function() {
+        function e(r, n, i, s, c, u, h) {
+            this.changes$ = new nt, this.instanceId = OE++, this.storage = r, this.databaseName = n, this.collectionName = i, this.schema = s, this.internals = c, this.options = u, this.settings = h, this.primaryPath = rt(this.schema.primaryKey)
+        }
+        var t = e.prototype;
+        return t.updateMinKnownDocs = function(r) {
+            this.internals.minKnownDocsAmount < r && (this.internals.minKnownDocsAmount = r)
+        }, t.bulkWrite = async function(r, n) {
+            var i = await xE(this, r, n);
+            return this.updateMinKnownDocs(r.length - i.error.length), i
+        }, t.findDocumentsById = async function(r, n) {
+            Yr(this);
+            var i = await rr(this, async s => {
+                var c = s.objectStore(this.internals.storeNames.documentStore);
+                return DE(c, r, n)
+            });
+            return this.updateMinKnownDocs(i.length), i
+        }, t.query = async function(r) {
+            await this.internals.state.creationPromise, Yr(this);
+            var n = await al(this, r);
+            return this.updateMinKnownDocs(n.documents.length), n
+        }, t.count = async function(r) {
+            if (r.queryPlan.selectorSatisfiedByIndex) {
+                var n = await RE(this, r);
+                return this.updateMinKnownDocs(n.count), n
+            }
+            var i = await al(this, r);
+            return this.updateMinKnownDocs(i.documents.length), {
+                count: i.documents.length,
+                mode: "slow"
+            }
+        }, t.changeStream = function() {
+            return this.changes$.asObservable()
+        }, t.cleanup = async function(r) {
+            await jn(0), await jn(0);
+            var n = this.internals.state;
+            await n.creationPromise;
+            var i = this.settings.IDBKeyRange;
+            Yr(this);
+            var s = (await nc(this)).objectStore(this.internals.storeNames.documentStore),
+                c = this.settings.batchSize,
+                u = tt() - r,
+                h = Ra(this.internals, Ln),
+                v = s.index(h),
+                m = ai(this.schema, Ln, [!0, 1]),
+                y = Ja(this.schema, Ln, [!0, u]),
+                w = i.bound(m, y, !0, !0),
+                S = await new Promise((b, P) => {
+                    var T = v.getAll(w, c);
+                    T.onerror = P, T.onsuccess = function(F) {
+                        b(F.target.result)
+                    }
+                });
+            return await Promise.all(S.map(b => new Promise((P, T) => {
+                var F = b.i,
+                    U = s.delete(F);
+                U.onerror = T, U.onsuccess = () => P()
+            }))), S.length < c
+        }, t.remove = async function() {
+            var r = this.internals.state;
+            return await r.creationPromise, Yr(this), rr(this, async n => {
+                var i = [n.objectStore(this.internals.storeNames.documentStore), n.objectStore(this.internals.storeNames.writeAheadStore)];
+                return this.schema.attachments && i.push(n.objectStore(this.internals.storeNames.attachmentsStore)), await Promise.all(i.map(s => new Promise((c, u) => {
+                    var h = s.clear();
+                    h.onerror = u, h.onsuccess = c
+                }))), this.close()
+            })
+        }, t.getAttachmentData = async function(r, n) {
+            var i = this.internals.state;
+            return await i.creationPromise, Yr(this), rr(this, s => {
+                var c = s.objectStore(this.internals.storeNames.attachmentsStore),
+                    u = oa(r, n);
+                return new Promise((h, v) => {
+                    var m = c.get(u);
+                    m.onsuccess = () => {
+                        var y = m.result;
+                        y ? h(y.data) : v("attachment missing documentId: " + r + " attachmentId: " + n)
+                    }
+                })
+            })
+        }, t.close = async function() {
+            return this.closed || (this.closed = (async () => (await this.internals.state.creationPromise, await rr(this, async r => {}), this.changes$.complete(), _E(this.internals.state)))()), this.closed
+        }, e
+    }();
+async function AE(e, t, r) {
+    var n = mE(t.schema),
+        i = Array.from(n.indexIdByName.values()),
+        s = await EE(e, r, t, [{
+            collectionName: t.collectionName,
+            schema: t.schema,
+            indexIds: i
+        }]);
+    await s.creationPromise;
+    var c = {
+            state: s,
+            storeNames: rc(t.collectionName, t.schema),
+            getIndexableStringByIndexId: n.monadByIndexId,
+            getIndexableStringByIndexNumber: Object.values(n.monadByIndexId),
+            indexIdByName: n.indexIdByName,
+            indexNames: Object.keys(n),
+            indexIds: i,
+            minKnownDocsAmount: 0
+        },
+        u = new TE(e, t.databaseName, t.collectionName, t.schema, c, t.options, r);
+    return await Hd(fh, t, u), u
+}
+var NE = function() {
+    function e(t) {
+        this.name = fh, this.rxdbVersion = gS, this.indexedDBStates = new Map, this.settings = t
+    }
+    return e.prototype.createStorageInstance = function(t) {
+        No(t);
+        var r = Object.assign({}, this.settings, t.options);
+        return AE(this, t, r)
+    }, e
+}();
+
+function BE(e = {}) {
+    var t = e.IDBKeyRange ? e.IDBKeyRange : IDBKeyRange,
+        r = e.indexedDB ? e.indexedDB : indexedDB,
+        n = Object.assign({
+            batchSize: 300,
+            transactionDurability: "relaxed"
+        }, e, {
+            IDBKeyRange: t,
+            indexedDB: r
+        });
+    return new NE(n)
+}
+const ME = [QS, BE, hh],
+    FE = "lmwrRxdb",
+    So = `${FE}Registry`,
+    ic = () => {
+        try {
+            return localStorage.getItem(So)
+        } catch {
+            return null
+        }
+    },
+    wh = (e, t) => {
+        try {
+            e.size > 0 && t ? localStorage.setItem(So, t) : localStorage.removeItem(So)
+        } catch {}
+    },
+    LE = e => {
+        try {
+            const t = JSON.parse(e);
+            if (Array.isArray(t)) {
+                const [r] = t;
+                return r || null
+            }
+            return typeof t == "string" && t || null
+        } catch {
+            return e || null
+        }
+    },
+    ac = e => {
+        if (!e) return new Set;
+        try {
+            return new Set(JSON.parse(e))
+        } catch {
+            return new Set
+        }
+    },
+    bh = e => {
+        try {
+            return JSON.stringify(Array.from(e))
+        } catch {
+            return null
+        }
+    },
+    UE = e => {
+        const t = ac(ic());
+        t.add(e), wh(t, bh(t))
+    },
+    WE = (e, t) => {
+        const r = ac(ic()),
+            n = Array.from(r).filter(i => e && i.includes(e));
+        return Promise.all(n.map(i => Promise.all(ME.map(s => Jo(e, s()).catch(() => null).finally(() => r.delete(i)))).then(() => {
+            typeof window.indexedDB.databases == "function" && window.indexedDB.databases().catch(() => null).then(s => {
+                if (s) try {
+                    s.forEach(c => {
+                        c.name && c.name.includes(e) && window.indexedDB.deleteDatabase(c.name)
+                    })
+                } catch {}
+            })
+        }))).then(() => {
+            wh(r, bh(r))
+        })
+    },
+    uP = async (e, t) => {
+        for (const r of e) await WE(r)
+    }, lP = () => {
+        const e = ac(ic());
+        return Array.from(e).map(t => LE(t)).filter(t => t !== null)
+    }, Sh = Re.createContext(null), sl = (e = Sh) => Re.useContext(e), ol = e => {
+        const {
+            openRxdbInstance: t,
+            children: r,
+            context: n = Sh
+        } = e, i = n, [s, c] = Re.useState(null);
+        if (Re.useEffect(() => {
+                const u = new AbortController;
+                return t(u.signal).then(h => {
+                    if (!u.signal.aborted && Id(h.database)) return c(h), UE(h.database.name), h
+                }).catch(h => {
+                    u.signal.aborted || c(xr(h, new Error(`Rxdb couldn't be created: ${h}.`)))
+                }), c(null), () => {
+                    u.abort()
+                }
+            }, [t]), s instanceof Error) throw s;
+        return ce.jsx(i.Provider, {
+            value: s,
+            children: r
+        })
+    };
+class $E {
+    constructor(t) {
+        this.getContentItemEncryptionKeys = t, this.encryptionKeysCache = new Map
+    }
+    dispose() {
+        this.encryptionKeysCache.clear()
+    }
+    async getEncryptionKeys(t) {
+        const r = `${t}`,
+            n = this.encryptionKeysCache.get(r);
+        if (n) return Promise.resolve(n);
+        const i = this.getContentItemEncryptionKeys(t).then(s => (this.encryptionKeysCache.set(r, s), s));
+        return this.encryptionKeysCache.set(r, i), i
+    }
+}
+
+function qE(e) {
+    return new Worker("/build/workers/content-item-decrypter.worker-BkKaelkV.js", {
+        name: e == null ? void 0 : e.name
+    })
+}
+
+function HE(e) {
+    return new SharedWorker("/build/workers/content-item-decrypter.worker-BkKaelkV.js", {
+        name: e == null ? void 0 : e.name
+    })
+}
+const JE = (e, t, r) => {
+        let n = !1;
+        const i = [],
+            s = Oe(),
+            c = setTimeout(() => {
+                const u = {
+                    contentItems: i
+                };
+                s.resolve([u, ca(t.getDownloadUrls({
+                    sharingBucketId: e,
+                    generateDownloadUrlsRequest: u
+                })).then(h => n ? xt(new Xr("Canceled", "Canceled")) : h)])
+            }, r);
+        return {
+            requestPromise: s.promise,
+            cancel: () => {
+                n = !0, clearTimeout(c)
+            },
+            addItems: u => {
+                const h = Array.isArray(u) ? u : [u];
+                i.push(...h)
+            }
+        }
+    },
+    zE = () => {
+        const e = new Map,
+            t = new Map,
+            r = new Map,
+            n = new Map,
+            i = new Map,
+            s = new Map,
+            c = new Map;
+        return {
+            decryptionKeysCache: e,
+            nameCache: t,
+            fileCache: r,
+            previewCache: n,
+            dataBlobCache: i,
+            exportedPrivateKeyCache: s,
+            blobUrlCache: c,
+            clear: () => {
+                e.clear(), t.clear(), r.clear(), i.clear(), c.forEach(({
+                    url: u
+                }) => {
+                    URL.revokeObjectURL(u)
+                }), c.clear()
+            }
+        }
+    },
+    jE = () => {
+        try {
+            if (typeof SharedWorker == "function") {
+                const t = new HE;
+                return t.port.start(), {
+                    worker: t,
+                    addMessageEventListener: r => {
+                        t.port.addEventListener("message", r)
+                    },
+                    removeMessageEventListener: r => {
+                        t.port.removeEventListener("message", r)
+                    },
+                    postMessage: (...r) => {
+                        t.port.postMessage(...r)
+                    },
+                    terminate: () => {
+                        t.port.close()
+                    }
+                }
+            }
+        } catch {}
+        const e = new qE;
+        return {
+            worker: e,
+            addMessageEventListener: t => {
+                e.addEventListener("message", t)
+            },
+            removeMessageEventListener: t => {
+                e.removeEventListener("message", t)
+            },
+            postMessage: (...t) => {
+                e.postMessage(...t)
+            },
+            terminate: () => {
+                e.terminate()
+            }
+        }
+    };
+class GE {
+    constructor(t, r, n) {
+        this.getContentItemDecryptionKeys = t, this.getContentItemExportedPrivateKey = r, this.apiOptions = n, this.events = new Of, this.localCache = zE(), this.decrypterWorker = jE(), this.previewDownloadInfoBatches = new Map, this.fileDownloadInfoBatches = new Map, this.abortController = new AbortController, this.downloadApi = Jn(sS, n, {
+            init: {
+                signal: this.abortController.signal
+            }
+        })
+    }
+    dispose() {
+        this.localCache.clear(), this.previewDownloadInfoBatches.forEach(t => t.cancel()), this.previewDownloadInfoBatches.clear(), this.fileDownloadInfoBatches.forEach(t => t.cancel()), this.fileDownloadInfoBatches.clear(), this.decrypterWorker.terminate(), this.abortController.abort()
+    }
+    decryptName(t) {
+        const r = this.getCachedDecryptedName(t);
+        if (r) return Promise.resolve(r);
+        const {
+            promise: n,
+            resolve: i
+        } = Oe(), s = this.getLocalNameCacheKey(t), c = h => {
+            this.localCache.nameCache.set(s, h), this.events.emit("onNameDecrypted", [h]), i(h)
+        };
+        return this.localCache.nameCache.set(s, n), (async () => {
+            const h = await this.getSharedCachedDecryptedName(t);
+            if (h) return c({
+                contentItem: {
+                    ...t
+                },
+                decryptedName: h
+            });
+            const v = m => {
+                const {
+                    data: y
+                } = m;
+                if (y.type !== "decryptName" || y.contentItem.id !== t.id || y.contentItem.nameEncrypted !== t.nameEncrypted) return;
+                this.decrypterWorker.removeMessageEventListener(v);
+                const {
+                    decryptedName: w
+                } = y;
+                c({
+                    decryptedName: w,
+                    contentItem: {
+                        ...t
+                    }
+                })
+            };
+            this.decrypterWorker.addMessageEventListener(v), this.decrypterWorker.postMessage({
+                type: "decryptName",
+                contentItem: t,
+                decryptionKeysSerialized: await ea(await this.getDecryptionKeys(t))
+            })
+        })(), n
+    }
+    decryptPreviews(t, r, n) {
+        return (n ? r.previews.filter(({
+            id: s
+        }) => !!n.find(c => c.id === s)) : r.previews).map(s => {
+            const c = this.getCachedDecryptedPreview(r, s);
+            if (c) return Promise.resolve(c);
+            const {
+                promise: u,
+                resolve: h
+            } = Oe(), v = this.getLocalPreviewCacheKey(r, s), m = y => {
+                this.localCache.previewCache.set(v, y), this.events.emit("onPreviewDecrypted", [y]), h(y)
+            };
+            return this.localCache.previewCache.set(v, u), (async () => {
+                const y = await this.getSharedCachedDecryptedData(r, s);
+                if (y) return m({
+                    contentItem: {
+                        ...r
+                    },
+                    previewItem: {
+                        ...s
+                    },
+                    decryptedData: y
+                });
+                const w = await this.getDownloadInfo(t, r, s),
+                    S = await this.getDownloadServiceWorkerContentItemUrl(r, w, s);
+                if (S) m({
+                    contentItem: {
+                        ...r
+                    },
+                    previewItem: {
+                        ...s
+                    },
+                    decryptedData: {
+                        url: S
+                    }
+                });
+                else {
+                    const {
+                        decryptedData: b
+                    } = await this.downloadAndDecryptData(r, w, s);
+                    m({
+                        contentItem: {
+                            ...r
+                        },
+                        previewItem: {
+                            ...s
+                        },
+                        decryptedData: b
+                    })
+                }
+            })(), u
+        })
+    }
+    decryptFile(t, r) {
+        const n = this.getCachedDecryptedFile(r);
+        if (n) return Promise.resolve(n);
+        const {
+            promise: i,
+            resolve: s
+        } = Oe(), c = this.getLocalFileCacheKey(r), u = h => {
+            this.localCache.fileCache.set(c, h), this.events.emit("onFileDecrypted", [h]), s(h)
+        };
+        return this.localCache.fileCache.set(c, i), (async () => {
+            const h = await this.getSharedCachedDecryptedData(r);
+            if (h) return u({
+                contentItem: {
+                    ...r
+                },
+                decryptedData: h
+            });
+            const v = await this.getDownloadInfo(t, r),
+                m = await this.getDownloadServiceWorkerContentItemUrl(r, v);
+            if (m) u({
+                contentItem: {
+                    ...r
+                },
+                decryptedData: {
+                    url: m
+                }
+            });
+            else {
+                const {
+                    decryptedData: y
+                } = await this.downloadAndDecryptData(r, v);
+                u({
+                    contentItem: {
+                        ...r
+                    },
+                    decryptedData: y
+                })
+            }
+        })(), i
+    }
+    getDecryptionKeys(t) {
+        const r = `${t.baseFileEncryptionKeyId}${t.ephemeralPublicKey}`,
+            n = this.localCache.decryptionKeysCache.get(r);
+        if (n) return Promise.resolve(n);
+        const i = this.getContentItemDecryptionKeys(t).then(s => (this.localCache.decryptionKeysCache.set(r, s), s));
+        return this.localCache.decryptionKeysCache.set(r, i), i
+    }
+    getExportedPrivateKey(t) {
+        const r = `${t.baseFileEncryptionKeyId}${t.ephemeralPublicKey}`,
+            n = this.localCache.exportedPrivateKeyCache.get(r);
+        if (n) return Promise.resolve(n);
+        const i = this.getDecryptionKeys(t).then(s => this.getContentItemExportedPrivateKey(t, s)).then(s => (this.localCache.exportedPrivateKeyCache.set(r, s), s));
+        return this.localCache.exportedPrivateKeyCache.set(r, i), i
+    }
+    getDecryptedDataBlob(t) {
+        const {
+            blob: r,
+            url: n
+        } = t;
+        if (r) return Promise.resolve(r);
+        const i = `${n}`,
+            s = this.localCache.dataBlobCache.get(i);
+        if (s) return Promise.resolve(s);
+        const {
+            promise: c,
+            resolve: u
+        } = Oe();
+        return this.localCache.dataBlobCache.set(i, c), (async () => {
+            const h = await _o(n, {
+                retry: Ta({
+                    maxDelay: 45e3
+                })
+            });
+            if (!h.ok) return;
+            const v = await h.value.blob();
+            this.localCache.dataBlobCache.set(i, v), u(v)
+        })(), c
+    }
+    getDecryptedName(t) {
+        const r = this.getCachedDecryptedName(t);
+        if (!(!r || r instanceof Promise)) return r
+    }
+    getDecryptedFile(t) {
+        const r = this.getCachedDecryptedFile(t);
+        if (!(!r || r instanceof Promise)) return r
+    }
+    getDecryptedPreview(t, r) {
+        const n = this.getCachedDecryptedPreview(t, r);
+        if (!(!n || n instanceof Promise)) return n
+    }
+    getCachedDecryptedName(t) {
+        return this.localCache.nameCache.get(this.getLocalNameCacheKey(t))
+    }
+    getCachedDecryptedPreview(t, r) {
+        return this.localCache.previewCache.get(this.getLocalPreviewCacheKey(t, r))
+    }
+    getCachedDecryptedFile(t) {
+        return this.localCache.fileCache.get(this.getLocalFileCacheKey(t))
+    }
+    getDownloadInfo(t, r, n) {
+        const {
+            promise: i,
+            resolve: s
+        } = Oe(), c = this.getDownloadInfoBatch(t, !!n), u = n ? {
+            id: r.id,
+            metadataId: n.id
+        } : {
+            id: r.id
+        };
+        return c.addItems(u), c.requestPromise.then(([h, v]) => {
+            v.then(m => {
+                if (!m.ok) return;
+                const {
+                    contentItems: y
+                } = m.value, w = y.find(({
+                    id: S,
+                    metadataId: b
+                }) => S === u.id && b === u.metadataId);
+                w && s(w)
+            })
+        }), i
+    }
+    getDownloadInfoBatch(t, r) {
+        const n = r ? this.previewDownloadInfoBatches : this.fileDownloadInfoBatches,
+            i = n.get(t) || JE(t, this.downloadApi, 150);
+        return n.set(t, i), {
+            ...i,
+            requestPromise: i.requestPromise.then(s => (n.delete(t), s))
+        }
+    }
+    downloadAndDecryptData(t, r, n) {
+        const {
+            promise: i,
+            resolve: s
+        } = Oe();
+        return (async () => {
+            const {
+                downloadUrl: u
+            } = r, h = v => {
+                const {
+                    data: m
+                } = v;
+                m.type !== "downloadAndDecryptData" || m.downloadUrl !== u || (this.decrypterWorker.removeMessageEventListener(h), s({
+                    contentItemDownloadInfo: r,
+                    decryptedData: this.createContentItemDecryptedData(m.decryptedData, r.id, r.metadataId)
+                }))
+            };
+            this.decrypterWorker.addMessageEventListener(h), this.decrypterWorker.postMessage({
+                type: "downloadAndDecryptData",
+                contentItem: t,
+                previewItem: n,
+                downloadUrl: u,
+                decryptionKeysSerialized: await ea(await this.getDecryptionKeys(t))
+            })
+        })(), i
+    }
+    async getDownloadServiceWorkerContentItemUrl(t, {
+        downloadUrl: r
+    }, n) {
+        return Zs.getInstance().createContentItemUrl({
+            contentItem: t,
+            decryptionKeysSerialized: await ea(await this.getDecryptionKeys(t)),
+            downloadUrl: r,
+            previewItem: n
+        })
+    }
+    getSharedCachedDecryptedName(t) {
+        const {
+            promise: r,
+            resolve: n
+        } = Oe(), i = s => {
+            const {
+                data: c
+            } = s;
+            c.type !== "cachedDecryptedName" || c.contentItem.id !== t.id || (this.decrypterWorker.removeMessageEventListener(i), n(c.decryptedName))
+        };
+        return this.decrypterWorker.addMessageEventListener(i), this.decrypterWorker.postMessage({
+            type: "cachedDecryptedName",
+            contentItem: t
+        }), r
+    }
+    getSharedCachedDecryptedData(t, r) {
+        const {
+            promise: n,
+            resolve: i
+        } = Oe(), s = c => {
+            var h;
+            const {
+                data: u
+            } = c;
+            u.type !== "cachedDecryptedData" || u.contentItem.id !== t.id || ((h = u.previewItem) == null ? void 0 : h.id) !== (r == null ? void 0 : r.id) || (this.decrypterWorker.removeMessageEventListener(s), i(u.decryptedData && this.createContentItemDecryptedData(u.decryptedData, t.id, r == null ? void 0 : r.id)))
+        };
+        return this.decrypterWorker.addMessageEventListener(s), this.decrypterWorker.postMessage({
+            type: "cachedDecryptedData",
+            contentItem: t,
+            previewItem: r
+        }), n
+    }
+    createContentItemDecryptedData(t, r, n) {
+        const i = `${r}${n}`,
+            s = this.localCache.blobUrlCache.get(i);
+        if (s) return s;
+        const c = {
+            contentItemId: r,
+            previewItemId: n,
+            blob: t,
+            url: URL.createObjectURL(t)
+        };
+        return this.localCache.blobUrlCache.set(i, c), c
+    }
+    getLocalNameCacheKey(t) {
+        return `${t.id}${t.nameEncrypted}`
+    }
+    getLocalFileCacheKey(t) {
+        return `${t.id}`
+    }
+    getLocalPreviewCacheKey(t, r) {
+        return `${t.id}${r.id}`
+    }
+    addEvents(t) {
+        return this.events.addEvents(t)
+    }
+    on(t, r) {
+        return this.events.on(t, r)
+    }
+    removeEvents(t) {
+        return this.events.removeEvents(t)
+    }
+    off(t, r) {
+        return this.events.off(t, r)
+    }
+}
+const cl = new Map;
+class VE {
+    generateKeyPair() {
+        const {
+            keyProperties: t,
+            keyUsages: r
+        } = Xe.getKeyProperties("ASYMMETRIC_PRIVATE_KEY");
+        return crypto.subtle.generateKey(t, !0, r)
+    }
+    deserializeRawPublicKey(t) {
+        const r = cl.get(t);
+        if (r) return r;
+        const {
+            keyProperties: n
+        } = Xe.getKeyProperties("ASYMMETRIC_PRIVATE_KEY"), i = crypto.subtle.importKey("raw", wt(t), n, !0, []);
+        return cl.set(t, i), i
+    }
+    async buildEcdhPrivateKey(t, r) {
+        return this.doBuild(Ne(await this.exportCryptoKey(t)), r)
+    }
+    async buildEcdhPrivateKeyWithPublicKeyString(t, r) {
+        return this.buildEcdhPrivateKeyWithUnwrappedKeys(Ne(await this.exportCryptoKey(t)), r)
+    }
+    async verifyCryptoKeyPair(t) {
+        const r = "ECDSA",
+            n = "SHA-256",
+            i = "jwk",
+            s = ["sign"],
+            c = ["verify"],
+            [u, h] = await Promise.all([crypto.subtle.exportKey(i, t.privateKey), crypto.subtle.exportKey(i, t.publicKey)]);
+        u.key_ops = s, h.key_ops = c;
+        const [v, m] = await Promise.all([crypto.subtle.importKey(i, u, {
+            name: r,
+            namedCurve: u.crv
+        }, !1, s), crypto.subtle.importKey(i, h, {
+            name: r,
+            namedCurve: h.crv
+        }, !1, c)]), y = new TextEncoder().encode(crypto.randomUUID()), w = await crypto.subtle.sign({
+            name: r,
+            hash: {
+                name: n
+            }
+        }, v, y);
+        return crypto.subtle.verify({
+            name: r,
+            hash: {
+                name: n
+            }
+        }, m, w, y)
+    }
+    async buildEcdhPrivateKeyWithUnwrappedKeys(t, r) {
+        return this.doBuild(t, await this.deserializeRawPublicKey(r))
+    }
+    async deriveAesEncryptionKey(t, r, n) {
+        const i = Xe.getKeyProperties(n);
+        return crypto.subtle.deriveKey({
+            name: "ECDH",
+            public: r
+        }, t, i.keyProperties, !0, i.keyUsages)
+    }
+    async exportCryptoKey(t) {
+        if (t.type === "private") {
+            const r = await crypto.subtle.exportKey("jwk", t);
+            if (!r.d) throw new Error("Couldn't export private key.");
+            return wt(_l(r.d))
+        }
+        return crypto.subtle.exportKey("raw", t)
+    }
+    async doBuild(t, r) {
+        const n = await crypto.subtle.exportKey("jwk", r);
+        return n.d = El(t), n.key_ops = ["deriveBits", "deriveKey"], crypto.subtle.importKey("jwk", n, {
+            name: "ECDH",
+            namedCurve: "P-256"
+        }, !0, ["deriveBits", "deriveKey"])
+    }
+}
+const On = new Map;
+class YE {
+    constructor(t, r, n, i, s) {
+        this.dataStore = t, this.symmetricKeyService = r, this.asymmetricKeyService = n, this.getPassphraseFn = i, this.createDefaultUserEncryptionKeyFn = s, this.getPassphrasePromise = Jc(), this.createDefaultUserEncryptionKeyPromise = Jc()
+    }
+    async getUserEncryptionKey(t) {
+        return this.dataStore.findById(t)
+    }
+    async getOrCreateDefaultEncryptionKey() {
+        const t = await this.dataStore.getLatest();
+        return t || this.createDefaultUserEncryptionKeyPromise.getOrCreate(() => this.createDefaultUserEncryptionKeyFn())
+    }
+    async getKeyWrappingKey(t) {
+        return (await this.resolveEncryptionKeys(t)).symmetricCryptoKey
+    }
+    async hasValidDefaultEncryptionKey() {
+        try {
+            const t = await this.getOrCreateDefaultEncryptionKey();
+            return t ? !!await this.getKeyWrappingKey(t) : !1
+        } catch {
+            return !1
+        }
+    }
+    async wrapUserEncryptionKeyWithOtherUserEncryptionKey(t, r, n, i) {
+        if (t.id === r.id) throw new Error("Can't wrap UserEncryptionKey with itself");
+        n || (n = await this.resolveEncryptionKeys(t)), i || (i = (await this.resolveEncryptionKeys(r)).symmetricCryptoKey);
+        const s = await this.symmetricKeyService.extractPrivateKeyAndWrapWithWrappingKey(i, n.asymmetricCryptoKeyPair.privateKey),
+            c = await this.symmetricKeyService.extractPrivateKeyAndWrapWithWrappingKey(i, n.symmetricCryptoKey);
+        return t.privateKeys = [{
+            type: "KEY_WRAPPED",
+            wrappedKeyWrappingKey: Ne(c),
+            wrappedAsymmetricPrivateKey: Ne(s),
+            wrappedByKeyId: r.id
+        }], t
+    }
+    async derivePassphrase(t, r) {
+        const n = new TextEncoder;
+        return Ne(await crypto.subtle.deriveBits({
+            name: "PBKDF2",
+            salt: n.encode(r),
+            iterations: 1e5,
+            hash: {
+                name: "SHA-256"
+            }
+        }, await crypto.subtle.importKey("raw", n.encode(t), {
+            name: "PBKDF2"
+        }, !1, ["deriveBits"]), 32 * 8))
+    }
+    async createUserEncryptionKey(t) {
+        const [r, n, i, s] = await Promise.all([this.asymmetricKeyService.generateKeyPair(), this.symmetricKeyService.createKeyWrappingKey(), this.symmetricKeyService.randomSalt(), this.symmetricKeyService.randomSalt()]), [c, u, h] = await Promise.all([this.asymmetricKeyService.exportCryptoKey(r.publicKey), this.symmetricKeyService.extractPrivateKeyAndWrapWithPassphrase(t, i, r.privateKey), this.symmetricKeyService.wrapWithPassphrase(t, s, n)]);
+        return {
+            userEncryptionKey: {
+                id: crypto.randomUUID(),
+                deleted: !1,
+                publicKey: Ne(c),
+                createdDate: new Date,
+                privateKeys: [{
+                    type: "PASSPHRASE_WRAPPED",
+                    wrappedAsymmetricPrivateKey: Ne(u),
+                    wrappedKeyWrappingKey: Ne(h),
+                    asymmetricKeyPassphraseSalt: Ne(i),
+                    keyWrappingKeyPassphraseSalt: Ne(s)
+                }]
+            },
+            symmetricCryptoKey: n,
+            asymmetricCryptoKeyPair: r,
+            passphrase: t
+        }
+    }
+    async changeDefaultEncryptionKeyPassphrase(t, r) {
+        const n = this.symmetricKeyService.randomSalt(),
+            i = this.symmetricKeyService.randomSalt(),
+            {
+                asymmetricCryptoKeyPair: s,
+                symmetricCryptoKey: c,
+                userEncryptionKey: u
+            } = await (r ? this.unwrapEncryptionKeyWithPassphrase(await this.getOrCreateDefaultEncryptionKey(), r) : this.unwrapDefaultEncryptionKey()),
+            h = await this.symmetricKeyService.extractPrivateKeyAndWrapWithPassphrase(t, n, s.privateKey),
+            v = await this.symmetricKeyService.wrapWithPassphrase(t, i, c);
+        return {
+            userEncryptionKey: {
+                ...u,
+                privateKeys: [{
+                    type: "PASSPHRASE_WRAPPED",
+                    wrappedAsymmetricPrivateKey: Ne(h),
+                    wrappedKeyWrappingKey: Ne(v),
+                    asymmetricKeyPassphraseSalt: Ne(n),
+                    keyWrappingKeyPassphraseSalt: Ne(i)
+                }]
+            },
+            symmetricCryptoKey: c,
+            asymmetricCryptoKeyPair: s,
+            passphrase: t
+        }
+    }
+    async isDefaultEncryptionKeyPassphrase(t) {
+        const r = await this.getOrCreateDefaultEncryptionKey();
+        return !!await this.unwrapUserEncryptionKeyWithPassphrase(r, t).catch(() => null)
+    }
+    async unwrapEncryptionKeyWithPassphrase(t, r) {
+        return this.unwrapUserEncryptionKeyWithPassphrase(t, r)
+    }
+    async unwrapDefaultEncryptionKey() {
+        return this.unwrapUserEncryptionKeyWithPassphrase(await this.getOrCreateDefaultEncryptionKey())
+    }
+    async unwrapUserEncryptionKeyWithPassphrase(t, r) {
+        const n = typeof r == "string",
+            i = n ? r : await this.getPassphrasePromise.getOrCreate(() => this.getPassphraseFn()).catch(c => {
+                throw this.getPassphrasePromise.invalidate(), c
+            }),
+            s = async () => (this.getPassphrasePromise.invalidate(), this.createDefaultUserEncryptionKeyPromise.invalidate(), await this.unwrapUserEncryptionKeyWithPassphrase(await this.getOrCreateDefaultEncryptionKey()));
+        if (typeof i != "string") return s();
+        for (const c of t.privateKeys)
+            if (c.type === "PASSPHRASE_WRAPPED") {
+                if (!c.wrappedKeyWrappingKey || !c.wrappedAsymmetricPrivateKey) throw new Error(`UserEncryptionKey "${t.id}" has invalid private keys`);
+                try {
+                    const [u, h, v] = await Promise.all([this.symmetricKeyService.unwrapKeyWithPassphrase(i, wt(c.keyWrappingKeyPassphraseSalt), wt(c.wrappedKeyWrappingKey), "WRAPPING_KEY"), this.symmetricKeyService.unwrapKeyWithPassphrase(i, wt(c.asymmetricKeyPassphraseSalt), wt(c.wrappedAsymmetricPrivateKey), "WRAPPED_ASYMMETRIC_PRIVATE_KEY"), this.asymmetricKeyService.deserializeRawPublicKey(t.publicKey)]), y = {
+                        privateKey: await this.asymmetricKeyService.buildEcdhPrivateKey(h, v),
+                        publicKey: v
+                    };
+                    return On.set(t.id, {
+                        userEncryptionKey: t,
+                        symmetricCryptoKey: u,
+                        asymmetricCryptoKeyPair: y
+                    }), {
+                        userEncryptionKey: t,
+                        passphrase: i,
+                        symmetricCryptoKey: u,
+                        asymmetricCryptoKeyPair: y
+                    }
+                } catch (u) {
+                    if (n) throw new Error(`Passphrase decryption of key "${t.id}" failed: "${xr(u).message}"`);
+                    return s()
+                }
+            } throw new Error(`UserEncryptionKey "${t.id}" is not passphrase wrapped`)
+    }
+    async resolveEncryptionKeys(t) {
+        var i;
+        const r = await this.resolveEncryptionKeyGraph(t);
+        if (r.length === 1) return On.get(t.id);
+        let n;
+        for (let s = r.length - 2; s >= 0; s--) {
+            const c = r[s],
+                u = r[s + 1],
+                h = (i = On.get(u.id)) == null ? void 0 : i.symmetricCryptoKey;
+            for (const v of c.privateKeys)
+                if (v.wrappedByKeyId === u.id) {
+                    if (!v.wrappedAsymmetricPrivateKey || !v.wrappedKeyWrappingKey) throw Error(`UserEncryptionKey ${c} contains`);
+                    const [m, y, w] = await Promise.all([this.symmetricKeyService.unwrapKeyWithWrappingKey(h, wt(v.wrappedKeyWrappingKey), "WRAPPING_KEY"), this.symmetricKeyService.unwrapKeyWithWrappingKey(h, wt(v.wrappedAsymmetricPrivateKey), "WRAPPED_ASYMMETRIC_PRIVATE_KEY"), this.asymmetricKeyService.deserializeRawPublicKey(c.publicKey)]);
+                    n = {
+                        userEncryptionKey: c,
+                        symmetricCryptoKey: m,
+                        asymmetricCryptoKeyPair: {
+                            publicKey: w,
+                            privateKey: y
+                        }
+                    }, On.set(c.id, n)
+                }
+        }
+        return n
+    }
+    async resolveEncryptionKeyGraph(t) {
+        if (On.has(t.id)) return [t];
+        for (const r of t.privateKeys) switch (r.type) {
+            case "PASSPHRASE_WRAPPED": {
+                const {
+                    userEncryptionKey: n
+                } = await this.unwrapUserEncryptionKeyWithPassphrase(t);
+                return [n]
+            }
+            case "KEY_WRAPPED": {
+                const n = await this.dataStore.findById(r.wrappedByKeyId);
+                if (!n) throw new Error(`UserEncryptionKey ${r.wrappedByKeyId} is referenced but not present in datastore`);
+                return [t, ...await this.resolveEncryptionKeyGraph(n)]
+            }
+        }
+        throw new Error(`UserEncryptionKey graph could not be resolved for key ${t.id}`)
+    }
+}
+class QE {
+    constructor(t, r, n, i) {
+        this.dataStore = t, this.symmetricKeyService = r, this.asymmetricKeyService = n, this.userKeysService = i
+    }
+    async generateFileEncryptionKey() {
+        return this.createFileEncryptionKey({
+            fileEncryptionKeyId: crypto.randomUUID(),
+            keyPair: await this.asymmetricKeyService.generateKeyPair()
+        })
+    }
+    async cryptoKeyPairToFileEncryptionKey({
+        fileEncryptionKeyId: t,
+        keyPair: r
+    }) {
+        return this.createFileEncryptionKey({
+            fileEncryptionKeyId: t,
+            keyPair: r
+        })
+    }
+    async getFileEncryptionKey(t) {
+        return this.dataStore.findById(t)
+    }
+    async getExportedFileEncryptionCryptoKey(t) {
+        return Ne(await this.asymmetricKeyService.exportCryptoKey(t.cryptoKey))
+    }
+    async getFileEncryptionCryptoKey(t, r, n) {
+        const i = await this.resolveEncryptionKeyGraph(t);
+        if (!i) throw new Error(`No path found to decrypt FileEncryptionKey: "${t.id}"`);
+        return {
+            aesKeyType: n,
+            cryptoKey: await this.asymmetricKeyService.deriveAesEncryptionKey(i, await this.asymmetricKeyService.deserializeRawPublicKey(r), n)
+        }
+    }
+    async deriveFileEncryptionKeyWrappingKey(t, r) {
+        return await crypto.subtle.deriveKey({
+            name: "ECDH",
+            public: r
+        }, t, {
+            name: "AES-KW",
+            length: 256
+        }, !0, ["wrapKey", "unwrapKey"])
+    }
+    async wrapFileEncryptionKeyWithOtherFileEncryptionKey(t, r) {
+        const n = await this.resolveEncryptionKeyGraph(t);
+        if (!n) throw new Error(`Couldn't resolve private key for FileEncryptionKey ${t.id}`);
+        const i = await this.deriveFileEncryptionKeyWrappingKey(n, await this.deserializePublicKey(r.publicKey));
+        return this.symmetricKeyService.extractPrivateKeyAndWrapWithWrappingKey(i, n)
+    }
+    async deriveFileEncryptionCryptoKey(t, r, n) {
+        return {
+            aesKeyType: n,
+            cryptoKey: await this.asymmetricKeyService.deriveAesEncryptionKey(t, r, n)
+        }
+    }
+    async wrapPrivateKeyWithUserEncryptionKey(t, r) {
+        return {
+            encryptedPrivateKey: Ne(await this.symmetricKeyService.extractPrivateKeyAndWrapWithWrappingKey(await this.userKeysService.getKeyWrappingKey(r), t)),
+            encryptedByKeyId: r.id,
+            encryptedByKeyType: "USER_ENCRYPTION_KEY"
+        }
+    }
+    async importPrivateKey(t, r) {
+        return this.asymmetricKeyService.buildEcdhPrivateKeyWithUnwrappedKeys(t, r.publicKey)
+    }
+    async exportPrivateKey(t) {
+        const r = await this.resolveEncryptionKeyGraph(t);
+        if (!r) throw new Error(`Unable to resolved file encryption key: "${t.id}"`);
+        return this.asymmetricKeyService.exportCryptoKey(r)
+    }
+    async getFileEncryptionKeyAesCryptoKey(t, r) {
+        const n = Xe.getKeyProperties(r);
+        return {
+            aesKeyType: r,
+            cryptoKey: await crypto.subtle.importKey("raw", await this.exportPrivateKey(t), n.keyProperties, !0, n.keyUsages)
+        }
+    }
+    async generatePassphraseWrappedPrivateKey(t, r, n) {
+        const i = await this.resolveEncryptionKeyGraph(t);
+        if (!i) throw new Error(`Unable to resolved file encryption key: "${t.id}"`);
+        return this.symmetricKeyService.extractPrivateKeyAndWrapWithPassphrase(r, n, i)
+    }
+    async deserializePublicKey(t) {
+        return this.asymmetricKeyService.deserializeRawPublicKey(t)
+    }
+    async encryptAesGcm(t, r, n) {
+        return {
+            iv: n,
+            encryptedData: (await this.symmetricKeyService.encryptAesGcm(t, r, n)).encryptedData
+        }
+    }
+    async resolveEncryptionKeyGraph(t) {
+        for (const r of t.privateKeys) {
+            if (r.encryptedByKeyType !== "USER_ENCRYPTION_KEY") continue;
+            const n = await this.userKeysService.getUserEncryptionKey(r.encryptedByKeyId);
+            if (n) {
+                const i = await this.symmetricKeyService.unwrapKeyWithWrappingKey(await this.userKeysService.getKeyWrappingKey(n), wt(r.encryptedPrivateKey), "WRAPPED_ASYMMETRIC_PRIVATE_KEY");
+                return this.asymmetricKeyService.buildEcdhPrivateKeyWithPublicKeyString(i, t.publicKey)
+            }
+        }
+        for (const r of t.privateKeys) {
+            if (r.encryptedByKeyType !== "FILE_ENCRYPTION_KEY") continue;
+            const n = await this.dataStore.findById(r.encryptedByKeyId);
+            if (n) {
+                const i = await this.resolveEncryptionKeyGraph(n);
+                if (i) {
+                    const s = await this.deriveFileEncryptionKeyWrappingKey(i, await this.deserializePublicKey(t.publicKey)),
+                        c = await this.symmetricKeyService.unwrapKeyWithWrappingKey(s, wt(r.encryptedPrivateKey), "WRAPPED_ASYMMETRIC_PRIVATE_KEY");
+                    return await this.asymmetricKeyService.buildEcdhPrivateKeyWithPublicKeyString(c, t.publicKey)
+                }
+            }
+        }
+    }
+    async createFileEncryptionKey({
+        fileEncryptionKeyId: t,
+        keyPair: r
+    }) {
+        const n = await this.userKeysService.getOrCreateDefaultEncryptionKey();
+        return {
+            id: t,
+            deleted: !1,
+            createdDate: new Date,
+            privateKeys: [await this.wrapPrivateKeyWithUserEncryptionKey(r.privateKey, n)],
+            publicKey: Ne(await this.asymmetricKeyService.exportCryptoKey(r.publicKey))
+        }
+    }
+}
+class XE {
+    constructor(t, r) {
+        this.asymmetricKeyService = t, this.fileEncryptionKeyService = r
+    }
+    async createEncryptionKeys(t) {
+        const r = await this.fileEncryptionKeyService.getFileEncryptionKey(t);
+        if (!r) throw new Error(`Could not find encryption FileEncryptionKey: "${t}"`);
+        const n = await this.asymmetricKeyService.deserializeRawPublicKey(r.publicKey),
+            i = await this.asymmetricKeyService.generateKeyPair(),
+            [s, c, u] = await Promise.all([this.asymmetricKeyService.exportCryptoKey(i.publicKey), this.fileEncryptionKeyService.deriveFileEncryptionCryptoKey(i.privateKey, n, "SYMMETRIC_AES-GCM_KEY"), this.fileEncryptionKeyService.deriveFileEncryptionCryptoKey(i.privateKey, n, "SYMMETRIC_AES-CTR_KEY")]);
+        return {
+            ephemeralPublicKey: Ne(s),
+            aesGcmCryptoKey: c,
+            aesCtrCryptoKey: u
+        }
+    }
+    async createDecryptionKeys({
+        baseFileEncryptionKeyId: t,
+        ephemeralPublicKey: r
+    }) {
+        const n = await this.fileEncryptionKeyService.getFileEncryptionKey(t);
+        if (!n) throw new Error(`Could not find decryption FileEncryptionKey: "${t}"`);
+        const [i, s] = await Promise.all([this.fileEncryptionKeyService.getFileEncryptionCryptoKey(n, r, "SYMMETRIC_AES-GCM_KEY"), this.fileEncryptionKeyService.getFileEncryptionCryptoKey(n, r, "SYMMETRIC_AES-CTR_KEY")]);
+        return {
+            aesGcmCryptoKey: i,
+            aesCtrCryptoKey: s
+        }
+    }
+}
+class jr {
+    constructor(t, r, n) {
+        this.collection = t, this.entitiyFromCollectionType = r, this.entityToCollectionType = n
+    }
+    async insert(t) {
+        const r = await this.collection.insert(this.entityToCollectionType(t));
+        return this.entitiyFromCollectionType(this.docToJson(r))
+    }
+    async upsert(t) {
+        const r = await this.collection.upsert(this.entityToCollectionType(t));
+        return this.entitiyFromCollectionType(this.docToJson(r))
+    }
+    async incrementalUpsert(t) {
+        const r = await this.collection.incrementalUpsert(this.entityToCollectionType(t));
+        return this.entitiyFromCollectionType(this.docToJson(r))
+    }
+    async modify(t, r) {
+        const n = await this.collection.findOne(t).modify(async i => this.entityToCollectionType(await r({
+            ...i,
+            ...this.entitiyFromCollectionType(i)
+        })));
+        return n && this.entitiyFromCollectionType(this.docToJson(n))
+    }
+    async incrementalModify(t, r) {
+        const n = await this.collection.findOne(t).incrementalModify(async i => this.entityToCollectionType(await r({
+            ...i,
+            ...this.entitiyFromCollectionType(i)
+        })));
+        return n && this.entitiyFromCollectionType(this.docToJson(n))
+    }
+    async patch(t, r) {
+        return this.modify(t, n => ({
+            ...n,
+            ...r
+        }))
+    }
+    async incrementalPatch(t, r) {
+        return this.incrementalModify(t, n => ({
+            ...n,
+            ...r
+        }))
+    }
+    async remove(t) {
+        const r = await this.collection.findOne(t).remove();
+        return r && this.entitiyFromCollectionType(this.docToJson(r))
+    }
+    async incrementalRemove(t) {
+        const r = await this.collection.findOne(t).incrementalRemove();
+        return r && this.entitiyFromCollectionType(this.docToJson(r))
+    }
+    async removeByIds(t) {
+        const r = [...await this.collection.findByIds(t).exec()],
+            n = await Promise.all(r.map(async ([, i]) => i.remove()));
+        return new Map(r.map(([i], s) => [i, this.entitiyFromCollectionType(this.docToJson(n[s]))]))
+    }
+    async findOne(t) {
+        const r = await this.collection.findOne(t).exec();
+        return r && this.entitiyFromCollectionType(this.docToJson(r))
+    }
+    async find(t) {
+        return (await this.collection.find(t).exec()).map(r => this.entitiyFromCollectionType(this.docToJson(r)))
+    }
+    async count(t) {
+        return await this.collection.count(t).exec()
+    }
+    async findByIds(t) {
+        return new Map([...await this.collection.findByIds(t).exec()].map(([r, n]) => [r, this.entitiyFromCollectionType(this.docToJson(n))]))
+    }
+    subscribe(t, r) {
+        return this.collection.find(t).$.subscribe(n => r(n.map(i => this.entitiyFromCollectionType(this.docToJson(i)))))
+    }
+    subscribeCount(t, r) {
+        return this.collection.count(t).$.subscribe(r)
+    }
+    subscribeById(t, r) {
+        return this.collection.findOne(t).$.subscribe(n => r(n ? this.entitiyFromCollectionType(this.docToJson(n)) : null))
+    }
+    subscribeByIds(t, r) {
+        return this.collection.findByIds(t).$.subscribe(n => r(new Map([...n].map(([i, s]) => [i, this.entitiyFromCollectionType(this.docToJson(s))]))))
+    }
+    docToJson(t) {
+        return {
+            ...t.toJSON(),
+            deleted: t.deleted
+        }
+    }
+}
+const sc = "lmwrRxdbAnon",
+    dP = () => {
+        try {
+            return localStorage.getItem(sc)
+        } catch {
+            return null
+        }
+    },
+    ZE = e => {
+        try {
+            localStorage.setItem(sc, e)
+        } catch {}
+    },
+    hP = () => {
+        try {
+            localStorage.removeItem(sc)
+        } catch {}
+    },
+    oc = {
+        MANAGED: "managed-passphrase",
+        USER_DEFINED: "user-passphrase"
+    },
+    e_ = async (e, t) => {
+        const r = oc[t],
+            n = await e.getLocal(r).catch(() => null),
+            i = n == null ? void 0 : n.get(r);
+        return typeof i == "string" ? i : null
+    }, Eh = async (e, t, r) => {
+        const n = oc[r];
+        await e.upsertLocal(n, {
+            [n]: t
+        }).catch(() => null)
+    }, t_ = async (e, t) => {
+        const r = oc[t],
+            n = await e.getLocal(r).catch(() => null);
+        await (n == null ? void 0 : n.remove())
+    }, _h = (e, t) => {
+        const r = e.rxdbFileEncryptionKeyUtils.collection.$.subscribe(t),
+            n = e.rxdbUserEncryptionKeyUtils.collection.$.subscribe(t);
+        return () => {
+            r.unsubscribe(), n.unsubscribe()
+        }
+    }, r_ = (e, t) => {
+        const r = [e, t].filter(n => !!n);
+        return {
+            async findById(n) {
+                const i = {
+                    selector: {
+                        id: n
+                    }
+                };
+                return (await Promise.all(r.map(c => c.rxdbUserEncryptionKeyUtils.findOne(i)))).find(c => !!c) || null
+            },
+            async getLatest() {
+                const n = {
+                    sort: [{
+                        createdDate: "desc"
+                    }]
+                };
+                return (await Promise.all(r.map(s => s.rxdbUserEncryptionKeyUtils.find(n)))).flat().find(s => s !== null && !!s.privateKeys.find(({
+                    type: c
+                }) => c === "PASSPHRASE_WRAPPED")) || null
+            }
+        }
+    }, n_ = (e, t) => ({
+        async findById(r) {
+            const n = {
+                selector: {
+                    id: r
+                }
+            };
+            return (await Promise.all([e, t].map(s => s.rxdbFileEncryptionKeyUtils.findOne(n)))).find(s => !!s) || null
+        }
+    }), i_ = e => ({
+        async createContentItem(t, r) {
+            await e.rxdbContentItemUtils.insert(t), await e.rxdbSharingBucketUtils.incrementalModify(r, n => ({
+                ...n,
+                contentItemIds: [...n.contentItemIds, t.id]
+            }))
+        },
+        async updateContentItem(t) {
+            await e.rxdbContentItemUtils.incrementalPatch(t.id, t)
+        },
+        async finishContentItem(t, r) {
+            await e.rxdbContentItemUtils.incrementalPatch(t.id, t), await e.rxdbSharingBucketUtils.incrementalModify(r, n => ({
+                ...n,
+                totalFileSize: (n.totalFileSize || 0) + t.size
+            }))
+        },
+        async removeContentItem(t, r) {
+            await e.rxdbContentItemUtils.incrementalRemove(t.id), await e.rxdbSharingBucketUtils.incrementalModify(r, n => ({
+                ...n,
+                contentItemIds: n.contentItemIds.filter(i => i !== t.id)
+            }))
+        }
+    }), a_ = (e, t) => r => {
+        const {
+            promise: n,
+            resolve: i
+        } = Oe(), s = async () => {
+            const u = await e.createEncryptionKeys(r).catch(() => null);
+            u && (c.forEach(h => h()), i(u))
+        }, c = t.map(u => _h(u, s));
+        return s(), n
+    }, s_ = (e, t) => r => {
+        const {
+            promise: n,
+            resolve: i
+        } = Oe(), s = async () => {
+            const u = await e.createDecryptionKeys(r).catch(() => null);
+            u && (c.forEach(h => h()), i(u))
+        }, c = t.map(u => _h(u, s));
+        return s(), n
+    }, ul = e => {
+        const t = new jr(e.sharing_bucket, Xo, _b),
+            r = new jr(e.content_item, Xd, gb),
+            n = new jr(e.file_encryption_key, Zo, kb),
+            i = new jr(e.user_encryption_key, Qd, cn),
+            s = new jr(e.user, nS, aS),
+            c = new jr(e.platform_action_history, Ub, $b);
+        return {
+            rxdb: e,
+            rxdbSharingBucketUtils: t,
+            rxdbContentItemUtils: r,
+            rxdbFileEncryptionKeyUtils: n,
+            rxdbUserEncryptionKeyUtils: i,
+            rxdbUserUtils: s,
+            rxdbPlatformActionHistoryUtils: c
+        }
+    }, o_ = {
+        multiInstance: !1,
+        replicationWaitForLeadership: !1
+    }, c_ = (e, t, r, n, i) => {
+        const s = ka(e, t);
+        return c => ah(c, s, r(), n, i)
+    }, u_ = (e, t) => {
+        const r = ka(e, t, !0);
+        return n => ah(n, r, hh(), o_)
+    }, l_ = async (e, {
+        options: t,
+        userId: r,
+        isAnonymous: n,
+        getRxdbStorage: i,
+        openAuthModal: s,
+        openUpgradeModal: c
+    }, u, h, v, m) => {
+        let y = null;
+        const w = ul(v.database),
+            S = ul(m.database),
+            b = r_(w, S),
+            P = gf(t.apiOptions, {
+                init: {
+                    signal: e
+                }
+            }),
+            T = Ta({
+                maxDelay: 45e3,
+                maxRetryCount: 6
+            }),
+            F = async () => {
+                const {
+                    userEncryptionKey: fe
+                } = await Jn(Zd, {
+                    ...P,
+                    retry: T
+                }).getOrCreateUserEncryptionKey();
+                return fe
+            }, U = () => {
+                if (!r) return Promise.resolve("MANAGED");
+                const {
+                    promise: fe,
+                    resolve: ve
+                } = Oe(), ne = w.rxdbUserUtils.subscribeById(r, we => {
+                    ve(we ? we.userEncryptionKeyType : "MANAGED")
+                });
+                return fe.then(we => (ne.unsubscribe(), we))
+            }, M = new Xe, z = new VE, H = new YE(b, M, z, async () => {
+                const fe = y,
+                    ve = await U(),
+                    ne = async _e => (_e && await Eh(v.database, _e, ve), _e), we = fe !== ve;
+                if (y = ve, we) {
+                    const _e = await e_(v.database, ve);
+                    if (_e) return _e
+                }
+                return ne(ve === ap.Managed ? (await wf(Jn(Pl, {
+                    ...P,
+                    retry: T
+                }).getPassphrase())).passphrase : await h())
+            }, F), Q = new QE(n_(w, S), M, z, H), W = new XE(z, Q), ie = new $E(a_(W, [w, S])), de = new GE(s_(W, [w, S]), (fe, ve) => Q.getExportedFileEncryptionCryptoKey(ve.aesCtrCryptoKey), P), Se = t.upload.createUploader({
+                apiOptions: P,
+                multipartOptions: t.upload.multipartOptions,
+                contentItemEncrypter: ie,
+                dataStore: i_(w)
+            }), ue = t.download.createDownloader({
+                apiOptions: P,
+                multipartOptions: t.download.multipartOptions,
+                contentItemDecrypter: de
+            });
+        r && n && !e.aborted && ZE(r);
+        const re = Oe(),
+            oe = r ? w.rxdbUserUtils.subscribeById(r, fe => {
+                var ne;
+                const ve = {
+                    userTier: ((ne = fe == null ? void 0 : fe.accountSubscription) == null ? void 0 : ne.tier) || Aw.Free,
+                    userBalance: (fe == null ? void 0 : fe.balance) || {
+                        credits: 0,
+                        lmwr: 0
+                    }
+                };
+                re.resolve(ve), e.aborted || u(({
+                    userTier: we,
+                    userBalance: _e
+                }) => {
+                    if (we !== ve.userTier || _e.credits !== ve.userBalance.credits || _e.lmwr !== ve.userBalance.lmwr) return ve
+                })
+            }) : re.resolve({
+                userBalance: {
+                    credits: 0,
+                    lmwr: 0
+                },
+                userTier: "FREE"
+            }),
+            {
+                userTier: ye,
+                userBalance: Pe
+            } = await re.promise,
+            $e = {
+                userId: r,
+                userTier: ye,
+                userBalance: Pe,
+                isAnonymous: n,
+                contentItemEncrypter: ie,
+                contentItemDecrypter: de,
+                uploader: Se,
+                downloader: ue,
+                userKeyService: H,
+                fileEncryptionKeyService: Q,
+                apiOptions: P,
+                getRxdbStorage: i,
+                awaitActiveRxdbReplication: async fe => {
+                    const ve = v.replication.awaitActiveReplication();
+                    await (typeof fe == "number" ? Promise.race([ve, new Promise(ne => setTimeout(ne, fe))]) : ve)
+                },
+                userRxdb: w,
+                memoryRxdb: S,
+                openAuthModal: s,
+                openUpgradeModal: c
+            },
+            Be = () => {
+                e.removeEventListener("abort", Be), oe == null || oe.unsubscribe(), ie.dispose(), de.dispose(), Se.clear(), ue.clear()
+            };
+        return e.aborted ? Be() : e.addEventListener("abort", Be), $e
+    }, ll = "Please enter a passphrase.", d_ = ml(Cf(!0, ll), {
+        emptyMessage: ll
+    }), Da = "All my uploaded data will be deleted", dl = `Please enter "${Da}" to continue.`, h_ = Sl({
+        confirm: ml(Rf().trim().toLowerCase().transform((e, t) => e !== Da.toLowerCase() ? (t.addIssue({
+            code: Df.custom,
+            message: dl
+        }), Kf) : e), {
+            emptyMessage: dl
+        })
+    }), f_ = ({
+        onPassphraseReset: e
+    }) => {
+        const t = Ph(),
+            {
+                closeModal: r
+            } = If(),
+            n = Re.useRef(null),
+            [i, s] = Re.useState(!1),
+            [c, u] = Re.useState(null),
+            h = Nn(e),
+            v = c && ce.jsx(Zi, {
+                type: "success",
+                description: "You successfully reset end-to-end encryption for your account.",
+                children: "Success"
+            });
+        return Re.useEffect(() => {
+            var m;
+            (m = n.current) == null || m.focus()
+        }, []), Re.useEffect(() => {
+            if (c && c.ok) return () => {
+                h(c.value)
+            }
+        }, [h, c]), ce.jsx(gl, {
+            header: ce.jsx(bl, {
+                danger: !0,
+                children: "Reset End-To-End encryption"
+            }),
+            children: v || ce.jsxs("div", {
+                className: "flex flex-col gap-y-3",
+                children: [ce.jsx(Zi, {
+                    type: "warning",
+                    description: ce.jsxs(ce.Fragment, {
+                        children: ["If you forgot your passphrase, there's unfortunately no way to recover your uploaded data. When you proceed with resetting end-to-end encryption,", " ", ce.jsx("strong", {
+                            children: "ALL YOUR UPLOADED DATA WILL BE DELETED."
+                        })]
+                    }),
+                    children: "Caution!"
+                }), ce.jsx(ua, {
+                    schema: h_,
+                    feedback: c && !c.ok && ce.jsx(Zi, {
+                        type: "error",
+                        description: c.error.message,
+                        children: c.error.code
+                    }),
+                    formIsLoading: i,
+                    formOnSubmit: async () => {
+                        const {
+                            userRxdb: m,
+                            apiOptions: y
+                        } = t;
+                        s(!0), u(null);
+                        try {
+                            const w = Jn(Pl, y),
+                                S = await ca(w.resetPassphrase());
+                            if (!S.ok) throw S.error;
+                            await Promise.all([Eh(m.rxdb, S.value.passphrase, "MANAGED"), t_(m.rxdb, "USER_DEFINED")]), u(S)
+                        } catch (w) {
+                            u(xt(w instanceof Xr ? w : new Xr(xr(w).message, "Unexpected Error")))
+                        }
+                        s(!1)
+                    },
+                    children: ({
+                        isLoading: m
+                    }) => ce.jsxs(ce.Fragment, {
+                        children: [ce.jsx(ua.Input, {
+                            name: "confirm",
+                            label: "Confirmation",
+                            description: ce.jsxs(ce.Fragment, {
+                                children: ['Enter "', Da, '" to continue.']
+                            }),
+                            placeholder: Da,
+                            ref: n
+                        }), ce.jsxs(wl, {
+                            children: [ce.jsx(Qs, {
+                                theme: "danger",
+                                type: "submit",
+                                loading: m,
+                                children: "Reset"
+                            }), ce.jsx(Qs, {
+                                theme: "white",
+                                onClick: () => r(),
+                                children: "Close"
+                            })]
+                        })]
+                    })
+                })]
+            })
+        })
+    }, p_ = ({
+        onPassphraseReset: e,
+        ...t
+    }) => ce.jsx(vl, {
+        content: ce.jsx(f_, {
+            onPassphraseReset: e
+        }),
+        ...t
+    }), m_ = Sl({
+        passphrase: d_
+    }), y_ = ({
+        dismissButton: e,
+        onPassphrase: t
+    }) => {
+        const {
+            userKeyService: r,
+            userId: n
+        } = Ph(), [i, s] = Re.useState(!1), [c, u] = Re.useState(null), h = Re.useRef(null);
+        return Re.useEffect(() => {
+            var v;
+            (v = h.current) == null || v.focus()
+        }, []), ce.jsx(gl, {
+            header: ce.jsx(bl, {
+                hideCloseButton: !0,
+                children: "End-To-End encryption passphrase"
+            }),
+            children: ({
+                closeModal: v
+            }) => ce.jsxs("div", {
+                className: "flex flex-col gap-y-3 type-d-75 w-full",
+                children: [ce.jsxs("div", {
+                    children: ["Please enter the passphrase you chose for the end-to-end encryption.", " ", ce.jsx(p_, {
+                        onPassphraseReset: () => {
+                            location.reload()
+                        },
+                        children: ({
+                            openModal: m
+                        }) => ce.jsx(xf, {
+                            className: "inline-flex",
+                            paddingless: !0,
+                            onClick: () => m(),
+                            children: "I have forgotten my passphrase."
+                        })
+                    })]
+                }), ce.jsx(ua, {
+                    schema: m_,
+                    feedback: c && !c.ok && ce.jsx(Zi, {
+                        type: "error",
+                        description: c.error.message,
+                        children: c.error.code
+                    }),
+                    formIsLoading: i,
+                    formOnSubmit: async ({
+                        values: m
+                    }) => {
+                        const {
+                            passphrase: y
+                        } = m;
+                        if (n) {
+                            s(!0), u(null);
+                            try {
+                                const w = await r.derivePassphrase(y, n);
+                                if (!await r.isDefaultEncryptionKeyPassphrase(w)) throw new Xr("The submitted passphrase is incorrect.", "Incorrect Passphrase");
+                                t == null || t(w), v()
+                            } catch (w) {
+                                s(!1), u(xt(w instanceof Xr ? w : new Xr(xr(w).message, "Unexpected Error")))
+                            }
+                        }
+                    },
+                    children: ({
+                        isLoading: m
+                    }) => ce.jsxs(ce.Fragment, {
+                        children: [ce.jsx(ua.SecretInput, {
+                            name: "passphrase",
+                            label: "Passphrase",
+                            description: "Enter the passphrase you chose for the end-to-end encryption.",
+                            placeholder: "••••••",
+                            revealButtonLabelShow: "Show Passphrase",
+                            revealButtonLabelHide: "Hide Passphrase",
+                            ref: h
+                        }), ce.jsxs(wl, {
+                            children: [ce.jsx(Qs, {
+                                type: "submit",
+                                loading: m,
+                                children: "Submit"
+                            }), e]
+                        })]
+                    })
+                })]
+            })
+        })
+    }, v_ = e => {
+        const {
+            dismissButton: t,
+            onPassphrase: r,
+            ...n
+        } = e;
+        return ce.jsx(vl, {
+            content: ce.jsx(y_, {
+                dismissButton: t,
+                onPassphrase: r
+            }),
+            ...n
+        })
+    }, g_ = Re.forwardRef(function(t, r) {
+        const [n, i] = Re.useState(new Set);
+        return Re.useImperativeHandle(r, () => ({
+            addModal: s => {
+                i(c => new Set([...c, s]))
+            },
+            removeModal: s => {
+                i(c => (c.delete(s), new Set(c)))
+            }
+        }), []), ce.jsx(ce.Fragment, {
+            children: n
+        })
+    }), za = Re.createContext(null), fP = () => Re.useContext(za), pP = () => {
+        const e = Re.useContext(za),
+            [t, r] = yl(Oe());
+        return Re.useMemo(() => {
+            e ? t().resolve(e) : r(Oe())
+        }, [e, t, r]), Nn(() => t().promise)
+    }, Ph = () => {
+        const e = Re.useContext(za);
+        if (!e) throw new Error("FileSharing not loaded yet.");
+        return e
+    }, kh = Re.createContext(null), Ch = Re.createContext(null), w_ = e => {
+        const {
+            options: t,
+            userId: r,
+            isAnonymous: n,
+            getRxdbStorage: i,
+            openAuthModal: s,
+            openUpgradeModal: c,
+            provideUserPassphraseDismissButton: u,
+            children: h
+        } = e, v = sl(kh), m = sl(Ch), [y, w] = Re.useState(null), [S, b] = yl(null), P = Nn(() => u), T = Nn(s), F = Nn(c);
+        if (Re.useEffect(() => {
+                if (!v || !m || v.database.name !== ka(r, n) || m.database.name !== ka(r, n, !0)) {
+                    w(null);
+                    return
+                }
+                const U = new AbortController;
+                return l_(U.signal, {
+                    options: t,
+                    userId: r,
+                    isAnonymous: n,
+                    getRxdbStorage: i,
+                    openAuthModal: T,
+                    openUpgradeModal: F
+                }, M => {
+                    w(z => {
+                        if (!z || z instanceof Error) return z;
+                        const H = M(z);
+                        return H ? {
+                            ...z,
+                            ...H
+                        } : z
+                    })
+                }, async () => {
+                    const M = S();
+                    if (!M) throw new Error("FileSharingContextProviderPassphraseModalRoot not found.");
+                    const {
+                        promise: z,
+                        resolve: H
+                    } = Oe(), {
+                        addModal: Q,
+                        removeModal: W
+                    } = M, ie = ce.jsx(v_, {
+                        dismissButton: P(),
+                        onPassphrase: de => {
+                            H(de)
+                        },
+                        onClosed: () => {
+                            H(null), W(ie)
+                        },
+                        dismissible: !1,
+                        defaultOpen: !0
+                    }, Date.now());
+                    return Q(ie), z
+                }, v, m).then(M => {
+                    U.signal.aborted || w(M)
+                }).catch(M => {
+                    U.signal.aborted || w(xr(M, new Error(`FileSharing couldn't be created: ${M}.`)))
+                }), w(null), () => {
+                    U.abort()
+                }
+            }, [t, n, v, r, m, i, P, S, T, F]), y instanceof Error) throw y;
+        return ce.jsxs(za.Provider, {
+            value: y,
+            children: [h, y && ce.jsx(g_, {
+                ref: U => {
+                    b(U)
+                }
+            }, y.userId)]
+        })
+    }, mP = e => {
+        const {
+            userId: t,
+            isAnonymous: r,
+            getRxdbStorage: n,
+            options: i
+        } = e, [s, c] = Re.useState(null), u = Re.useMemo(() => c_(t, r, n, i.rxdb, !!t && {
+            isAnonymous: r,
+            userId: t,
+            apiOptions: i.apiOptions,
+            onUnrecoverableReplicationError(v) {
+                c(v)
+            }
+        }), [t, r, n, i]), h = Re.useMemo(() => u_(t, r), [t, r]);
+        if (s) throw new Error(`Data Synchronization Error. Please reload the page. (${s.code})`);
+        return ce.jsx(ol, {
+            openRxdbInstance: u,
+            context: kh,
+            children: ce.jsx(ol, {
+                openRxdbInstance: h,
+                context: Ch,
+                children: ce.jsx(w_, {
+                    ...e
+                })
+            })
+        })
+    };
+export {
+    VE as A, V_ as B, gb as C, Zs as D, Of as E, kb as F, BE as G, mP as H, sS as I, fp as J, Aw as K, G_ as L, dp as M, Xd as N, j_ as O, z_ as P, p_ as R, Xe as S, Ne as a, El as b, wt as c, Zd as d, _h as e, Qr as f, _l as g, Ph as h, t_ as i, Y_ as j, pP as k, Q_ as l, _b as m, lP as n, dP as o, c_ as p, ul as q, d_ as r, Eh as s, r_ as t, fP as u, e_ as v, uP as w, ka as x, hP as y, o_ as z
+};
+! function() {
+    try {
+        var e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof self ? self : {},
+            n = (new Error).stack;
+        n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "a67984a7-43ad-5a0b-ada1-2827d39ff239")
+    } catch (e) {}
+}()
+//# debugId=a67984a7-43ad-5a0b-ada1-2827d39ff239
+//# sourceMappingURL=file-sharing-provider-DDdyxT8m.js.map
