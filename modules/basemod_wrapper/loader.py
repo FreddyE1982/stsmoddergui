@@ -6,13 +6,15 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Dict, Iterable, Optional, Sequence
 
 import urllib.request
 
 
 BASEMOD_RELEASE_URL = "https://github.com/daviscook477/BaseMod/releases/latest/download/BaseMod.jar"
 BASEMOD_JAR_NAME = "BaseMod.jar"
+STSLIB_RELEASE_URL = "https://github.com/kiooeht/StSLib/releases/latest/download/StSLib.jar"
+STSLIB_JAR_NAME = "StSLib.jar"
 
 
 class BaseModBootstrapError(RuntimeError):
@@ -44,7 +46,16 @@ def ensure_basemod_jar(base_dir: Path) -> Path:
     return jar_path
 
 
-def start_jvm(classpath_entries: Iterable[Path]) -> None:
+def ensure_stslib_jar(base_dir: Path) -> Path:
+    """Download the StSLib jar if it is missing."""
+
+    jar_path = base_dir / "lib" / STSLIB_JAR_NAME
+    if not jar_path.exists():
+        _download(STSLIB_RELEASE_URL, jar_path)
+    return jar_path
+
+
+def start_jvm(classpath_entries: Sequence[Path]) -> None:
     """Start the JVM with the given classpath if it is not already running."""
 
     import jpype
@@ -59,14 +70,32 @@ def start_jvm(classpath_entries: Iterable[Path]) -> None:
     import jpype.imports  # noqa: F401
 
 
-def ensure_basemod_environment(base_dir: Optional[Path] = None) -> Path:
-    """Ensure that the BaseMod environment is ready for use."""
+def ensure_basemod_environment(
+    base_dir: Optional[Path] = None,
+    *,
+    extra_classpath: Optional[Sequence[Path]] = None,
+) -> Dict[str, Path]:
+    """Ensure that the BaseMod + StSLib environment is ready for use."""
 
     base_dir = base_dir or Path(__file__).resolve().parent
     ensure_jpype()
-    jar_path = ensure_basemod_jar(base_dir)
-    start_jvm([jar_path])
-    return jar_path
+    basemod_jar = ensure_basemod_jar(base_dir)
+    stslib_jar = ensure_stslib_jar(base_dir)
+    classpath = [basemod_jar, stslib_jar]
+    if extra_classpath:
+        classpath.extend(extra_classpath)
+    start_jvm(classpath)
+    return {"basemod": basemod_jar, "stslib": stslib_jar}
+
+
+def ensure_dependency_classpath(base_dir: Optional[Path] = None) -> Dict[str, Path]:
+    """Return a mapping of core dependency jars without starting the JVM."""
+
+    base_dir = base_dir or Path(__file__).resolve().parent
+    return {
+        "basemod": ensure_basemod_jar(base_dir),
+        "stslib": ensure_stslib_jar(base_dir),
+    }
 
 
 __all__ = [
@@ -74,5 +103,7 @@ __all__ = [
     "ensure_jpype",
     "ensure_basemod_jar",
     "ensure_basemod_environment",
+    "ensure_dependency_classpath",
     "start_jvm",
+    "ensure_stslib_jar",
 ]
