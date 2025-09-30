@@ -285,10 +285,11 @@ class Character:
                 inner_path = Path(blueprint.inner_image_source)
                 if not inner_path.exists():
                     issues.append(f"inner image '{inner_path}' is missing")
-            image_path = blueprint.image or f"{mod_id}/images/cards/{blueprint.identifier}.png"
-            resolved = cls._resource_path(image_path, assets_root, mod_id)
+            image_resource = blueprint.image or f"{mod_id}/images/cards/{blueprint.identifier}.png"
+            resolved = cls._resource_path(image_resource, assets_root, mod_id)
             if not resolved.exists():
-                issues.append(f"card image '{resolved}' is missing")
+                if not (blueprint.inner_image_source and blueprint.image is None):
+                    issues.append(f"card image '{resolved}' is missing")
             if issues:
                 missing_cards[identifier] = issues
         asset_issues: List[str] = []
