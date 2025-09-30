@@ -11,7 +11,13 @@ from .loader import (
     ensure_jpype,
 )
 from .project import BundleOptions, ModProject, ProjectLayout, compileandbundle, create_project
-from .cards import SimpleCardBlueprint, register_simple_card
+from .cards import (
+    CardLocalizationEntry,
+    ResolvedCardLocalization,
+    SimpleCardBlueprint,
+    build_card_localizations,
+    register_simple_card,
+)
 from .keywords import (
     KEYWORD_REGISTRY,
     Keyword,
@@ -433,6 +439,9 @@ __all__ = [
     "BundleOptions",
     "create_project",
     "compileandbundle",
+    "build_card_localizations",
+    "CardLocalizationEntry",
+    "ResolvedCardLocalization",
     "SimpleCardBlueprint",
     "register_simple_card",
     "Keyword",
