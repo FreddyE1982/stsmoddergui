@@ -32,6 +32,12 @@ Extend `SimpleCardBlueprint` with multi-target power routing, secondary magic nu
 Usage: allow blueprint authors to declare additional `effects` in sequence, plus hooks for `on_draw` and
 `on_discard` so heavily scripted cards can still be described declaratively.
 
+## Inner card image caching and deduplication
+
+Cache processed inner card art keyed by source checksum so repeated calls to `innerCardImage` do not rebuild identical assets.
+Usage: extend `prepare_inner_card_image` with a hash manifest stored alongside generated files; reuse outputs when available
+and expose the manifest through the plugin layer for advanced asset tooling.
+
 ## LimeWire decryption pipeline
 
 Build a Python implementation of the LimeWire content decrypter so that the encrypted jars downloaded during bundling can be unwrapped automatically. Usage: mirror the `GE#getContentItemDecryptionKeys` flow in Python, deriving AES keys from the passphrase and decrypting the AES-CTR stream into usable game jars.
