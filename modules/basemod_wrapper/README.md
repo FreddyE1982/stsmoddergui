@@ -55,6 +55,16 @@ reuses) the BaseMod, ModTheSpire and StSLib jars and launches the JVM with a
 sane default classpath. Consumers simply import and go – no manual setup of
 Java paths or environment variables.
 
+### Adaptive GraalPy illustration swaps
+
+Enabling ``experimental.graalpy_adaptive_illustrations`` provisions a
+rule-driven Pillow pipeline that recolours inner card art based on
+``Deck.statistics()`` snapshots. The module exposes the granular
+``AdaptiveIllustrationEngine`` plus a high-level ``AdaptiveIllustrationDirector``
+that plugs straight into ``Deck`` subclasses. See
+``modules.basemod_wrapper.experimental.graalpy_adaptive_illustrations`` and the
+``how to/graalpy-adaptive-illustrations.md`` recipe for end-to-end usage.
+
 ## High level workflow
 
 1. **Create a project** via `create_project(...)`. The resulting `ModProject`

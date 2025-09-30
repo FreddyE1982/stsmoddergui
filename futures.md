@@ -167,3 +167,10 @@
   turn-by-turn breakdowns, then document how plugins can subscribe to the
   timeline feed to generate UI overlays or debugging notebooks.
 
+- [todo] **Adaptive illustration preset marketplace** – Extend
+  `experimental.graalpy_adaptive_illustrations` with transform bundles that
+  plugin authors can publish and share. Usage: add a registry on the adaptive
+  engine that loads presets from JSON manifests (tints, glows,
+  shader-inspired blends) and document how decks can opt-in with a single
+  `director.apply_presets("buddy_glow")` call so future updates stay
+  data-driven.
