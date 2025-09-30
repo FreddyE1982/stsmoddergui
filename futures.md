@@ -138,4 +138,11 @@
   that scans the `assets/<mod_id>/localizations` tree, reports cards that only
   exist in a subset of languages, and exposes a plugin hook so translation
   workflows can gate builds when required locales are incomplete.
+- [todo] **Python runtime auto-launcher** – Ship a lightweight script alongside
+  bundles that reads `PythonRuntimeBootstrapPlan` metadata and toggles
+  `PYTHONPATH`, virtualenv activation and entrypoint invocation automatically
+  before spawning ModTheSpire. Usage: extend `modules.modbuilder.runtime_env`
+  with a CLI (`python -m modules.modbuilder.runtime_env launch <bundle>`)
+  that executes the bootstrap plan directly, saving testers from copying
+  commands and ensuring cross-platform consistency.
 

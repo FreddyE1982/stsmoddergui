@@ -11,6 +11,12 @@ from .character import (
     CharacterStartConfig,
     CharacterValidationReport,
 )
+from .runtime_env import (
+    PlatformBootstrap,
+    PythonRuntimeBootstrapPlan,
+    PythonRuntimeDescriptor,
+    discover_python_runtime,
+)
 from plugins import PLUGIN_MANAGER
 
 PLUGIN_MANAGER.expose("Deck", Deck)
@@ -27,6 +33,10 @@ PLUGIN_MANAGER.expose("CharacterColorConfig", CharacterColorConfig)
 PLUGIN_MANAGER.expose("CharacterDeckSnapshot", CharacterDeckSnapshot)
 PLUGIN_MANAGER.expose("CharacterValidationReport", CharacterValidationReport)
 PLUGIN_MANAGER.expose("CHARACTER_VALIDATION_HOOK", CHARACTER_VALIDATION_HOOK)
+PLUGIN_MANAGER.expose("discover_python_runtime", discover_python_runtime)
+PLUGIN_MANAGER.expose("PythonRuntimeDescriptor", PythonRuntimeDescriptor)
+PLUGIN_MANAGER.expose("PythonRuntimeBootstrapPlan", PythonRuntimeBootstrapPlan)
+PLUGIN_MANAGER.expose("PlatformBootstrap", PlatformBootstrap)
 PLUGIN_MANAGER.expose_module("modules.modbuilder")
 
 __all__ = [
@@ -44,4 +54,8 @@ __all__ = [
     "CharacterDeckSnapshot",
     "CharacterValidationReport",
     "CHARACTER_VALIDATION_HOOK",
+    "discover_python_runtime",
+    "PythonRuntimeDescriptor",
+    "PythonRuntimeBootstrapPlan",
+    "PlatformBootstrap",
 ]

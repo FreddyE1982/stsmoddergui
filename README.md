@@ -14,6 +14,7 @@ directly to Python developers.
 - High level project system for declaring characters, card colours and cards via `ModProject`.
 - Declarative `SimpleCardBlueprint` helper that builds everyday attacks, skills and powers without boilerplate.
 - Turn-key bundling through `compileandbundle` which writes ModTheSpire manifests, Java enum patches and copies Python assets.
+- Runtime bootstrap helpers (`modules.modbuilder.runtime_env`) that describe bundled Python packages and generate platform-specific activation commands.
 - Forward-looking roadmap documented in `futures.md`.
 - Built-in deck analytics helper that converts validation snapshots into tables and JSON artefacts for dashboards and plugins.
 
