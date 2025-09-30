@@ -5,11 +5,12 @@ import math
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+import json
 from types import MappingProxyType
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union
 
 from modules.basemod_wrapper.card_assets import ensure_pillow
-from modules.basemod_wrapper.cards import SimpleCardBlueprint
+from modules.basemod_wrapper.cards import SimpleCardBlueprint, build_card_localizations
 from modules.basemod_wrapper.loader import BaseModBootstrapError, ensure_dependency_classpath
 from modules.basemod_wrapper.project import (
     BundleOptions,
@@ -187,6 +188,7 @@ class Character:
         unique_cards = decks.unique_cards
 
         cls._prepare_static_spine(character, assets_root_path)
+        cls._write_card_localizations(character, assets_root_path, unique_cards)
 
         if bundle and not register_cards:
             raise BaseModBootstrapError("Cards must be registered when bundling the mod.")
@@ -781,6 +783,35 @@ class Character:
         if not resolved.exists():
             raise BaseModBootstrapError(f"Assets directory '{resolved}' does not exist.")
         return resolved
+
+    @classmethod
+    def _write_card_localizations(
+        cls,
+        character: "Character",
+        assets_root: Path,
+        cards: Mapping[str, SimpleCardBlueprint],
+    ) -> None:
+        payloads = build_card_localizations(cards.values())
+        if not payloads:
+            return
+        base_dir = assets_root / "localizations"
+        for language, entries in payloads.items():
+            target_dir = base_dir / language
+            target_dir.mkdir(parents=True, exist_ok=True)
+            target_file = target_dir / "cards.json"
+            existing: Dict[str, Any]
+            if target_file.exists():
+                try:
+                    existing = json.loads(target_file.read_text(encoding="utf8"))
+                except json.JSONDecodeError:
+                    existing = {}
+            else:
+                existing = {}
+            existing.update(entries)
+            target_file.write_text(
+                json.dumps(existing, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf8",
+            )
 
     @staticmethod
     def _resolve_python_source(

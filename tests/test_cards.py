@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from modules.basemod_wrapper.cards import SimpleCardBlueprint
+from modules.basemod_wrapper.cards import SimpleCardBlueprint, build_card_localizations
 from modules.basemod_wrapper.loader import BaseModBootstrapError
 from modules.basemod_wrapper.project import ModProject
 from modules.basemod_wrapper.card_assets import InnerCardImageResult, ensure_pillow
@@ -78,6 +78,44 @@ def test_inner_card_image_resets_blueprint_image(tmp_path, use_real_dependencies
     assert blueprint.inner_image_source == str(image_path.resolve())
     assert blueprint.image is None
     assert blueprint._inner_image_result is None
+
+
+def test_build_card_localizations_handles_multiple_languages(use_real_dependencies):
+    blueprint = SimpleCardBlueprint(
+        identifier="BuddyStrike",
+        title="Buddy Strike",
+        description="Deal {damage} damage.",
+        cost=1,
+        card_type="attack",
+        target="enemy",
+        rarity="common",
+        value=9,
+        localizations={
+            "fra": {
+                "title": "Frappe de Buddy",
+                "description": "Inflige {damage} dégâts.",
+                "extended_description": [
+                    "Inflige {damage} dégâts, puis motive Buddy."
+                ],
+            },
+            "eng": {"upgrade_description": "Deal {damage} damage twice."},
+        },
+    )
+
+    payloads = build_card_localizations([blueprint])
+
+    assert set(payloads) == {"eng", "fra"}
+    eng_entry = payloads["eng"]["BuddyStrike"]
+    assert eng_entry["NAME"] == "Buddy Strike"
+    assert eng_entry["DESCRIPTION"] == "Deal !D! damage."
+    assert eng_entry["UPGRADE_DESCRIPTION"] == "Deal !D! damage twice."
+
+    fra_entry = payloads["fra"]["BuddyStrike"]
+    assert fra_entry["NAME"] == "Frappe de Buddy"
+    assert fra_entry["DESCRIPTION"] == "Inflige !D! dégâts."
+    assert fra_entry["EXTENDED_DESCRIPTION"] == [
+        "Inflige !D! dégâts, puis motive Buddy."
+    ]
 
 
 def test_factory_uses_prepared_inner_card_image(monkeypatch, stubbed_runtime, tmp_path):

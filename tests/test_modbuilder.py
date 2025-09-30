@@ -358,6 +358,86 @@ def test_character_allows_inner_card_blueprints(tmp_path: Path, use_real_depende
     assert not card_image.exists()
 
 
+def test_character_writes_card_localizations(tmp_path: Path, use_real_dependencies: bool) -> None:
+    class StarterDeck(Deck):
+        pass
+
+    class UnlockableDeck(Deck):
+        pass
+
+    include_cards: dict[str, bool] = {}
+
+    localized_common = SimpleCardBlueprint(
+        identifier="Common0",
+        title="Common0",
+        description="Deal {damage} damage.",
+        cost=1,
+        card_type="attack",
+        target="enemy",
+        rarity="common",
+        value=7,
+        image="buddy/images/cards/Common0.png",
+        localizations={
+            "fra": {
+                "title": "Commune 0",
+                "description": "Inflige {damage} dégâts.",
+                "upgrade_description": "Inflige {damage} dégâts puissants.",
+            }
+        },
+    )
+    StarterDeck.addCard(localized_common)
+    include_cards["Common0.png"] = True
+
+    for index in range(1, 60):
+        name = f"Common{index}"
+        StarterDeck.addCard(_make_blueprint(name, rarity="common"))
+        include_cards[f"{name}.png"] = True
+
+    for index in range(37):
+        name = f"Uncommon{index}"
+        UnlockableDeck.addCard(_make_blueprint(name, rarity="uncommon"))
+        include_cards[f"{name}.png"] = True
+    for index in range(3):
+        name = f"Rare{index}"
+        UnlockableDeck.addCard(_make_blueprint(name, rarity="rare"))
+        include_cards[f"{name}.png"] = True
+
+    class DummyCharacter(_BaseTestCharacter):
+        def __init__(self) -> None:
+            super().__init__()
+            self.start.deck = StarterDeck
+            self.unlockableDeck = UnlockableDeck
+
+    assets_root = tmp_path / "assets" / "buddy"
+    _prepare_assets(assets_root, include_cards=include_cards)
+    python_root = tmp_path / "python"
+    _prepare_python_source(python_root)
+
+    DummyCharacter.createMod(
+        tmp_path / "dist",
+        assets_root=assets_root,
+        python_source=python_root,
+        bundle=False,
+        register_cards=False,
+    )
+
+    eng_path = assets_root / "localizations" / "eng" / "cards.json"
+    fra_path = assets_root / "localizations" / "fra" / "cards.json"
+
+    assert eng_path.exists()
+    assert fra_path.exists()
+
+    eng_data = json.loads(eng_path.read_text(encoding="utf8"))
+    fra_data = json.loads(fra_path.read_text(encoding="utf8"))
+
+    assert "Common0" in eng_data
+    assert eng_data["Common0"]["DESCRIPTION"] == "Deal !D! damage."
+    assert "Common0" in fra_data
+    assert fra_data["Common0"]["NAME"] == "Commune 0"
+    assert fra_data["Common0"]["UPGRADE_DESCRIPTION"] == "Inflige !D! dégâts puissants."
+    assert "Common1" not in fra_data
+
+
 def test_character_collect_cards_and_validate(tmp_path: Path, use_real_dependencies: bool) -> None:
     class StarterDeck(Deck):
         pass

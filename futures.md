@@ -131,4 +131,11 @@
   the ModTheSpire output directory and Steam Workshop subscriptions via the
   Steam Web API so scripts can warn if required utilities (ModTheSpire,
   BaseMod, StSLib) are missing before testers try to run the game.
+- [todo] **Localization consistency audits** – Now that simple cards can emit
+  multilingual `cards.json` payloads, add a tooling pass that compares the
+  generated files against existing assets and highlights missing or stale
+  translations. Usage: surface a `modules.tools.localization.audit()` helper
+  that scans the `assets/<mod_id>/localizations` tree, reports cards that only
+  exist in a subset of languages, and exposes a plugin hook so translation
+  workflows can gate builds when required locales are incomplete.
 

@@ -179,6 +179,7 @@ Each blueprint is a dataclass with the following key fields:
 | `card_uses` / `card_uses_upgrade` | Required for Exhaustive cards. Provides the base number of uses (and optional upgrade delta) that will be rendered via `{uses}`. |
 | `image` | Resource path used when you already have card art on disk. |
 | `inner_image_source` | Optional 500x380 image that will be processed into BaseMod-ready portrait/inner art pairs. |
+| `localizations` | Mapping of language codes (`eng`, `fra`, `zhs`, etc.) to dictionaries describing translated titles/descriptions. Missing languages fall back to the base `title`/`description`. |
 
 You can also call `blueprint.innerCardImage("art/Strike.png")` (or the snake
 case alias `inner_card_image`) to register a source image after initialisation.
@@ -253,10 +254,22 @@ combo = SimpleCardBlueprint(
     ],
     on_draw={"effect": "draw", "amount": 1},
     on_discard={"effect": "energy", "amount": 1},
+    localizations={
+        "fra": {
+            "title": "Combo d'âme",
+            "description": "Gagnez {block} Block. Appliquez {secondary} Faiblesse.",
+        }
+    },
 )
 
 PROJECT.add_simple_card(combo)
 ```
+
+Each localisation entry accepts optional `upgrade_description` and
+`extended_description` fields. Placeholder tokens (`{damage}`, `{block}`,
+`{secondary}`, etc.) are automatically converted into the appropriate Slay the
+Spire dynamic markers (for example `!D!`, `!B!`, `!M2!`) when localisation files
+are generated.
 
 When registered, the blueprint generates a full `CustomCard` subclass, wires the
 correct BaseMod/StSLib actions (`DamageAction`, `GainBlockAction`,

@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
+import re
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from plugins import PLUGIN_MANAGER
@@ -169,6 +171,26 @@ class EffectSpec:
     callback: Optional[Callable[[object, object, Optional[object], int], None]] = None
 
 
+@dataclass(frozen=True)
+class CardLocalizationEntry:
+    """Container describing per-language localisation overrides."""
+
+    title: Optional[str] = None
+    description: Optional[str] = None
+    upgrade_description: Optional[str] = None
+    extended_description: Tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True)
+class ResolvedCardLocalization:
+    """Localisation payload ready to be written to cards.json."""
+
+    title: str
+    description: str
+    upgrade_description: str
+    extended_description: Tuple[str, ...] = field(default_factory=tuple)
+
+
 def register_keyword_placeholder(keyword: str, token: str) -> None:
     """Register ``token`` as the placeholder for ``keyword`` descriptions."""
 
@@ -247,6 +269,166 @@ def _compute_placeholders(keywords: Sequence[str]) -> Dict[str, str]:
         if token:
             placeholders[keyword] = token
     return placeholders
+
+
+def _normalise_language_code(language: Optional[str]) -> str:
+    if language is None:
+        return ""
+    if not isinstance(language, str):
+        raise BaseModBootstrapError("Language codes must be strings.")
+    cleaned = language.strip().lower().replace("-", "_")
+    if not cleaned:
+        raise BaseModBootstrapError("Language codes must be non-empty strings.")
+    return cleaned
+
+
+def _clean_optional_string(value: Optional[Any]) -> Optional[str]:
+    if value is None:
+        return None
+    return str(value).strip()
+
+
+def _normalise_extended_description(value: Any) -> Tuple[str, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, str):
+        return (value.strip(),)
+    if isinstance(value, Sequence):
+        return tuple(str(item).strip() for item in value if item is not None)
+    raise BaseModBootstrapError(
+        "Extended descriptions must be strings or iterables of strings."
+    )
+
+
+def _coerce_localization_entry(value: Any) -> CardLocalizationEntry:
+    if isinstance(value, CardLocalizationEntry):
+        entry = value
+    elif isinstance(value, Mapping):
+        entry = CardLocalizationEntry(
+            title=_clean_optional_string(
+                value.get("title")
+                or value.get("name")
+                or value.get("TITLE")
+                or value.get("NAME")
+            ),
+            description=_clean_optional_string(
+                value.get("description")
+                or value.get("text")
+                or value.get("DESCRIPTION")
+            ),
+            upgrade_description=_clean_optional_string(
+                value.get("upgrade_description")
+                or value.get("UPGRADE_DESCRIPTION")
+            ),
+            extended_description=_normalise_extended_description(
+                value.get("extended_description")
+                or value.get("EXTENDED_DESCRIPTION")
+            ),
+        )
+    elif isinstance(value, str):
+        entry = CardLocalizationEntry(description=value.strip())
+    else:
+        raise BaseModBootstrapError(
+            "Localisation entries must be mappings, strings or CardLocalizationEntry instances."
+        )
+    return CardLocalizationEntry(
+        title=_clean_optional_string(entry.title),
+        description=_clean_optional_string(entry.description),
+        upgrade_description=_clean_optional_string(entry.upgrade_description),
+        extended_description=tuple(
+            item for item in _normalise_extended_description(entry.extended_description)
+        ),
+    )
+
+
+def _normalise_localisations(
+    entries: Mapping[str, Any]
+) -> Mapping[str, CardLocalizationEntry]:
+    if not isinstance(entries, Mapping):
+        raise BaseModBootstrapError("'localizations' must be supplied as a mapping of language to entries.")
+    normalised: Dict[str, CardLocalizationEntry] = {}
+    for language, entry in entries.items():
+        code = _normalise_language_code(language)
+        normalised[code] = _coerce_localization_entry(entry)
+    return normalised
+
+
+def _merge_localization_entries(
+    base: CardLocalizationEntry, override: Optional[CardLocalizationEntry]
+) -> CardLocalizationEntry:
+    if override is None:
+        return base
+    extended = override.extended_description or base.extended_description
+    return CardLocalizationEntry(
+        title=override.title or base.title,
+        description=override.description or base.description,
+        upgrade_description=override.upgrade_description
+        or base.upgrade_description
+        or override.description
+        or base.description,
+        extended_description=tuple(extended),
+    )
+
+
+_PLACEHOLDER_PATTERN = re.compile(r"\{([^{}]+)\}")
+
+
+def _localisation_placeholder_mapping(
+    blueprint: "SimpleCardBlueprint",
+) -> Mapping[str, str]:
+    value_token = {
+        "damage": "!D!",
+        "block": "!B!",
+        "magic": "!M!",
+    }.get(blueprint.value_field, "!M!")
+    mapping: Dict[str, str] = {
+        "value": value_token,
+        "amount": value_token,
+        "damage": "!D!",
+        "block": "!B!",
+        "magic": "!M!",
+        "secondary": "!M2!",
+    }
+    for key, token in blueprint._placeholders.items():
+        mapping[_normalise(key)] = token
+    mapping.setdefault("uses", blueprint._placeholders.get("uses", "{uses}"))
+    return mapping
+
+
+def _convert_description_for_localization(
+    blueprint: "SimpleCardBlueprint", template: Optional[str]
+) -> str:
+    if not template:
+        return ""
+    if "{" not in template:
+        return template
+    mapping = _localisation_placeholder_mapping(blueprint)
+
+    def repl(match: re.Match[str]) -> str:
+        key = _normalise(match.group(1))
+        token = mapping.get(key)
+        if token is None:
+            token = mapping.get("value", match.group(0))
+        return token
+
+    return _PLACEHOLDER_PATTERN.sub(repl, template)
+
+
+def _resolve_localization_entry(
+    blueprint: "SimpleCardBlueprint", entry: CardLocalizationEntry
+) -> ResolvedCardLocalization:
+    description = entry.description or blueprint.description
+    upgrade = entry.upgrade_description or entry.description or description
+    resolved = ResolvedCardLocalization(
+        title=(entry.title or blueprint.title or "").strip(),
+        description=_convert_description_for_localization(blueprint, description),
+        upgrade_description=_convert_description_for_localization(blueprint, upgrade),
+        extended_description=tuple(
+            _convert_description_for_localization(blueprint, text)
+            for text in entry.extended_description
+        ),
+    )
+    return resolved
 
 
 def _ensure_tuple(value: Sequence[Any] | Any) -> Tuple[Any, ...]:
@@ -412,11 +594,15 @@ class SimpleCardBlueprint:
     effects: Sequence[Any] = field(default_factory=tuple)
     on_draw: Sequence[Any] = field(default_factory=tuple)
     on_discard: Sequence[Any] = field(default_factory=tuple)
+    localizations: Mapping[str, CardLocalizationEntry] = field(default_factory=dict)
     _inner_image_result: Optional[InnerCardImageResult] = field(default=None, init=False, repr=False)
     _resolved_effects: Tuple[EffectSpec, ...] = field(default_factory=tuple, init=False, repr=False)
     _on_draw_effects: Tuple[EffectSpec, ...] = field(default_factory=tuple, init=False, repr=False)
     _on_discard_effects: Tuple[EffectSpec, ...] = field(default_factory=tuple, init=False, repr=False)
     _placeholders: Mapping[str, str] = field(default_factory=dict, init=False, repr=False)
+    _normalised_localizations: Mapping[str, CardLocalizationEntry] = field(
+        default_factory=dict, init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "identifier", self.identifier)
@@ -546,6 +732,17 @@ class SimpleCardBlueprint:
             placeholders.setdefault("uses", KEYWORD_PLACEHOLDERS.get("exhaustive", "!stslib:ex!"))
         object.__setattr__(self, "_placeholders", placeholders)
 
+        object.__setattr__(
+            self,
+            "_normalised_localizations",
+            _normalise_localisations(self.localizations or {}),
+        )
+        object.__setattr__(
+            self,
+            "localizations",
+            MappingProxyType(dict(self._normalised_localizations)),
+        )
+
         resolved_effects: List[EffectSpec] = []
         if self.card_type != "ATTACK" and self.effect:
             primary_field = _EFFECT_VALUE_FIELD[self.effect]
@@ -614,6 +811,34 @@ class SimpleCardBlueprint:
             object.__setattr__(self, "_inner_image_result", result)
             object.__setattr__(self, "image", result.resource_path)
         return self._inner_image_result
+
+    # ------------------------------------------------------------------
+    # localisation helpers
+    # ------------------------------------------------------------------
+    def localization_languages(self, default_language: Optional[str] = "eng") -> Tuple[str, ...]:
+        """Return the languages that should be emitted for this blueprint."""
+
+        languages = set(self._normalised_localizations)
+        if default_language:
+            languages.add(_normalise_language_code(default_language))
+        return tuple(sorted(languages))
+
+    def resolve_localization(
+        self,
+        language: str,
+        *,
+        default_language: Optional[str] = "eng",
+    ) -> Optional[ResolvedCardLocalization]:
+        """Return the resolved localisation payload for ``language``."""
+
+        code = _normalise_language_code(language)
+        default_code = _normalise_language_code(default_language) if default_language else None
+        override = self._normalised_localizations.get(code)
+        if override is None and code != default_code:
+            return None
+        base = CardLocalizationEntry(title=self.title, description=self.description)
+        entry = _merge_localization_entries(base, override) if override else base
+        return _resolve_localization_entry(self, entry)
 
 
 class SimpleCardFactory:
@@ -1034,17 +1259,46 @@ def register_simple_card(project: "ModProject", blueprint: SimpleCardBlueprint) 
     project.add_card(blueprint.identifier, factory, basic=blueprint.starter)
 
 
+def build_card_localizations(
+    blueprints: Iterable[SimpleCardBlueprint],
+    *,
+    default_language: str = "eng",
+) -> Dict[str, Dict[str, Any]]:
+    """Return cards.json payloads grouped by language for ``blueprints``."""
+
+    aggregated: Dict[str, Dict[str, Any]] = {}
+    default_code = _normalise_language_code(default_language) if default_language else ""
+    for blueprint in blueprints:
+        for language in blueprint.localization_languages(default_code or None):
+            resolved = blueprint.resolve_localization(language, default_language=default_code or None)
+            if resolved is None:
+                continue
+            card_entry: Dict[str, Any] = {
+                "NAME": resolved.title,
+                "DESCRIPTION": resolved.description,
+                "UPGRADE_DESCRIPTION": resolved.upgrade_description,
+            }
+            if resolved.extended_description:
+                card_entry["EXTENDED_DESCRIPTION"] = list(resolved.extended_description)
+            aggregated.setdefault(language, {})[blueprint.identifier] = card_entry
+    return aggregated
+
+
 PLUGIN_MANAGER.expose("SimpleCardBlueprint", SimpleCardBlueprint)
 PLUGIN_MANAGER.expose("register_simple_card", register_simple_card)
 PLUGIN_MANAGER.expose("register_keyword_placeholder", register_keyword_placeholder)
 PLUGIN_MANAGER.expose("keyword_placeholders", KEYWORD_PLACEHOLDERS)
+PLUGIN_MANAGER.expose("build_card_localizations", build_card_localizations)
 PLUGIN_MANAGER.expose_module("modules.basemod_wrapper.cards", alias="basemod_cards")
 
 __all__ = [
     "ActionSpec",
     "EffectSpec",
+    "CardLocalizationEntry",
+    "ResolvedCardLocalization",
     "SimpleCardBlueprint",
     "SimpleCardFactory",
     "register_simple_card",
     "register_keyword_placeholder",
+    "build_card_localizations",
 ]
