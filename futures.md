@@ -57,3 +57,7 @@ Teach ``ModProject.scaffold`` to generate localisation folders for multiple lang
 ## Asset templating helpers
 
 Provide optional PNG placeholders (solid alpha grids) whenever ``scaffold`` creates texture slots. Usage: add an ``include_placeholders: bool`` flag that writes simple coloured PNGs using Pillow to make generated mods immediately runnable even before artists deliver final assets.
+
+## Plugin attribute diff subscriptions
+
+Build a watcher atop ``repository_attributes`` that emits change events whenever modules expose new callables or state. Usage: extend ``PLUGIN_MANAGER`` with a ``subscribe_to_exports`` helper that hands plugins a diff of newly discovered attributes so tooling can hot-reload capabilities without rescanning the entire manifest.

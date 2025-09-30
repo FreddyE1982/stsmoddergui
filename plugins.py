@@ -48,6 +48,11 @@ class _LazyModuleProxy:
             self._module = import_module(self._module_name)
         return self._module
 
+    def load(self) -> Any:
+        """Return the underlying module, importing it on demand."""
+
+        return self._load()
+
     def __getattr__(self, item: str) -> Any:
         return getattr(self._load(), item)
 
@@ -80,6 +85,54 @@ class _RepositoryNamespace:
 
     def items(self):
         return self._modules.items()
+
+
+class _RepositoryAttributeManifest:
+    """Materialises public attributes for each repository module on demand."""
+
+    def __init__(self, modules: Dict[str, _LazyModuleProxy]) -> None:
+        self._modules = modules
+        self._cache: Dict[str, MappingProxyType] = {}
+
+    def _materialise(self, module_name: str) -> MappingProxyType:
+        if module_name not in self._modules:
+            raise KeyError(module_name)
+        if module_name not in self._cache:
+            module = self._modules[module_name].load()
+            export: Dict[str, Any] = {
+                key: getattr(module, key)
+                for key in dir(module)
+                if key != "__builtins__"
+            }
+            self._cache[module_name] = MappingProxyType(export)
+        return self._cache[module_name]
+
+    def __contains__(self, module_name: str) -> bool:  # pragma: no cover - trivial
+        return module_name in self._modules
+
+    def __getitem__(self, module_name: str) -> MappingProxyType:
+        return self._materialise(module_name)
+
+    def get(self, module_name: str, default: Optional[Any] = None) -> MappingProxyType:
+        try:
+            return self._materialise(module_name)
+        except KeyError:
+            if default is not None:
+                return default
+            raise
+
+    def modules(self) -> Iterable[str]:
+        return self._modules.keys()
+
+    def items(self):  # pragma: no cover - simple delegation
+        for module_name in sorted(self._modules):
+            yield module_name, self._materialise(module_name)
+
+    def snapshot(self) -> MappingProxyType:
+        """Return an immutable mapping of module names to public attributes."""
+
+        manifest = {name: self._materialise(name) for name in self._modules}
+        return MappingProxyType(manifest)
 
 
 class PluginManager:
@@ -241,6 +294,7 @@ PLUGIN_MANAGER.expose_module("plugins")
 _REPO_ROOT = Path(__file__).resolve().parent
 _MODULE_PROXIES = _discover_repository_modules(_REPO_ROOT)
 _REPOSITORY_NAMESPACE = _RepositoryNamespace(_MODULE_PROXIES)
+_REPOSITORY_ATTRIBUTE_MANIFEST = _RepositoryAttributeManifest(_MODULE_PROXIES)
 
 for module_name in _MODULE_PROXIES:
     if module_name in PLUGIN_MANAGER.exposed:
@@ -248,5 +302,6 @@ for module_name in _MODULE_PROXIES:
     PLUGIN_MANAGER.expose_lazy_module(module_name)
 
 PLUGIN_MANAGER.expose("repository", _REPOSITORY_NAMESPACE)
+PLUGIN_MANAGER.expose("repository_attributes", _REPOSITORY_ATTRIBUTE_MANIFEST)
 
 __all__ = ["PLUGIN_MANAGER", "PluginManager", "PluginError", "PluginRecord"]
