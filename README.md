@@ -15,6 +15,7 @@ directly to Python developers.
 - Declarative `SimpleCardBlueprint` helper that builds everyday attacks, skills and powers without boilerplate.
 - Turn-key bundling through `compileandbundle` which writes ModTheSpire manifests, Java enum patches and copies Python assets.
 - Forward-looking roadmap documented in `futures.md`.
+- Built-in deck analytics helper that converts validation snapshots into tables and JSON artefacts for dashboards and plugins.
 
 ## Getting started
 

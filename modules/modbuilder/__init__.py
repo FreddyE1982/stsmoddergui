@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from .deck import Deck, DeckStatistics
+from .deck import Deck, DeckStatistics, build_statistics_from_cards
+from .analytics import DeckAnalytics, DeckAnalyticsRow, build_deck_analytics, tabulate_blueprints
 from .character import (
     CHARACTER_VALIDATION_HOOK,
     Character,
@@ -14,6 +15,11 @@ from plugins import PLUGIN_MANAGER
 
 PLUGIN_MANAGER.expose("Deck", Deck)
 PLUGIN_MANAGER.expose("DeckStatistics", DeckStatistics)
+PLUGIN_MANAGER.expose("build_statistics_from_cards", build_statistics_from_cards)
+PLUGIN_MANAGER.expose("DeckAnalytics", DeckAnalytics)
+PLUGIN_MANAGER.expose("DeckAnalyticsRow", DeckAnalyticsRow)
+PLUGIN_MANAGER.expose("build_deck_analytics", build_deck_analytics)
+PLUGIN_MANAGER.expose("tabulate_blueprints", tabulate_blueprints)
 PLUGIN_MANAGER.expose("Character", Character)
 PLUGIN_MANAGER.expose("CharacterStartConfig", CharacterStartConfig)
 PLUGIN_MANAGER.expose("CharacterImageConfig", CharacterImageConfig)
@@ -26,6 +32,11 @@ PLUGIN_MANAGER.expose_module("modules.modbuilder")
 __all__ = [
     "Deck",
     "DeckStatistics",
+    "build_statistics_from_cards",
+    "DeckAnalytics",
+    "DeckAnalyticsRow",
+    "build_deck_analytics",
+    "tabulate_blueprints",
     "Character",
     "CharacterStartConfig",
     "CharacterImageConfig",

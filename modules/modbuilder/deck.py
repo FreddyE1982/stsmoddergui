@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Dict, Iterable, Iterator, List, Mapping, Tuple
+from typing import Dict, Iterable, Iterator, List, Mapping, Sequence, Tuple
 
 from modules.basemod_wrapper.cards import SimpleCardBlueprint
 
@@ -89,13 +89,7 @@ class Deck(metaclass=DeckMeta):
         results without worrying about accidental mutation.
         """
 
-        identifier_counts = Counter(cls.card_identifiers())
-        rarity_counts = Counter(card.rarity.upper() for card in cls._card_sequence)
-        return DeckStatistics(
-            total_cards=len(cls._card_sequence),
-            identifier_counts=MappingProxyType(dict(identifier_counts)),
-            rarity_counts=MappingProxyType(dict(rarity_counts)),
-        )
+        return build_statistics_from_cards(cls._card_sequence)
 
     @classmethod
     def card_identifiers(cls) -> List[str]:
@@ -115,6 +109,26 @@ class Deck(metaclass=DeckMeta):
 
 
 __all__ = ["Deck"]
+
+
+def build_statistics_from_cards(
+    cards: Sequence[SimpleCardBlueprint],
+) -> "DeckStatistics":
+    """Return :class:`DeckStatistics` for an arbitrary card sequence.
+
+    The helper mirrors :meth:`Deck.statistics` but operates on any iterable of
+    :class:`SimpleCardBlueprint` instances.  It keeps the return value immutable
+    so the analytics layer and plugins can safely cache or serialise the
+    results.
+    """
+
+    identifier_counts = Counter(card.identifier for card in cards)
+    rarity_counts = Counter(card.rarity.upper() for card in cards)
+    return DeckStatistics(
+        total_cards=len(cards),
+        identifier_counts=MappingProxyType(dict(identifier_counts)),
+        rarity_counts=MappingProxyType(dict(rarity_counts)),
+    )
 
 
 @dataclass(frozen=True)
@@ -152,3 +166,4 @@ class DeckStatistics:
 
 
 __all__.append("DeckStatistics")
+__all__.append("build_statistics_from_cards")
