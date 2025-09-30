@@ -85,3 +85,12 @@ resulting auto-generated card classes plus resolved resource paths. Usage:
 `python -m modules.basemod_wrapper.cards preview blueprint.json` would process
 blueprints, emit a tabular summary of costs/keywords and highlight any missing
 art assets before bundling.
+
+## Keyword timeline hooks
+
+Expand the newly introduced `Keyword` scheduler so keywords can subscribe to
+additional combat lifecycle events (enemy intent changes, card draws, shuffles).
+Usage: expose optional callbacks on the base class (``on_draw``, ``on_intent``)
+that the scheduler wires into BaseMod subscribers, and surface the registration
+points on ``PLUGIN_MANAGER`` so third-party extensions can augment the event
+matrix without monkeypatching the core implementation.

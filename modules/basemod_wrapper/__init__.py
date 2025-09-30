@@ -7,6 +7,13 @@ from typing import Any, Dict, Iterable, Optional, Sequence
 from .loader import ensure_basemod_environment, ensure_jpype
 from .project import BundleOptions, ModProject, ProjectLayout, compileandbundle, create_project
 from .cards import SimpleCardBlueprint, register_simple_card
+from .keywords import (
+    KEYWORD_REGISTRY,
+    Keyword,
+    KeywordRegistry,
+    apply_persistent_card_changes,
+    keyword_scheduler,
+)
 
 ensure_jpype()
 from .proxy import JavaPackageWrapper, create_package_wrapper
@@ -254,6 +261,11 @@ class UnifiedSpireAPI:
                 upgrader(card, int(upgrade))
             handled = True
         if not handled:
+            metadata = KEYWORD_REGISTRY.resolve(keyword)
+            if metadata is not None:
+                KEYWORD_REGISTRY.attach_to_card(card, keyword, amount=amount, upgrade=upgrade)
+                handled = True
+        if not handled:
             raise KeyError(f"Unknown keyword '{keyword}'.")
 
     def keyword_fields(self) -> Dict[str, str]:
@@ -392,4 +404,9 @@ __all__ = [
     "compileandbundle",
     "SimpleCardBlueprint",
     "register_simple_card",
+    "Keyword",
+    "KeywordRegistry",
+    "KEYWORD_REGISTRY",
+    "keyword_scheduler",
+    "apply_persistent_card_changes",
 ]
