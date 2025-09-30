@@ -161,6 +161,128 @@ class RevenantStrike(basemod.abstracts.CustomCard):
 
 Because the wrapper already exposes all Java packages, card code reads like a native Python module.
 
+## One-liner cards via simple blueprints
+
+When you only need straightforward cards (deal damage, gain Block, apply a debuff or grant a power) the
+`SimpleCardBlueprint` helper removes all boilerplate. Each blueprint captures the fields you would normally enter
+in the custom card constructor:
+
+1. `title` — the display name of the card.
+1. `description` — freeform text. The placeholders `{damage}`, `{block}`, `{magic}` or `{value}` will be replaced
+   with the configured numbers so you do not have to hardcode them.
+2. `card_type` — one of `attack`, `skill` or `power`.
+3. `target` — `enemy`, `all_enemies`, `self`, `self_and_enemy` or `none`.
+4. `effect` — for skills and powers choose a standard keyword: `block`, `draw`, `energy`, `strength`, `dexterity`,
+   `artifact`, `focus`, `weak`, `vulnerable`, `frail` or `poison`.
+5. `value` — how much damage, Block or power to grant. `upgrade_value` increases the number on upgrade.
+6. `color_id` — optional. Leave unset to use the project colour or specify `RED`, `GREEN`, `BLUE`, `PURPLE`, etc.
+7. `starter` — flag the card as part of the basic card pool.
+8. `rarity` — `basic`, `common`, `uncommon`, `rare`, `special` or `curse`.
+
+### Attack examples
+
+```python
+from modules.basemod_wrapper import SimpleCardBlueprint
+
+# Single target strike.
+strike = SimpleCardBlueprint(
+    identifier="BuddyStrike",
+    title="Buddy Strike",
+    description="Deal {damage} damage.",
+    cost=1,
+    card_type="attack",
+    target="enemy",
+    rarity="common",
+    value=8,
+    upgrade_value=3,
+    image=PROJECT.resource_path("images/cards/buddy_strike.png"),
+    starter=True,
+)
+
+# All enemy swipe.
+wide_slash = SimpleCardBlueprint(
+    identifier="BuddyWhirl",
+    title="Buddy Whirl",
+    description="Deal {damage} damage to ALL enemies.",
+    cost=2,
+    card_type="attack",
+    target="all_enemies",
+    rarity="uncommon",
+    value=6,
+    upgrade_value=2,
+    attack_effect="slash_horizontal",
+    image=PROJECT.resource_path("images/cards/buddy_whirl.png"),
+)
+
+PROJECT.add_simple_card(strike)
+PROJECT.add_simple_card(wide_slash)
+```
+
+### Skill variations
+
+```python
+# Gain Block.
+guard = SimpleCardBlueprint(
+    identifier="BuddyGuard",
+    title="Buddy Guard",
+    description="Gain {block} Block.",
+    cost=1,
+    card_type="skill",
+    target="self",
+    effect="block",
+    rarity="common",
+    value=12,
+    upgrade_value=4,
+    image=PROJECT.resource_path("images/cards/buddy_guard.png"),
+)
+
+# Apply Weak to an enemy.
+glare = SimpleCardBlueprint(
+    identifier="BuddyGlare",
+    title="Buddy Glare",
+    description="Apply {magic} Weak.",
+    cost=1,
+    card_type="skill",
+    target="enemy",
+    effect="weak",
+    rarity="uncommon",
+    value=2,
+    upgrade_value=1,
+    image=PROJECT.resource_path("images/cards/buddy_glare.png"),
+)
+
+# Hand the blueprints to the project.
+PROJECT.add_simple_card(guard)
+PROJECT.add_simple_card(glare)
+```
+
+### Power setup
+
+```python
+fortify = SimpleCardBlueprint(
+    identifier="BuddyFortify",
+    title="Buddy Fortify",
+    description="At the start of your turn, gain {magic} Strength.",
+    cost=2,
+    card_type="power",
+    target="self",
+    effect="strength",
+    rarity="rare",
+    value=2,
+    upgrade_value=1,
+    image=PROJECT.resource_path("images/cards/buddy_fortify.png"),
+)
+
+# Powers automatically use ApplyPowerAction and understand base-game keywords.
+PROJECT.add_simple_card(fortify)
+```
+
+Each `SimpleCardBlueprint` automatically constructs the `CustomCard` subclass, routes the effect through the
+appropriate `DamageAction`, `GainBlockAction` or `ApplyPowerAction`, and registers the card via `BaseMod.addCard`.
+If you pass `starter=True` the card also lands in the colour's basic pool. For colours outside your mod project set
+`color_id` to one of the base game enums (e.g. `RED` for the Ironclad). Whenever you need more exotic behaviour you
+can still hand craft a class — the blueprints are intentionally small wrappers for the common cases.
+
 ### 5. Load the mod in-game
 
 Your `entrypoint.py` already calls `enable_runtime()`, which in turn registers every BaseMod hook. Import the entrypoint in your development REPL or point your ModTheSpire bootstrapper at it; the character, colour and cards become available instantly.
