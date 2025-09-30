@@ -6,6 +6,7 @@ from typing import Any, Dict, Iterable, Optional, Sequence
 
 from .loader import ensure_basemod_environment, ensure_jpype
 from .project import BundleOptions, ModProject, ProjectLayout, compileandbundle, create_project
+from .cards import SimpleCardBlueprint, register_simple_card
 
 ensure_jpype()
 from .proxy import JavaPackageWrapper, create_package_wrapper
@@ -337,6 +338,8 @@ PLUGIN_MANAGER.expose("basemod_dependency_jars", _ENVIRONMENT.dependency_jars)
 PLUGIN_MANAGER.expose("basemod_classpath", _ENVIRONMENT.classpath)
 PLUGIN_MANAGER.expose("create_project", create_project)
 PLUGIN_MANAGER.expose("compileandbundle", compileandbundle)
+PLUGIN_MANAGER.expose("SimpleCardBlueprint", SimpleCardBlueprint)
+PLUGIN_MANAGER.expose("register_simple_card", register_simple_card)
 PLUGIN_MANAGER.expose("ModProject", ModProject)
 PLUGIN_MANAGER.expose("ProjectLayout", ProjectLayout)
 PLUGIN_MANAGER.expose("BundleOptions", BundleOptions)
@@ -357,4 +360,6 @@ __all__ = [
     "BundleOptions",
     "create_project",
     "compileandbundle",
+    "SimpleCardBlueprint",
+    "register_simple_card",
 ]

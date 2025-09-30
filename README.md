@@ -12,6 +12,7 @@ directly to Python developers.
 - Repository wide plugin manager that exposes every module to third party
   extensions.
 - High level project system for declaring characters, card colours and cards via `ModProject`.
+- Declarative `SimpleCardBlueprint` helper that builds everyday attacks, skills and powers without boilerplate.
 - Turn-key bundling through `compileandbundle` which writes ModTheSpire manifests, Java enum patches and copies Python assets.
 - Forward-looking roadmap documented in `futures.md`.
 

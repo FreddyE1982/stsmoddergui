@@ -26,6 +26,12 @@ Cache inspected Java method signatures to speed up repeated calls to heavily
 used BaseMod hooks.  Usage: extend ``JavaCallableWrapper`` with a lookup table so
 plugins do not incur repeated reflection overhead.
 
+## Advanced simple card effects
+
+Extend `SimpleCardBlueprint` with multi-target power routing, secondary magic numbers and optional follow-up actions.
+Usage: allow blueprint authors to declare additional `effects` in sequence, plus hooks for `on_draw` and
+`on_discard` so heavily scripted cards can still be described declaratively.
+
 ## LimeWire decryption pipeline
 
 Build a Python implementation of the LimeWire content decrypter so that the encrypted jars downloaded during bundling can be unwrapped automatically. Usage: mirror the `GE#getContentItemDecryptionKeys` flow in Python, deriving AES keys from the passphrase and decrypting the AES-CTR stream into usable game jars.

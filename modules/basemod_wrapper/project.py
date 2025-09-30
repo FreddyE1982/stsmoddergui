@@ -8,13 +8,16 @@ import subprocess
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence, Tuple, Type
 
 from importlib import import_module
 from functools import lru_cache
 
 from .loader import BaseModBootstrapError, ensure_dependency_classpath
 from plugins import PLUGIN_MANAGER
+
+if TYPE_CHECKING:  # pragma: no cover - typing helper
+    from .cards import SimpleCardBlueprint
 
 ColorTuple = Tuple[float, float, float, float]
 
@@ -291,6 +294,13 @@ class ModProject:
         if basic:
             self.basic_cards.add(identifier)
 
+    def add_simple_card(self, blueprint: "SimpleCardBlueprint") -> None:
+        """Create and register a simple card blueprint against the project."""
+
+        from .cards import register_simple_card
+
+        register_simple_card(self, blueprint)
+
     def card(self, identifier: str, *, basic: bool = False) -> Callable[[Callable[[], object]], Callable[[], object]]:
         def decorator(factory: Callable[[], object]) -> Callable[[], object]:
             self.add_card(identifier, factory, basic=basic)
@@ -315,6 +325,15 @@ class ModProject:
     # ------------------------------------------------------------------
     # runtime integration
     # ------------------------------------------------------------------
+    def runtime_color_enum(self) -> object:
+        """Return the registered card colour for runtime factories."""
+
+        if self._color_enum is None:
+            raise BaseModBootstrapError(
+                "Colour not initialised. Call enable_runtime() before creating cards."
+            )
+        return self._color_enum
+
     def scaffold(
         self,
         base_directory: Path,
