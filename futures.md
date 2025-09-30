@@ -80,3 +80,12 @@ Usage: expose optional callbacks on the base class (``on_draw``, ``on_intent``)
 that the scheduler wires into BaseMod subscribers, and surface the registration
 points on ``PLUGIN_MANAGER`` so third-party extensions can augment the event
 matrix without monkeypatching the core implementation.
+
+## Character builder scaffolding
+
+Teach the high-level `Character` helper to generate self-contained runtime
+packages so that mods assembled through the declarative decks API can bundle a
+ready-to-run `project.py`. Usage: extend `Character.createMod` with an optional
+`generate_python_package` flag that writes a minimal package embedding the
+registered decks and characters, ensuring teams without an existing Python code
+base can still rely on the automated bundler.
