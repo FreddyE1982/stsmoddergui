@@ -4,11 +4,18 @@ This walkthrough leans entirely on the repository's highest level helpers – `D
 
 ## 1. Define the starter and unlockable decks
 
-1. Import the turnkey helpers:
+1. Import the turnkey helpers and keep the card art locations handy. Every
+   blueprint needs an inner card illustration so the automatic asset pipeline
+   can bake the portrait and small variants. The images must be **exactly**
+   500x380 PNG files.
 
    ```python
+   from pathlib import Path
+
    from modules.modbuilder import Deck
    from modules.basemod_wrapper import SimpleCardBlueprint
+
+   CARD_ART = Path("resources/Buddy/images/cards/inner")
    ```
 
 2. Model each deck as a subclass of `Deck` and register cards with `Deck.addCard`. Because `Deck` keeps the registration order, the starter draw pile will match your declarations exactly.
@@ -29,7 +36,7 @@ This walkthrough leans entirely on the repository's highest level helpers – `D
            value=6,
            upgrade_value=3,
            starter=True,
-       )
+       ).innerCardImage(str(CARD_ART / "BuddyStrike.png"))
    )
 
    StarterDeck.addCard(
@@ -45,7 +52,7 @@ This walkthrough leans entirely on the repository's highest level helpers – `D
            value=5,
            upgrade_value=3,
            starter=True,
-       )
+       ).innerCardImage(str(CARD_ART / "BuddyDefend.png"))
    )
 
    class Unlockables(Deck):
@@ -62,11 +69,13 @@ This walkthrough leans entirely on the repository's highest level helpers – `D
            rarity="rare",
            value=14,
            upgrade_value=6,
-       )
+       ).innerCardImage(str(CARD_ART / "BuddyFinisher.png"))
    )
    ```
 
-3. Use `Deck.statistics()` whenever you need to double-check rarity spread or duplicates without writing extra tooling:
+3. Use `Deck.statistics()` whenever you need to double-check rarity spread or duplicates without writing extra tooling. Once
+   the inner card image is registered, the bundler derives the card frame, small art and portrait files automatically and caches
+   the results in `.inner_card_manifest.json` so reruns are instant.
 
    ```python
    print(StarterDeck.statistics())
@@ -110,14 +119,21 @@ This walkthrough leans entirely on the repository's highest level helpers – `D
                shoulder1="resources/Buddy/images/character/shoulder1.png",
                shoulder2="resources/Buddy/images/character/shoulder2.png",
                corpse="resources/Buddy/images/character/corpse.png",
+               staticspineanimation="resources/Buddy/images/character/idle.png",
            )
    ```
 
-2. Let `Character.collect_cards` and `Character.validate` do the heavy lifting. They ensure the decks conform to rarity targets and that every blueprint has matching art before any bundling happens, so there is no need for manual sanity checks.
+2. Let `Character.collect_cards` and `Character.validate` do the heavy lifting. They ensure the decks conform to rarity targets
+   and that every blueprint has matching art before any bundling happens. When `staticspineanimation` is set, the helper also
+   generates the matching `.atlas` and `.json` skeleton files next to the PNG and wires them into the runtime automatically, so
+   you can ship a static pose without touching Spine.
 
 ## 3. Bundle a runnable mod package
 
-1. Create directories for Python scripts and assets. Make sure the resource tree mirrors the paths referenced in `CharacterColorConfig` and `SimpleCardBlueprint.image`.
+1. Create directories for Python scripts and assets. Make sure the resource tree mirrors the paths referenced in
+   `CharacterColorConfig`, `CharacterImageConfig.staticspineanimation`, and the `innerCardImage` calls. Every inner art PNG
+   should live under `resources/Buddy/images/cards/inner`, while the static character pose sits at
+   `resources/Buddy/images/character/idle.png` so the auto-generated atlas and skeleton land alongside it.
 2. Call `Buddy.createMod(destination, assets_root=..., python_source=...)`. Use the keyword arguments instead of lower-level project helpers – `createMod` wires decks, character blueprint, and bundling options in one go.
 
    ```python
