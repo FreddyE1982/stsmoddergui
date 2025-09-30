@@ -1,30 +1,77 @@
 # BaseMod Python Wrapper
 
-The `modules.basemod_wrapper` package gives Python modders fully automated access to [BaseMod](https://github.com/daviscook477/BaseMod), StSLib and the ModTheSpire toolchain. Importing the package spins up JPype, downloads the latest jars, exposes the Java namespaces and registers every public object with the repository wide plugin system. On top of the raw APIs the wrapper offers a high level project builder that handles runtime registration, directory scaffolding and ModTheSpire packaging without ever writing Java or touching the BaseMod hook machinery yourself.
+The `modules.basemod_wrapper` package embeds the whole Slay the Spire modding
+stack (BaseMod, StSLib and ModTheSpire) behind a Python-first façade. Importing
+it spins up JPype, fetches the Java dependencies, exposes every package through
+friendly dotted access and registers the entire module surface with the
+repository wide plugin system. The goal is simple: write Slay the Spire mods in
+idiomatic Python without touching JVM bootstrap code.
 
 ```python
-from modules.basemod_wrapper import basemod
+from modules.basemod_wrapper import basemod, create_project
 
-# All Java packages are available through pleasant dotted access.
-basemod.BaseMod.addKeyword(
-    "my_mod",
-    "SOULBURN",
-    ["soulburn"],
-    "Loses X HP at start of turn."
+# Subscribe Python callables directly to BaseMod hooks.
+basemod.BaseMod.subscribe(lambda *args: print("Hook invoked!"))
+
+# Prepare a high-level project container that mirrors BaseMod concepts.
+project = create_project(
+    mod_id="revenant",
+    name="The Revenant",
+    author="OldBuddy",
+    description="Soul-fuelled spectre who drains the Spire.",
 )
 ```
 
-The wrapper converts Python callables to functional interfaces automatically, so you can hand plain functions or lambdas to BaseMod without manual proxy classes.
+## Exported surface
 
-## Repository-wide plugin exposure
+Importing `modules.basemod_wrapper` eagerly initialises a
+`BaseModEnvironment`. The following objects become immediately available and
+are also published to the global plugin manager (`plugins.PLUGIN_MANAGER`):
 
-Every module, function and class in the repository is exposed through the global plugin manager. Mod authors or helper utilities can introspect the `PLUGIN_MANAGER.exposed` mapping to obtain handles to the wrapper, the high level project builder or any other subsystem. The plugin namespace also provides a lazily imported view of the entire repository under `plugins.PLUGIN_MANAGER.exposed["repository"]`.
+- `basemod`, `cardcrawl`, `modthespire`, `stslib` and `libgdx`: lazy package
+  wrappers that mirror the JVM namespaces.
+- `spire`: a `UnifiedSpireAPI` façade that bundles common StSLib helpers,
+  keyword utilities and modifier registration.
+- `create_project`, `ModProject`, `ProjectLayout`, `BundleOptions` and
+  `compileandbundle`: a batteries-included workflow for describing colours,
+  characters and cards before bundling them into a ModTheSpire-ready
+  distribution.
+- `SimpleCardBlueprint` and `register_simple_card`: declarative helpers for
+  building everyday cards without hand-written subclasses.
+- `BaseModEnvironment`: access to the resolved dependency jars and default
+  classpath should you need to integrate with custom tooling.
 
-## A full tutorial: ship a custom character + deck
+All of these symbols are exposed to plugins via
+`PLUGIN_MANAGER.expose(...)` so third-party helpers can inspect or extend the
+wrapper without tight coupling.
 
-The following tutorial walks through the whole workflow using only the high level helpers. You will end up with a ModTheSpire-ready bundle containing a new hero, his colour palette and a starter deck. At no point will you touch the `BaseMod.subscribe` plumbing or write Java patches by hand.
+## Boot sequence and dependency handling
 
-### 1. Describe the project
+`ensure_jpype()` is called as soon as the package is imported. If JPype is not
+present it is installed on the fly. The wrapper then downloads (or reuses) the
+BaseMod, ModTheSpire and StSLib jars into the module directory and launches the
+JVM with a sane default classpath. Consumers simply import and go – no manual
+setup of Java paths or environment variables.
+
+## High level workflow
+
+1. **Create a project** via `create_project(...)`. The resulting `ModProject`
+   tracks colours, cards and characters, and can be imported by both build
+   scripts and ModTheSpire entry points.
+2. **Scaffold the file system** with `project.scaffold(...)`. The helper
+   creates a ready-to-edit tree with Python packages, stub entrypoints and
+   resource folders while preserving existing files.
+3. **Define a colour** using `project.define_color(...)` and register cards via
+   `project.card` or `project.add_simple_card`.
+4. **Describe characters** using `CharacterBlueprint` from
+   `modules.basemod_wrapper.project` and attach starting decks plus relics.
+5. **Iterate in a REPL** by calling `project.enable_runtime()` (already done in
+   the generated entrypoint). BaseMod hooks are registered for you so edits only
+   require a reload.
+6. **Bundle for ModTheSpire** through `compileandbundle(project, options)` or
+   by reusing `project.bundle_options_from_layout(layout, ...)`.
+
+### Project scaffolding in practice
 
 ```python
 from modules.basemod_wrapper import create_project
@@ -34,101 +81,37 @@ project = create_project(
     name="The Revenant",
     author="OldBuddy",
     description="Soul-fuelled spectre who drains the Spire.",
-    version="1.0.0",
 )
-```
-
-`ModProject` keeps track of every colour, card and character you define. The object can be imported from both your build scripts and your ModTheSpire entrypoint.
-
-### 2. Let the wrapper scaffold the filesystem
-
-```python
 layout = project.scaffold("/path/to/workspace", package_name="revenant_mod")
+
+# Generated structure (existing files are left untouched):
+# revenant/
+# ├── assets/revenant/images/{cards,character,orbs}/
+# ├── assets/revenant/localizations/eng/cards.json
+# └── python/revenant_mod/{__init__.py,cards/,entrypoint.py,project.py}
 ```
 
-Running `scaffold` creates a ready-to-edit directory tree:
+`project.py` ships with a `PROJECT` singleton and `configure()` stub. Importing
+`entrypoint.py` (the ModTheSpire entry point) calls `enable_runtime()` which in
+turn registers BaseMod listeners, colours and cards.
 
-```
-/path/to/workspace/revenant/
-├── assets/
-│   └── revenant/
-│       ├── images/
-│       │   ├── cards/
-│       │   ├── character/
-│       │   └── orbs/
-│       └── localizations/eng/cards.json
-└── python/
-    └── revenant_mod/
-        ├── __init__.py
-        ├── cards/__init__.py
-        ├── entrypoint.py
-        └── project.py
-```
+## Card authoring options
 
-`project.py` contains a `PROJECT` object and `configure()` function stub where you can define colours, cards and characters. `entrypoint.py` bootstraps the runtime automatically by calling `enable_runtime()` – no manual subscriptions.
+### Full control: custom classes
 
-### 3. Define the card colour and textures
-
-Edit `python/revenant_mod/project.py` and fill the `configure()` function:
+Write traditional subclasses for complex behaviour by leaning on the exposed
+JVM packages:
 
 ```python
-from modules.basemod_wrapper.project import CharacterAssets, CharacterBlueprint
-from .cards.revenant_strike import RevenantStrike
-
-
-def configure() -> None:
-    color = PROJECT.define_color(
-        "REVENANT_PURPLE",
-        card_color=(0.45, 0.15, 0.7, 1.0),
-        trail_color=(0.40, 0.10, 0.65, 1.0),
-        slash_color=(0.55, 0.25, 0.85, 1.0),
-        attack_bg=PROJECT.resource_path("images/cards/attack.png"),
-        skill_bg=PROJECT.resource_path("images/cards/skill.png"),
-        power_bg=PROJECT.resource_path("images/cards/power.png"),
-        orb=PROJECT.resource_path("images/cards/orb.png"),
-        attack_bg_small=PROJECT.resource_path("images/cards/attack_small.png"),
-        skill_bg_small=PROJECT.resource_path("images/cards/skill_small.png"),
-        power_bg_small=PROJECT.resource_path("images/cards/power_small.png"),
-        orb_small=PROJECT.resource_path("images/cards/orb_small.png"),
-    )
-
-    @PROJECT.card("RevenantStrike", basic=True)
-    def make_revenant_strike():
-        return RevenantStrike(color)
-
-    PROJECT.add_character(
-        CharacterBlueprint(
-            identifier="revenant",
-            character_name="The Revenant",
-            description="Haunts the Spire with spectral blades.",
-            assets=CharacterAssets(
-                shoulder_image=PROJECT.resource_path("images/character/shoulder.png"),
-                shoulder2_image=PROJECT.resource_path("images/character/shoulder2.png"),
-                corpse_image=PROJECT.resource_path("images/character/corpse.png"),
-            ),
-            starting_deck=["RevenantStrike"] * 4 + ["RevenantDefend"] * 4,
-            starting_relics=["RevenantLantern"],
-            loadout_description="Devours the living for borrowed strength.",
-        )
-    )
-```
-
-Any resources referenced via `PROJECT.resource_path(...)` resolve to the mod’s resources folder (e.g. `revenant/images/...`). Drop your PNGs into the matching directories under `assets/revenant/` and the bundler will pick them up.
-
-### 4. Implement cards with pure Python
-
-Create `python/revenant_mod/cards/revenant_strike.py`:
-
-```python
-from modules.basemod_wrapper import cardcrawl, basemod
+from modules.basemod_wrapper import basemod, cardcrawl
 
 
 class RevenantStrike(basemod.abstracts.CustomCard):
     ID = "RevenantStrike"
-    IMG = "revenant/images/cards/strike.png"
+    IMG = "revenant/images/cards/revenant_strike.png"
     COST = 1
 
-    def __init__(self, color):
+    def __init__(self, color_enum):
         super().__init__(
             self.ID,
             "Soul Strike",
@@ -136,7 +119,7 @@ class RevenantStrike(basemod.abstracts.CustomCard):
             self.COST,
             "Deal {0} damage.",
             cardcrawl.cards.AbstractCard.CardType.ATTACK,
-            color,
+            color_enum,
             cardcrawl.cards.AbstractCard.CardRarity.BASIC,
             cardcrawl.cards.AbstractCard.CardTarget.ENEMY,
         )
@@ -159,83 +142,67 @@ class RevenantStrike(basemod.abstracts.CustomCard):
         return type(self)(self.color)
 ```
 
-Because the wrapper already exposes all Java packages, card code reads like a native Python module.
+Register the class with the project using either the decorator or the explicit
+`add_card` helper:
 
-## One-liner cards via simple blueprints
+```python
+from .cards.revenant_strike import RevenantStrike
 
-When you only need straightforward cards (deal damage, gain Block, apply a debuff or grant a power) the
-`SimpleCardBlueprint` helper removes all boilerplate. Each blueprint captures the fields you would normally enter
-in the custom card constructor:
 
-1. `title` — the display name of the card.
-1. `description` — freeform text. The placeholders `{damage}`, `{block}`, `{magic}` or `{value}` will be replaced
-   with the configured numbers so you do not have to hardcode them.
-2. `card_type` — one of `attack`, `skill` or `power`.
-3. `target` — `enemy`, `all_enemies`, `self`, `self_and_enemy` or `none`.
-4. `effect` — for skills and powers choose a standard keyword: `block`, `draw`, `energy`, `strength`, `dexterity`,
-   `artifact`, `focus`, `weak`, `vulnerable`, `frail` or `poison`.
-5. `value` — how much damage, Block or power to grant. `upgrade_value` increases the number on upgrade.
-6. `color_id` — optional. Leave unset to use the project colour or specify `RED`, `GREEN`, `BLUE`, `PURPLE`, etc.
-7. `starter` — flag the card as part of the basic card pool.
-8. `rarity` — `basic`, `common`, `uncommon`, `rare`, `special` or `curse`.
+@PROJECT.card("RevenantStrike", basic=True)
+def make_revenant_strike():
+    return RevenantStrike(PROJECT.runtime_color_enum())
+```
 
-### Automatic inner art processing
+### Fast lane: `SimpleCardBlueprint`
 
-If you rely on the default BaseMod card frames you no longer have to manually slice the inner card artwork. Call
-``SimpleCardBlueprint.innerCardImage("art/Strike.png")`` with a **500x380** PNG and the wrapper will clone the
-[StSModdingToolCardImagesCreator](https://github.com/JohnnyBazooka89/StSModdingToolCardImagesCreator), build it (once) and
-generate both the 250x190 in-game art and the 500x380 portrait variant. The correct pair is picked automatically based on the
-blueprint’s card type (`attack`, `skill`, or `power`) and copied into `assets/<mod_id>/images/cards/`. The blueprint’s
-``image`` path is updated to the resource string (`<mod_id>/images/cards/<Identifier>.png`) so BaseMod can discover the
-portrait companion (`_p`) without extra configuration.
+For everyday attacks, blocks and power cards the wrapper offers a declarative
+builder that handles class generation, keyword wiring and BaseMod registration.
+Each blueprint is a dataclass with the following key fields:
 
-### Attack examples
+| Field | Purpose |
+| ----- | ------- |
+| `identifier` | The internal card ID (`mod_id` prefix is added automatically during registration). |
+| `title` | Display name in game. |
+| `description` | Card text. Placeholders `{damage}`, `{block}`, `{magic}` and `{value}` auto-format based on the effect. |
+| `cost` | Base energy cost. |
+| `card_type` | `attack`, `skill` or `power`. Short aliases like `atk` are accepted. |
+| `target` | One of `enemy`, `all_enemies`, `self`, `self_and_enemy`, `none` or `all`. |
+| `rarity` | `basic`, `common`, `uncommon`, `rare`, `special` or `curse`. |
+| `value` / `upgrade_value` | Base and upgrade numbers (damage, block or magic). |
+| `effect` | Required for non-attacks – choose from `block`, `draw`, `energy`, `strength`, `dexterity`, `artifact`, `focus`, `weak`, `vulnerable`, `frail` or `poison`. |
+| `color_id` | Optional override to register the card against an existing Base Game colour (e.g. `RED`). |
+| `starter` | Set to `True` to drop the card into the basic pool. |
+| `attack_effect` | Visual for damage actions (`slash_diagonal`, `slash_horizontal`, `blunt_heavy`, etc.). |
+| `keywords` | Iterable of keyword flags. Canonical names (`innate`, `retain`, `stslib:Exhaustive`) are normalised automatically. |
+| `keyword_values` / `keyword_upgrades` | Numeric keyword payloads (e.g. Exhaustive counts) and their upgrade deltas. |
+| `image` | Resource path used when you already have card art on disk. |
+| `inner_image_source` | Optional 500x380 image that will be processed into BaseMod-ready portrait/inner art pairs. |
+
+You can also call `blueprint.innerCardImage("art/Strike.png")` (or the snake
+case alias `inner_card_image`) to register a source image after initialisation.
 
 ```python
 from modules.basemod_wrapper import SimpleCardBlueprint
 
-# Single target strike.
 strike = SimpleCardBlueprint(
-    identifier="BuddyStrike",
-    title="Buddy Strike",
+    identifier="RevenantStrike",
+    title="Soul Strike",
     description="Deal {damage} damage.",
     cost=1,
     card_type="attack",
     target="enemy",
-    rarity="common",
-    value=8,
+    rarity="basic",
+    value=7,
     upgrade_value=3,
-    image=PROJECT.resource_path("images/cards/buddy_strike.png"),
     starter=True,
+    image=PROJECT.resource_path("images/cards/revenant_strike.png"),
 )
 
-# All enemy swipe.
-wide_slash = SimpleCardBlueprint(
-    identifier="BuddyWhirl",
-    title="Buddy Whirl",
-    description="Deal {damage} damage to ALL enemies.",
-    cost=2,
-    card_type="attack",
-    target="all_enemies",
-    rarity="uncommon",
-    value=6,
-    upgrade_value=2,
-    attack_effect="slash_horizontal",
-    image=PROJECT.resource_path("images/cards/buddy_whirl.png"),
-)
-
-PROJECT.add_simple_card(strike)
-PROJECT.add_simple_card(wide_slash)
-```
-
-### Skill variations
-
-```python
-# Gain Block.
 guard = SimpleCardBlueprint(
-    identifier="BuddyGuard",
-    title="Buddy Guard",
-    description="Gain {block} Block.",
+    identifier="RevenantGuard",
+    title="Soul Guard",
+    description="Gain {block} Block. Exhaustive !stslib:ex!.",
     cost=1,
     card_type="skill",
     target="self",
@@ -243,95 +210,55 @@ guard = SimpleCardBlueprint(
     rarity="common",
     value=12,
     upgrade_value=4,
-    image=PROJECT.resource_path("images/cards/buddy_guard.png"),
-)
-
-# Apply Weak to an enemy.
-glare = SimpleCardBlueprint(
-    identifier="BuddyGlare",
-    title="Buddy Glare",
-    description="Apply {magic} Weak.",
-    cost=1,
-    card_type="skill",
-    target="enemy",
-    effect="weak",
-    rarity="uncommon",
-    value=2,
-    upgrade_value=1,
-    image=PROJECT.resource_path("images/cards/buddy_glare.png"),
-)
-
-# Hand the blueprints to the project.
-PROJECT.add_simple_card(guard)
-PROJECT.add_simple_card(glare)
-```
-
-### Power setup
-
-```python
-fortify = SimpleCardBlueprint(
-    identifier="BuddyFortify",
-    title="Buddy Fortify",
-    description="At the start of your turn, gain {magic} Strength.",
-    cost=2,
-    card_type="power",
-    target="self",
-    effect="strength",
-    rarity="rare",
-    value=2,
-    upgrade_value=1,
-    image=PROJECT.resource_path("images/cards/buddy_fortify.png"),
-)
-
-# Powers automatically use ApplyPowerAction and understand base-game keywords.
-PROJECT.add_simple_card(fortify)
-```
-
-Each `SimpleCardBlueprint` automatically constructs the `CustomCard` subclass, routes the effect through the
-appropriate `DamageAction`, `GainBlockAction` or `ApplyPowerAction`, and registers the card via `BaseMod.addCard`.
-If you pass `starter=True` the card also lands in the colour's basic pool. For colours outside your mod project set
-`color_id` to one of the base game enums (e.g. `RED` for the Ironclad). Whenever you need more exotic behaviour you
-can still hand craft a class — the blueprints are intentionally small wrappers for the common cases.
-
-### Keyword helpers
-
-`SimpleCardBlueprint` accepts an optional `keywords` tuple so you can toggle card flags without writing boilerplate.
-Canonical base-game keywords (`innate`, `retain`, `ethereal`, `exhaust`) flip the matching `AbstractCard` fields, while
-StSLib helpers are routed through `modules.basemod_wrapper.spire.apply_keyword`. Numeric keyword data (such as
-`exhaustive` or `persist`) can be supplied via `keyword_values` and their upgrade deltas via `keyword_upgrades`:
-
-```python
-innate_retaining_block = SimpleCardBlueprint(
-    identifier="BuddyBrace",
-    title="Buddy Brace",
-    description="Gain {block} Block. Exhaustive !stslib:ex!.",
-    cost=1,
-    card_type="skill",
-    target="self",
-    effect="block",
-    rarity="uncommon",
-    value=9,
-    upgrade_value=3,
     keywords=("innate", "retain", "stslib:Exhaustive"),
     keyword_values={"exhaustive": 2},
     keyword_upgrades={"exhaustive": 1},
 )
+
+PROJECT.add_simple_card(strike)
+PROJECT.add_simple_card(guard)
 ```
 
-Keyword names are normalised automatically, so `stslib:` prefixes, whitespace and common misspellings like `inate`
-are handled for you.
+When registered, the blueprint generates a full `CustomCard` subclass, wires the
+correct BaseMod/StSLib actions (`DamageAction`, `GainBlockAction`,
+`ApplyPowerAction`) and exposes it to the runtime. The resulting card IDs are
+prefixed automatically with your project’s `mod_id`.
 
-### 5. Load the mod in-game
+#### Inner art automation
 
-Your `entrypoint.py` already calls `enable_runtime()`, which in turn registers every BaseMod hook. Import the entrypoint in your development REPL or point your ModTheSpire bootstrapper at it; the character, colour and cards become available instantly.
+Calling `innerCardImage(...)` prompts the wrapper to clone and build the
+[StSModdingToolCardImagesCreator](https://github.com/JohnnyBazooka89/StSModdingToolCardImagesCreator)
+if necessary, then renders both the 250×190 in-game art and the 500×380 portrait.
+The processed textures land under `assets/<mod_id>/images/cards/` with the
+expected naming convention (`<Identifier>.png` and `<Identifier>_p.png`). Repeated
+runs reuse cached builds and only reprocess when the source PNG changes.
 
-### 6. Produce a ModTheSpire bundle
+### Manual registration
 
-Once art and scripts are ready, create a bundle directly from the layout:
+If you want to bypass `ModProject` entirely you can call
+`register_simple_card(project, blueprint)` directly. This is primarily useful
+inside custom tooling or plugin workflows.
+
+## Runtime iteration
+
+- `project.enable_runtime()` registers the colour, cards and characters with
+  BaseMod immediately. The generated `entrypoint.py` handles this for you.
+- The `spire` façade exposes keyword helpers (`spire.apply_keyword`) so you can
+  toggle StSLib fields without repeating reflection-heavy code.
+- Damage/block modifier helpers (`spire.add_damage_modifier`,
+  `spire.add_block_modifier`) wrap the relevant StSLib managers.
+
+Import `python/<package>/entrypoint.py` in a live JPype session to hot reload
+changes without re-bundling.
+
+## Bundling for ModTheSpire
+
+`compileandbundle(project, options)` produces a ready-to-drop directory with a
+patch jar, manifest and copied Python/assets. Build options can either be passed
+explicitly or sourced from a scaffolded layout:
 
 ```python
 from pathlib import Path
-
 from modules.basemod_wrapper import compileandbundle
 
 options = project.bundle_options_from_layout(
@@ -343,31 +270,40 @@ bundle_path = compileandbundle(project, options)
 print(f"Mod packaged at {bundle_path}")
 ```
 
-Alternatively, skip manual options altogether:
+Behind the scenes the bundler writes enum patches, resolves dependencies,
+assembles the ModTheSpire manifest and copies assets/Python sources into the
+output directory. Drop the resulting folder into `ModTheSpire/mods/` and enable
+it from the launcher.
+
+## Plugin integration
+
+Every public symbol in the wrapper is shared with the repository-wide plugin
+system. External tooling can consume the plugin manifest to discover new
+capabilities, register additional blueprints or introspect the exported Java
+packages:
 
 ```python
-compileandbundle(
-    project,
-    layout=layout,
-    additional_classpath=[Path("/path/to/SlayTheSpire/desktop-1.0.jar")],
-)
+from plugins import PLUGIN_MANAGER
+
+context = PLUGIN_MANAGER.exposed
+wrapper = context["basemod_wrapper"]  # Lazily imported module alias.
+blueprint_cls = context["SimpleCardBlueprint"]
 ```
 
-`compileandbundle` generates the enum patch automatically, builds a `revenant_patches.jar`, writes the ModTheSpire manifest and copies your Python sources and assets into the correct locations. Drop the produced directory into `ModTheSpire/mods/` and enable it from the launcher.
+The plugin namespace is immutable (`MappingProxyType`) which keeps the surface
+predictable while still allowing plugins to import modules lazily through the
+provided aliases.
 
-### 7. Iterate rapidly
+## Troubleshooting tips
 
-While developing you can call `project.enable_runtime()` in a Python REPL to hot reload cards and characters without rebuilding the bundle. The underlying `BaseMod.subscribe` machinery is hidden behind the scenes; all you need to do is edit your Python files and re-import them.
+- Ensure a Java runtime is available on `PATH`. JPype will raise a descriptive
+  error if the JVM cannot be located.
+- The first call to `innerCardImage` triggers a one-time build of the card image
+  tool. Subsequent invocations reuse the compiled binary.
+- If you need to inspect the raw classpath, check
+  `basemod_environment.classpath` from the plugin manager or directly via the
+  imported module.
 
-## Runtime helpers
-
-- `BaseModEnvironment` exposes the resolved dependency jars and offers helper methods for building bundle options.
-- `UnifiedSpireAPI` (available as `modules.basemod_wrapper.spire`) includes helpers for common StSLib actions and keyword manipulation.
-
-## Bundling utilities
-
-- `ProjectLayout` represents the scaffolded filesystem and offers helper properties for resource paths.
-- `ModProject.bundle_options_from_layout()` produces ready-to-use `BundleOptions` instances.
-- `compileandbundle()` accepts either explicit `BundleOptions` or a layout plus overrides and returns the final mod directory.
-
-The wrapper aims to keep everything high level and pythonic while still exposing 100% of BaseMod and StSLib to power users. If you spot a missing helper add it directly, document the use case in `futures.md`, and the plugin manager will make it discoverable instantly.
+The wrapper is designed to stay thin while exposing 100% of the BaseMod and
+StSLib APIs. File issues or extend it directly – the plugin manager guarantees
+that new helpers remain discoverable for downstream tooling.
