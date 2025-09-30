@@ -36,71 +36,39 @@ team can test builds regardless of their preferred workflow.
    expect to find every asset, including the Python package, inside the game's `mods/`
    directory.
 
-## 2. Prepare the Python runtime that ships with the bundle
+## 2. Prepare the Python runtime with one command
 
-The JPype bridge expects a live Python environment next to the jar. When you ship the bundle
-to teammates, they must keep the `python/` directory and provision an interpreter that can
-import `python/<package>/entrypoint.py`. A reliable activation flow looks like this:
+Every bundle now ships with a turnkey launcher script called `bootstrap_mod.py`. It lives in
+the root of the generated mod folder next to `ModTheSpire.json`. Running it once creates the
+virtual environment, installs any requirements and activates the packaged entrypoint so
+BaseMod hooks are registered.
 
-1. **Create a virtual environment** dedicated to the mod.
-   - macOS/Linux:
-     ```bash
-     python3 -m venv /path/to/SlayTheSpire/mods/BuddyMod/.venv
-     ```
-   - Windows (PowerShell or `cmd.exe`):
-     ```powershell
-     py -3 -m venv C:\Games\SlayTheSpire\mods\BuddyMod\.venv
-     ```
-2. **Install JPype and your dependencies** into that environment. If your Python package
-   already ships a `requirements.txt`, use it. Otherwise install JPype manually.
-   - macOS/Linux:
-     ```bash
-     /path/to/SlayTheSpire/mods/BuddyMod/.venv/bin/pip install -r python/requirements.txt
-     ```
-     *(Fallback if no requirements file exists: `.../pip install JPype1`)*
-   - Windows:
-     ```powershell
-     C:\Games\SlayTheSpire\mods\BuddyMod\.venv\Scripts\pip.exe install -r python\requirements.txt
-     ```
-3. **Expose the bundled sources via `PYTHONPATH`** so the entrypoint resolves regardless of
-   the working directory.
-   - macOS/Linux:
-     ```bash
-     export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}/path/to/SlayTheSpire/mods/BuddyMod/python"
-     ```
-   - Windows:
-     ```cmd
-     set PYTHONPATH=%PYTHONPATH%;C:\Games\SlayTheSpire\mods\BuddyMod\python
-     ```
-4. **Sanity-check the entrypoint** before booting the game. Activating it once registers all
-   BaseMod hooks through `Character.enable_runtime()`.
-   - macOS/Linux:
-     ```bash
-     /path/to/SlayTheSpire/mods/BuddyMod/.venv/bin/python -m buddy_mod.entrypoint
-     ```
-   - Windows:
-     ```powershell
-     C:\Games\SlayTheSpire\mods\BuddyMod\.venv\Scripts\python.exe -m buddy_mod.entrypoint
-     ```
+1. Open a terminal and change into the bundled mod directory (the folder that contains
+   `ModTheSpire.json`).
+2. Run the bootstrapper:
 
-If you prefer generating the commands programmatically, the new
-`modules.modbuilder.runtime_env.discover_python_runtime` helper inspects the bundled folder
-and prints a ready-to-run bootstrap plan:
+   ```bash
+   python bootstrap_mod.py
+   ```
 
-```python
-from pathlib import Path
+   The script automatically:
+   - creates (or reuses) a `.venv/` virtual environment inside the bundle,
+   - installs dependencies listed in `python/requirements*.txt`,
+   - installs the bundled package in editable mode so code tweaks apply instantly, and
+   - executes `python/<package>/entrypoint.py` with `PYTHONPATH` set correctly.
 
-from modules.modbuilder.runtime_env import discover_python_runtime
+3. When the script prints that the runtime is initialised you can close the terminal. The
+   `.venv/` folder is ready for ModTheSpire to import your Python components.
 
-bundle_root = Path("/path/to/SlayTheSpire/mods/BuddyMod")
-descriptor = discover_python_runtime(bundle_root)
-plan = descriptor.bootstrap_plan()
+Prefer to double-check what the script will do? Invoke the CLI helper without executing any
+commands:
 
-for command in plan.posix.commands():
-    print(command)
+```bash
+python -m modules.modbuilder.runtime_env plan /path/to/SlayTheSpire/mods/BuddyMod
 ```
 
-Use `plan.windows.commands()` when preparing instructions for teammates on Windows.
+The CLI mirrors the copy-paste commands from earlier revisions for teams that need to embed
+the bootstrapper into larger automation.
 
 ## 3. Launch through ModTheSpire's desktop app
 
@@ -111,8 +79,9 @@ Use `plan.windows.commands()` when preparing instructions for teammates on Windo
 3. Double-click `MTS.cmd`/`MTS.sh` (or run `java -jar ModTheSpire.jar` with Java 8).
    The ModTheSpire window lists every JAR inside `mods/`. Tick your mod and press **Play**
    to boot the game with the bundle enabled.
-4. Whenever you rebuild the mod, replace the JAR in `mods/` and rerun ModTheSpire.
-   The launcher remembers your previous selection so regression testing stays quick.
+4. Whenever you rebuild the mod, replace the JAR in `mods/`, rerun the bootstrapper to pick
+   up dependency changes, and rerun ModTheSpire. The launcher remembers your previous
+   selection so regression testing stays quick.
 
 ## 4. Launch through the Steam Workshop mod manager
 
