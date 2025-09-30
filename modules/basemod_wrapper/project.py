@@ -688,6 +688,9 @@ class ModProject:
 
         (mod_root / "ModTheSpire.json").write_text(self._render_modthespire_manifest(options))
         (mod_root / "README.txt").write_text(self._render_bundle_readme())
+        from modules.modbuilder.runtime_env import write_runtime_bootstrapper
+
+        write_runtime_bootstrapper(mod_root)
         return mod_root
 
     def _render_enum_patch(self) -> str:

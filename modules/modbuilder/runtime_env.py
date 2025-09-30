@@ -24,9 +24,23 @@ tooling and documentation renderers can surface the same guidance.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
+import os
 from pathlib import Path
 import shlex
-from typing import Dict, Iterator, List, Optional, Tuple
+import subprocess
+import sys
+from typing import (
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+)
 
 from plugins import PLUGIN_MANAGER
 
@@ -113,6 +127,22 @@ class PythonRuntimeBootstrapPlan:
     venv_directory: Path
     posix: PlatformBootstrap
     windows: PlatformBootstrap
+
+    def python_executable(self, platform: Optional[str] = None) -> Path:
+        """Return the Python launcher inside the managed virtual environment."""
+
+        target = _normalise_platform(platform)
+        if target == "windows":
+            return self.venv_directory / "Scripts" / "python.exe"
+        return self.venv_directory / "bin" / "python"
+
+    def pip_executable(self, platform: Optional[str] = None) -> Path:
+        """Return the pip launcher inside the managed virtual environment."""
+
+        target = _normalise_platform(platform)
+        if target == "windows":
+            return self.venv_directory / "Scripts" / "pip.exe"
+        return self.venv_directory / "bin" / "pip"
 
     def environment_variables(self) -> Dict[str, str]:
         """Return environment variables required for launching the mod."""
@@ -293,10 +323,276 @@ def discover_python_runtime(bundle_root: Path, package_name: Optional[str] = Non
     return descriptor
 
 
+def _normalise_platform(platform: Optional[str]) -> str:
+    if platform is None:
+        return "windows" if os.name == "nt" else "posix"
+    candidate = platform.lower()
+    if candidate not in {"windows", "posix"}:
+        raise PythonRuntimeError(f"Unsupported platform '{platform}'.")
+    return candidate
+
+
+def _ensure_virtualenv(venv_directory: Path, *, logger: Callable[[str], None]) -> None:
+    marker = venv_directory / "pyvenv.cfg"
+    if marker.exists():
+        logger(f"Virtual environment already present at {venv_directory}.")
+        return
+    logger(f"Creating virtual environment at {venv_directory}.")
+    result = subprocess.run(
+        [sys.executable, "-m", "venv", str(venv_directory)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise PythonRuntimeError(
+            "Failed to create virtual environment:\n" f"{result.stderr.strip()}"
+        )
+
+
+def _run_pip(
+    pip_executable: Path,
+    arguments: Sequence[str],
+    *,
+    env: Mapping[str, str],
+    logger: Callable[[str], None],
+) -> None:
+    command = [str(pip_executable), *arguments]
+    logger("Executing: " + " ".join(shlex.quote(part) for part in command))
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=dict(env),
+    )
+    if result.returncode != 0:
+        raise PythonRuntimeError(
+            "pip command failed:\n"
+            + result.stdout.strip()
+            + ("\n" if result.stdout.strip() else "")
+            + result.stderr.strip()
+        )
+
+
+def _prepare_environment(
+    base: Optional[MutableMapping[str, str]],
+    python_root: Path,
+    *,
+    extra_env: Optional[Mapping[str, str]] = None,
+) -> Dict[str, str]:
+    environment: Dict[str, str] = dict(base or os.environ)
+    pythonpath = environment.get("PYTHONPATH", "")
+    python_root_text = str(python_root)
+    if pythonpath:
+        if python_root_text not in pythonpath.split(os.pathsep):
+            environment["PYTHONPATH"] = os.pathsep.join([pythonpath, python_root_text])
+    else:
+        environment["PYTHONPATH"] = python_root_text
+    if extra_env:
+        environment.update({str(key): str(value) for key, value in extra_env.items()})
+    return environment
+
+
+def _invoke_entrypoint(
+    plan: PythonRuntimeBootstrapPlan,
+    *,
+    platform: str,
+    environment: Mapping[str, str],
+    logger: Callable[[str], None],
+) -> None:
+    python_executable = plan.python_executable(platform)
+    command = [str(python_executable), "-m", f"{plan.descriptor.package_name}.entrypoint"]
+    logger("Executing: " + " ".join(shlex.quote(part) for part in command))
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=dict(environment),
+    )
+    if result.returncode != 0:
+        raise PythonRuntimeError(
+            "Entrypoint execution failed:\n"
+            + result.stdout.strip()
+            + ("\n" if result.stdout.strip() else "")
+            + result.stderr.strip()
+        )
+
+
+def execute_bootstrap_plan(
+    plan: PythonRuntimeBootstrapPlan,
+    *,
+    platform: Optional[str] = None,
+    extra_env: Optional[Mapping[str, str]] = None,
+    logger: Optional[Callable[[str], None]] = None,
+    skip_entrypoint: bool = False,
+) -> None:
+    """Execute ``plan`` by creating the venv, installing deps and running the entrypoint."""
+
+    logger = logger or print
+    target_platform = _normalise_platform(platform)
+    _ensure_virtualenv(plan.venv_directory, logger=logger)
+
+    pip_executable = plan.pip_executable(target_platform)
+    environment = os.environ.copy()
+    for requirements in plan.descriptor.requirement_files:
+        _run_pip(
+            pip_executable,
+            ["install", "--no-input", "-r", str(requirements)],
+            env=environment,
+            logger=logger,
+        )
+    for editable in plan.descriptor.editable_targets:
+        _run_pip(
+            pip_executable,
+            ["install", "--no-input", "-e", str(editable)],
+            env=environment,
+            logger=logger,
+        )
+    if not plan.descriptor.requirement_files and not plan.descriptor.editable_targets:
+        _run_pip(
+            pip_executable,
+            ["install", "--no-input", "JPype1"],
+            env=environment,
+            logger=logger,
+        )
+
+    runtime_env = _prepare_environment(environment, plan.descriptor.python_root, extra_env=extra_env)
+
+    if skip_entrypoint:
+        return
+
+    _invoke_entrypoint(
+        plan,
+        platform=target_platform,
+        environment=runtime_env,
+        logger=logger,
+    )
+
+
+def bootstrap_python_runtime(
+    bundle_root: Path,
+    *,
+    package_name: Optional[str] = None,
+    venv_directory: Optional[Path] = None,
+    platform: Optional[str] = None,
+    extra_env: Optional[Mapping[str, str]] = None,
+    logger: Optional[Callable[[str], None]] = None,
+    skip_entrypoint: bool = False,
+) -> PythonRuntimeDescriptor:
+    """Discover and bootstrap the Python runtime for ``bundle_root`` immediately."""
+
+    descriptor = discover_python_runtime(bundle_root, package_name)
+    plan = descriptor.bootstrap_plan(venv_directory=venv_directory)
+    execute_bootstrap_plan(
+        plan,
+        platform=platform,
+        extra_env=extra_env,
+        logger=logger,
+        skip_entrypoint=skip_entrypoint,
+    )
+    return descriptor
+
+
+def write_runtime_bootstrapper(
+    target_directory: Path,
+    *,
+    script_name: str = "bootstrap_mod.py",
+) -> Path:
+    """Write a convenience launcher script into ``target_directory``."""
+
+    path = target_directory / script_name
+    path.write_text(BOOTSTRAPPER_TEMPLATE, encoding="utf8")
+    return path
+
+
+def _cli_plan(descriptor: PythonRuntimeDescriptor, *, output_json: bool) -> None:
+    plan = descriptor.bootstrap_plan()
+    if output_json:
+        print(json.dumps(plan.as_dict(), indent=2))
+        return
+    print(f"Bundle: {descriptor.bundle_root}")
+    print(f"Python package: {descriptor.package_name}")
+    print(f"Virtualenv: {plan.venv_directory}")
+    print("POSIX bootstrap commands:")
+    for command in plan.posix.commands():
+        print(f"  {command}")
+    print("Windows bootstrap commands:")
+    for command in plan.windows.commands():
+        print(f"  {command}")
+
+
+def _cli_launch(args: "argparse.Namespace") -> None:
+    descriptor = bootstrap_python_runtime(
+        Path(args.bundle),
+        package_name=args.package,
+        venv_directory=Path(args.venv) if args.venv else None,
+        platform=args.platform,
+        skip_entrypoint=args.skip_entrypoint,
+    )
+    print(
+        f"Python runtime for '{descriptor.package_name}' ready at "
+        f"{descriptor.bundle_root / '.venv'}"
+    )
+
+
+def _cli(argv: Optional[Sequence[str]] = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Bootstrap bundled Python runtimes.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    plan_parser = subparsers.add_parser("plan", help="Print the bootstrap commands for a bundle")
+    plan_parser.add_argument("bundle", type=str, help="Path to the bundled mod directory")
+    plan_parser.add_argument("--package", type=str, default=None, help="Override the Python package name")
+    plan_parser.add_argument("--json", action="store_true", help="Emit the plan as JSON")
+
+    launch_parser = subparsers.add_parser(
+        "launch", help="Automatically create the venv, install dependencies and run the entrypoint"
+    )
+    launch_parser.add_argument("bundle", type=str, help="Path to the bundled mod directory")
+    launch_parser.add_argument("--package", type=str, default=None, help="Override the Python package name")
+    launch_parser.add_argument(
+        "--venv", type=str, default=None, help="Custom location for the virtual environment"
+    )
+    launch_parser.add_argument(
+        "--platform",
+        type=str,
+        default=None,
+        choices=("posix", "windows"),
+        help="Force platform specific behaviour (defaults to host)",
+    )
+    launch_parser.add_argument(
+        "--skip-entrypoint",
+        action="store_true",
+        help="Prepare the runtime without executing the entrypoint",
+    )
+
+    args = parser.parse_args(argv)
+    if args.command == "plan":
+        descriptor = discover_python_runtime(Path(args.bundle), args.package)
+        _cli_plan(descriptor, output_json=args.json)
+        return 0
+    if args.command == "launch":
+        _cli_launch(args)
+        return 0
+    return 1
+
+
+def main() -> None:
+    """Entry-point for ``python -m modules.modbuilder.runtime_env``."""
+
+    raise SystemExit(_cli())
+
+
 PLUGIN_MANAGER.expose("discover_python_runtime", discover_python_runtime)
 PLUGIN_MANAGER.expose("PythonRuntimeDescriptor", PythonRuntimeDescriptor)
 PLUGIN_MANAGER.expose("PythonRuntimeBootstrapPlan", PythonRuntimeBootstrapPlan)
 PLUGIN_MANAGER.expose("PlatformBootstrap", PlatformBootstrap)
+PLUGIN_MANAGER.expose("bootstrap_python_runtime", bootstrap_python_runtime)
+PLUGIN_MANAGER.expose("execute_bootstrap_plan", execute_bootstrap_plan)
+PLUGIN_MANAGER.expose("write_runtime_bootstrapper", write_runtime_bootstrapper)
 PLUGIN_MANAGER.expose_module("modules.modbuilder.runtime_env")
 
 
@@ -305,6 +601,183 @@ __all__ = [
     "PlatformBootstrap",
     "PythonRuntimeBootstrapPlan",
     "PythonRuntimeDescriptor",
+    "bootstrap_python_runtime",
+    "execute_bootstrap_plan",
+    "write_runtime_bootstrapper",
     "discover_python_runtime",
+    "main",
 ]
+
+BOOTSTRAPPER_TEMPLATE = """#!/usr/bin/env python3
+\"\"\"One-click bootstrapper for bundled Slay the Spire mods.\"\"\"
+from __future__ import annotations
+
+import os
+import shlex
+import subprocess
+import sys
+from pathlib import Path
+
+
+def _iter_requirement_files(python_root: Path, package_root: Path) -> list[Path]:
+    searched: set[Path] = set()
+    result: list[Path] = []
+    directories = (python_root, package_root, package_root.parent)
+    names = (
+        "requirements.txt",
+        "requirements-dev.txt",
+        "requirements-dev.in",
+        "requirements.in",
+    )
+    for directory in directories:
+        for name in names:
+            candidate = directory / name
+            if candidate.exists() and candidate not in searched:
+                searched.add(candidate)
+                result.append(candidate)
+    return result
+
+
+def _iter_editable_targets(package_root: Path) -> list[Path]:
+    markers = ("pyproject.toml", "setup.cfg", "setup.py")
+    for marker in markers:
+        if (package_root / marker).exists():
+            return [package_root]
+    return []
+
+
+def _run_pip(pip_executable: Path, arguments: list[str]) -> None:
+    command = [str(pip_executable), "install", "--no-input", *arguments]
+    print("$ " + " ".join(shlex.quote(part) for part in command))
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise SystemExit(
+            "pip command failed (status {status})\n{stdout}{stderr}".format(
+                status=result.returncode,
+                stdout=(result.stdout or "").strip(),
+                stderr=("\n" + (result.stderr or "").strip()) if result.stderr else "",
+            )
+        )
+
+
+def _ensure_virtualenv(venv_directory: Path) -> None:
+    marker = venv_directory / "pyvenv.cfg"
+    if marker.exists():
+        print(f"Reusing virtual environment at {venv_directory}")
+        return
+    print(f"Creating virtual environment at {venv_directory}")
+    result = subprocess.run(
+        [sys.executable, "-m", "venv", str(venv_directory)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise SystemExit(
+            "Virtual environment creation failed (status {status})\n{stderr}".format(
+                status=result.returncode,
+                stderr=(result.stderr or "").strip(),
+            )
+        )
+
+
+def _python_executable(venv_directory: Path) -> Path:
+    if os.name == "nt":
+        return venv_directory / "Scripts" / "python.exe"
+    return venv_directory / "bin" / "python"
+
+
+def _pip_executable(venv_directory: Path) -> Path:
+    if os.name == "nt":
+        return venv_directory / "Scripts" / "pip.exe"
+    return venv_directory / "bin" / "pip"
+
+
+def _bootstrap(bundle_root: Path) -> str:
+    bundle_root = bundle_root.resolve()
+    python_root = bundle_root / "python"
+    if not python_root.exists():
+        raise SystemExit(f"Bundle directory '{bundle_root}' does not contain a python/ folder.")
+
+    packages = [
+        child
+        for child in python_root.iterdir()
+        if child.is_dir()
+        and (child / "entrypoint.py").exists()
+        and (child / "__init__.py").exists()
+    ]
+    if not packages:
+        raise SystemExit("No Python package with an entrypoint.py was found under 'python/'.")
+    if len(packages) > 1:
+        names = ", ".join(sorted(package.name for package in packages))
+        raise SystemExit(
+            "Multiple Python packages were found. Specify package_name explicitly. Available packages: "
+            + names
+        )
+
+    package_root = packages[0]
+    package_name = package_root.name
+    venv_directory = bundle_root / ".venv"
+    _ensure_virtualenv(venv_directory)
+
+    pip_executable = _pip_executable(venv_directory)
+    requirement_files = _iter_requirement_files(python_root, package_root)
+    editable_targets = _iter_editable_targets(package_root)
+
+    for requirement in requirement_files:
+        _run_pip(pip_executable, ["-r", str(requirement)])
+    for editable in editable_targets:
+        _run_pip(pip_executable, ["-e", str(editable)])
+    if not requirement_files and not editable_targets:
+        _run_pip(pip_executable, ["JPype1"])
+
+    python_executable = _python_executable(venv_directory)
+    environment = os.environ.copy()
+    python_root_text = str(python_root)
+    pythonpath = environment.get("PYTHONPATH")
+    if pythonpath:
+        environment["PYTHONPATH"] = pythonpath + os.pathsep + python_root_text
+    else:
+        environment["PYTHONPATH"] = python_root_text
+
+    print(f"Executing entrypoint for {package_name}")
+    result = subprocess.run(
+        [str(python_executable), "-m", f"{package_name}.entrypoint"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=environment,
+    )
+    if result.returncode != 0:
+        raise SystemExit(
+            "Entrypoint execution failed (status {status})\n{stdout}{stderr}".format(
+                status=result.returncode,
+                stdout=(result.stdout or "").strip(),
+                stderr=("\n" + (result.stderr or "").strip()) if result.stderr else "",
+            )
+        )
+    return package_name
+
+
+def main() -> None:
+    bundle_root = Path.cwd()
+    try:
+        from modules.modbuilder.runtime_env import bootstrap_python_runtime  # type: ignore
+    except Exception:
+        package_name = _bootstrap(bundle_root)
+    else:
+        descriptor = bootstrap_python_runtime(bundle_root)
+        package_name = descriptor.package_name
+    print(f"Python runtime initialised for '{package_name}' at {bundle_root / '.venv'}")
+
+
+if __name__ == "__main__":
+    main()
+"""
+
 
