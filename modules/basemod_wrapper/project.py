@@ -119,6 +119,9 @@ class CharacterBlueprint:
     banner_texture: Optional[str] = None
     select_button_texture: Optional[str] = None
     energy_image: Optional[str] = None
+    skeleton_atlas: Optional[str] = None
+    skeleton_json: Optional[str] = None
+    skeleton_scale: float = 1.0
 
     def build_player_class(self, color_enum: object, player_enum: object, color_definition: ColorDefinition) -> Type:
         import jpype
@@ -148,6 +151,15 @@ class CharacterBlueprint:
                     EnergyManager(self.blueprint.energy_per_turn),
                     self.blueprint.energy_image,
                 )
+                atlas = self.blueprint.skeleton_atlas
+                json = self.blueprint.skeleton_json
+                scale = float(self.blueprint.skeleton_scale)
+                if atlas and json:
+                    self.loadAnimation(atlas, json, scale)
+                elif atlas or json:
+                    raise BaseModBootstrapError(
+                        "Character blueprints require both skeleton atlas and json paths when supplying animation assets."
+                    )
 
             def getLoadout(self):
                 Loadout = CustomPlayer.Loadout
