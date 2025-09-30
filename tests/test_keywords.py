@@ -1,16 +1,19 @@
 from __future__ import annotations
 
+import json
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 
 import pytest
 
 from modules.basemod_wrapper.keywords import (
+    CARD_PERSISTENCE_MANAGER,
     CardEditor,
     Keyword,
     KeywordContext,
     KEYWORD_REGISTRY,
     RuntimeHandles,
+    apply_persistent_card_changes,
     keyword_scheduler,
 )
 
@@ -306,7 +309,7 @@ def test_enemy_proxy_controls_target_and_hp(use_real_dependencies: bool) -> None
     assert any(entry["name"] == "lose_hp" for entry in log)
 
 
-def test_card_editor_snapshot_and_persistence(use_real_dependencies: bool) -> None:
+def test_card_editor_snapshot_and_persistence(use_real_dependencies: bool, tmp_path) -> None:
     player = StubCreature()
     card = SimpleNamespace(
         cardID="StubCard",
@@ -333,3 +336,136 @@ def test_card_editor_snapshot_and_persistence(use_real_dependencies: bool) -> No
     editor.persist_for_run(player, baseDamage=9)
     master_card = player.masterDeck.group[0]
     assert master_card.baseDamage == 9
+
+    storage_path = tmp_path / "persistent_cards.json"
+    CARD_PERSISTENCE_MANAGER.configure_storage(storage_path)
+    try:
+        editor.persist_forever(player, baseMagicNumber=3)
+        assert storage_path.exists()
+        stored = json.loads(storage_path.read_text(encoding="utf8"))
+        assert stored["StubCard"]["baseMagicNumber"] == 3
+
+        fresh_player = StubCreature()
+        fresh_player.masterDeck.group.append(SimpleNamespace(cardID="StubCard", baseMagicNumber=0))
+        apply_persistent_card_changes(fresh_player)
+        assert fresh_player.masterDeck.group[0].baseMagicNumber == 3
+    finally:
+        CARD_PERSISTENCE_MANAGER.reset_storage()
+
+
+def test_card_zone_adds_card_by_title(use_real_dependencies: bool) -> None:
+    player = StubCreature()
+    runtime, _ = _build_runtime(player, [])
+    library = runtime.cardcrawl.helpers.CardLibrary
+
+    class LibraryCard:
+        def __init__(self, card_id: str, name: str) -> None:
+            self.cardID = card_id
+            self.name = name
+
+        def makeCopy(self) -> "LibraryCard":
+            return LibraryCard(self.cardID, self.name)
+
+    template = LibraryCard("Strike_R", "Strike")
+    library.getCard = lambda _: None
+    library.cardsByName = {"Strike": template}
+    library.cardsByID = {"Strike_R": template}
+    player.masterDeck.group.append(template)
+
+    context = KeywordContext(
+        keyword=SimpleNamespace(),
+        player=player,
+        monster=None,
+        card=SimpleNamespace(),
+        amount=None,
+        upgrade=None,
+        runtime=runtime,
+    )
+
+    context.hand.add_by_name("Strike")
+    keyword_scheduler.flush()
+    assert player.hand.group[-1].cardID == "Strike_R"
+
+    player.hand.group.clear()
+    library.cardsByName = {}
+    library.cardsByID = {}
+
+    context.hand.add_by_name("Strike")
+    keyword_scheduler.flush()
+    assert player.hand.group[-1].cardID == "Strike_R"
+
+
+def test_keyword_scheduler_applies_persistent_changes(use_real_dependencies: bool, tmp_path) -> None:
+    player = StubCreature()
+    runtime, _ = _build_runtime(player, [])
+    card = SimpleNamespace(cardID="PersistMe", baseMagicNumber=1, initializeDescription=lambda: None)
+    player.masterDeck.group.append(card)
+
+    storage_path = tmp_path / "cards.json"
+    CARD_PERSISTENCE_MANAGER.configure_storage(storage_path)
+    try:
+        editor = CardEditor(card)
+        editor.persist_forever(player, baseMagicNumber=7)
+        player.masterDeck.group[0].baseMagicNumber = 1
+        runtime.cardcrawl.dungeons.AbstractDungeon.player = player
+        keyword_scheduler.apply_persistent_changes(runtime)
+        assert player.masterDeck.group[0].baseMagicNumber == 7
+    finally:
+        CARD_PERSISTENCE_MANAGER.reset_storage()
+
+
+def test_keyword_when_respects_turn_offsets(use_real_dependencies: bool) -> None:
+    player = StubCreature()
+    runtime, log = _build_runtime(player, [])
+
+    class OffsetKeyword(Keyword):
+        def __init__(self) -> None:
+            super().__init__()
+            self.when = "next"
+            self.turn_offset = 2
+
+        def apply(self, context: KeywordContext) -> None:
+            context.player_proxy.block += 3
+
+    keyword = OffsetKeyword()
+    class DummyCard:
+        pass
+
+    card = DummyCard()
+    KEYWORD_REGISTRY.attach_to_card(card, keyword.__class__.__name__, amount=None, upgrade=None)
+
+    KEYWORD_REGISTRY.trigger(card, player, None, runtime=runtime)
+    assert player.currentBlock == 0
+    keyword_scheduler.debug_advance_turn()
+    assert player.currentBlock == 0
+    keyword_scheduler.debug_advance_turn()
+    assert any(entry["name"] == "gain_block" for entry in log)
+    assert player.currentBlock == 3
+
+
+def test_keyword_random_range_is_respected(use_real_dependencies: bool) -> None:
+    player = StubCreature()
+    runtime, log = _build_runtime(player, [])
+
+    class RandomKeyword(Keyword):
+        def __init__(self) -> None:
+            super().__init__()
+            self.when = "random"
+            self.random_turn_range = (2, 2)
+
+        def apply(self, context: KeywordContext) -> None:
+            context.player_proxy.draw_cards(1)
+
+    keyword = RandomKeyword()
+    class DummyCard:
+        pass
+
+    card = DummyCard()
+    KEYWORD_REGISTRY.attach_to_card(card, keyword.__class__.__name__, amount=None, upgrade=None)
+
+    KEYWORD_REGISTRY.trigger(card, player, None, runtime=runtime)
+    assert not any(entry["name"] == "draw" for entry in log)
+    keyword_scheduler.debug_advance_turn()
+    assert not any(entry["name"] == "draw" for entry in log)
+    keyword_scheduler.debug_advance_turn()
+    assert any(entry["name"] == "draw" for entry in log)

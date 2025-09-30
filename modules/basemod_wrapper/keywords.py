@@ -152,8 +152,17 @@ class KeywordScheduler:
         target_turn = self._turn + max(1, turn_offset)
         self._end_of_turn.setdefault(target_turn, []).append(func)
 
-    def enqueue_random_turn(self, *, end_of_turn: bool, max_offset: int = 3, func: Callable[[], None]) -> None:
-        offset = _RANDOM.randint(1, max_offset)
+    def enqueue_random_turn(
+        self,
+        *,
+        end_of_turn: bool,
+        min_offset: int = 1,
+        max_offset: int = 3,
+        func: Callable[[], None],
+    ) -> None:
+        if min_offset > max_offset:
+            min_offset, max_offset = max_offset, min_offset
+        offset = _RANDOM.randint(max(1, min_offset), max(1, max_offset))
         if end_of_turn:
             self.enqueue_end_of_turn(offset, func)
         else:
@@ -170,15 +179,29 @@ class KeywordScheduler:
         tasks = self._start_of_turn.pop(self._turn, [])
         for task in tasks:
             task()
+        if tasks:
+            self.flush()
 
     def execute_end_of_turn(self) -> None:
         tasks = self._end_of_turn.pop(self._turn, [])
         for task in tasks:
             task()
+        if tasks:
+            self.flush()
 
     def debug_advance_turn(self) -> None:
         self.advance_turn()
         self.execute_end_of_turn()
+
+    def apply_persistent_changes(self, runtime: Optional[RuntimeHandles] = None) -> None:
+        runtime = runtime or RuntimeHandles.current()
+        dungeon = getattr(runtime.cardcrawl.dungeons, "AbstractDungeon", None)
+        player = getattr(dungeon, "player", None) if dungeon else None
+        if player is not None:
+            apply_persistent_card_changes(player)
+
+    def receivePostDungeonInitialize(self, _dungeon: Any) -> None:  # pragma: no cover - requires JVM
+        self.apply_persistent_changes()
 
 
 _SCHEDULER = KeywordScheduler()
@@ -189,9 +212,31 @@ class CardPersistenceManager:
     """Persist card modifications across runs."""
 
     def __init__(self) -> None:
-        self._path = Path(__file__).with_name("persistent_cards.json")
+        self._default_path = Path(__file__).with_name("persistent_cards.json")
+        self._path = self._default_path
         self._data: Dict[str, Dict[str, Any]] = {}
         self._loaded = False
+
+    @property
+    def path(self) -> Path:
+        return self._path
+
+    def configure_storage(self, path: Path) -> None:
+        """Change the persistence target to ``path``.
+
+        The method clears the in-memory cache so callers can point the manager at
+        temporary directories during tests or mod previews without leaking
+        changes into the default storage location.
+        """
+
+        self._path = Path(path)
+        self._data = {}
+        self._loaded = False
+
+    def reset_storage(self) -> None:
+        """Restore the default persistence location."""
+
+        self.configure_storage(self._default_path)
 
     def _ensure_loaded(self) -> None:
         if self._loaded:
@@ -207,6 +252,7 @@ class CardPersistenceManager:
         self._ensure_loaded()
         existing = self._data.setdefault(card_id, {})
         existing.update(payload)
+        self._path.parent.mkdir(parents=True, exist_ok=True)
         self._path.write_text(json.dumps(self._data, indent=2, sort_keys=True), encoding="utf8")
 
     def payload_for(self, card_id: str) -> Dict[str, Any]:
@@ -223,6 +269,7 @@ class CardPersistenceManager:
 
 
 _CARD_PERSISTENCE = CardPersistenceManager()
+CARD_PERSISTENCE_MANAGER = _CARD_PERSISTENCE
 
 
 class CardEditor:
@@ -332,7 +379,12 @@ class CardZoneProxy:
             raise KeywordError("Cards can only be added directly to the hand from keywords.")
         cardcrawl = self._context.runtime.cardcrawl
         library = cardcrawl.helpers.CardLibrary
-        card = library.getCard(name)
+        getter = getattr(library, "getCard", None)
+        card = getter(name) if callable(getter) else None
+        if card is None:
+            card = self._locate_card_in_library(library, name)
+        if card is None:
+            card = self._locate_card_in_player_collections(name)
         if card is None:
             raise KeywordError(f"Unknown card '{name}'.")
         player = getattr(cardcrawl.dungeons.AbstractDungeon, "player", None)
@@ -340,6 +392,63 @@ class CardZoneProxy:
             raise KeywordError("Player is not available – cannot add card to hand.")
         action = cardcrawl.actions.common.MakeTempCardInHandAction(card.makeCopy(), 1)
         cardcrawl.dungeons.AbstractDungeon.actionManager.addToBottom(action)
+
+    def _locate_card_in_library(self, library: Any, name: str) -> Optional[Any]:
+        normalized = _normalize_identifier(name)
+        containers = []
+        for attr in ("cardsByID", "cards", "cardsByName"):
+            candidate = getattr(library, attr, None)
+            if candidate is not None:
+                containers.append(candidate)
+        for container in containers:
+            if isinstance(container, dict):
+                items = container.values()
+            elif hasattr(container, "values"):
+                items = container.values()
+            elif hasattr(container, "items"):
+                items = (value for _, value in container.items())
+            else:
+                items = []
+            for card in items:
+                match = self._match_card_identifier(card, normalized)
+                if match is not None:
+                    return match
+        return None
+
+    def _locate_card_in_player_collections(self, name: str) -> Optional[Any]:
+        normalized = _normalize_identifier(name)
+        player = self._context.player
+        piles = []
+        for attr in ("hand", "drawPile", "discardPile", "exhaustPile", "masterDeck"):
+            pile = getattr(player, attr, None)
+            if pile is None:
+                continue
+            group = getattr(pile, "group", None)
+            if group is None:
+                group = getattr(pile, "cards", None)
+            if group is None:
+                group = getattr(pile, "cardGroup", None)
+            if group is None:
+                group = pile
+            piles.append(group)
+        for pile in piles:
+            try:
+                iterator = list(pile)
+            except TypeError:
+                continue
+            for card in iterator:
+                match = self._match_card_identifier(card, normalized)
+                if match is not None:
+                    return card
+        return None
+
+    @staticmethod
+    def _match_card_identifier(card: Any, normalized: str) -> Optional[Any]:
+        for attr in ("cardID", "name", "card_id"):
+            value = getattr(card, attr, None)
+            if value and _normalize_identifier(str(value)) == normalized:
+                return card
+        return None
 
 
 class ComparableInt:
@@ -460,8 +569,8 @@ class PlayerProxy:
     """Provide access to player centric attributes."""
 
     def __init__(self, context: "KeywordContext") -> None:
-        self._context = context
-        self._powers = PowerProxy(self._context, self._context.player, owner_label="player")
+        object.__setattr__(self, "_context", context)
+        object.__setattr__(self, "_powers", PowerProxy(self._context, self._context.player, owner_label="player"))
 
     @property
     def powers(self) -> "PowerProxy":
@@ -539,6 +648,20 @@ class PlayerProxy:
         action_cls = self._context.runtime.cardcrawl.actions.common.DiscardAction
         action = action_cls(self._context.player, self._context.player, int(amount), False)
         self._context.enqueue_action(action)
+
+    def __getattr__(self, item: str) -> int:
+        if item.startswith("_"):
+            raise AttributeError(item)
+        return getattr(self._powers, item)
+
+    def __setattr__(self, key: str, value: Any) -> None:
+        if key in {"_context", "_powers"}:
+            object.__setattr__(self, key, value)
+            return
+        if hasattr(type(self), key):
+            object.__setattr__(self, key, value)
+            return
+        setattr(self._powers, key, value)
 
 
 class EnemyProxy:
@@ -625,6 +748,37 @@ class MonsterHandle(ComparableInt):
     def __isub__(self, other: int) -> "MonsterHandle":
         self.hp = self._value() - int(other)
         return self
+
+    @property
+    def block(self) -> int:
+        return int(getattr(self.monster, "currentBlock", 0))
+
+    @block.setter
+    def block(self, value: int) -> None:
+        current = int(getattr(self.monster, "currentBlock", 0))
+        delta = int(value) - current
+        if delta == 0:
+            return
+        runtime = self.context.runtime.cardcrawl
+        if delta > 0:
+            action = runtime.actions.common.GainBlockAction(self.monster, self.context.player, delta)
+        else:
+            action = runtime.actions.common.LoseBlockAction(self.monster, self.context.player, abs(delta))
+        self.context.enqueue_action(action)
+
+    def __getattr__(self, item: str) -> Any:
+        if item.startswith("_"):
+            raise AttributeError(item)
+        return getattr(self.powers, item)
+
+    def __setattr__(self, key: str, value: Any) -> None:
+        if key in {"context", "monster", "powers"}:
+            object.__setattr__(self, key, value)
+            return
+        if hasattr(type(self), key):
+            object.__setattr__(self, key, value)
+            return
+        setattr(self.powers, key, value)
 
 
 @dataclass
@@ -824,6 +978,8 @@ class Keyword(metaclass=KeywordMeta):
         self.description = description
         self.proper_name = proper_name
         self.when: str = "now"
+        self.turn_offset: int = 1
+        self.random_turn_range: Tuple[int, int] = (1, 3)
         self.keyword_id = _normalize_keyword(self.name)
         self._context: Optional[KeywordContext] = None
 
@@ -925,7 +1081,14 @@ class KeywordRegistry:
         bucket = self._card_keywords.setdefault(card, [])
         bucket.append((metadata.keyword, {"amount": amount, "upgrade": upgrade}))
 
-    def trigger(self, card: Any, player: Any, monster: Optional[Any]) -> None:
+    def trigger(
+        self,
+        card: Any,
+        player: Any,
+        monster: Optional[Any],
+        *,
+        runtime: Optional[RuntimeHandles] = None,
+    ) -> None:
         entries = self._card_keywords.get(card)
         if not entries:
             return
@@ -937,18 +1100,38 @@ class KeywordRegistry:
                 card=card,
                 amount=payload.get("amount"),
                 upgrade=payload.get("upgrade"),
+                runtime=runtime,
             )
             when = getattr(keyword, "when", "now").lower()
+            offset = max(1, int(getattr(keyword, "turn_offset", 1) or 1))
+            random_range = getattr(keyword, "random_turn_range", (1, 3))
+            if isinstance(random_range, int):
+                random_min, random_max = 1, int(random_range)
+            else:
+                try:
+                    random_min, random_max = random_range
+                except (TypeError, ValueError):
+                    random_min, random_max = 1, 3
             if when == "now":
                 _SCHEDULER.enqueue_immediate(lambda ctx=context, kw=keyword: kw.run(ctx))
             elif when == "next":
-                _SCHEDULER.enqueue_start_of_turn(1, lambda ctx=context, kw=keyword: kw.run(ctx))
+                _SCHEDULER.enqueue_start_of_turn(offset, lambda ctx=context, kw=keyword: kw.run(ctx))
             elif when == "random":
-                _SCHEDULER.enqueue_random_turn(end_of_turn=False, func=lambda ctx=context, kw=keyword: kw.run(ctx))
+                _SCHEDULER.enqueue_random_turn(
+                    end_of_turn=False,
+                    min_offset=random_min,
+                    max_offset=random_max,
+                    func=lambda ctx=context, kw=keyword: kw.run(ctx),
+                )
             elif when == "nextend":
-                _SCHEDULER.enqueue_end_of_turn(1, lambda ctx=context, kw=keyword: kw.run(ctx))
+                _SCHEDULER.enqueue_end_of_turn(offset, lambda ctx=context, kw=keyword: kw.run(ctx))
             elif when == "randomend":
-                _SCHEDULER.enqueue_random_turn(end_of_turn=True, func=lambda ctx=context, kw=keyword: kw.run(ctx))
+                _SCHEDULER.enqueue_random_turn(
+                    end_of_turn=True,
+                    min_offset=random_min,
+                    max_offset=random_max,
+                    func=lambda ctx=context, kw=keyword: kw.run(ctx),
+                )
             else:
                 raise KeywordError(f"Unknown scheduling hint '{keyword.when}'.")
         _SCHEDULER.flush()
@@ -974,6 +1157,8 @@ PLUGIN_MANAGER.expose("KeywordContext", KeywordContext)
 PLUGIN_MANAGER.expose("RuntimeHandles", RuntimeHandles)
 PLUGIN_MANAGER.expose("CardEditor", CardEditor)
 PLUGIN_MANAGER.expose("CardZoneProxy", CardZoneProxy)
+PLUGIN_MANAGER.expose("CardPersistenceManager", CardPersistenceManager)
+PLUGIN_MANAGER.expose("CARD_PERSISTENCE_MANAGER", _CARD_PERSISTENCE)
 PLUGIN_MANAGER.expose("HPProxy", HPProxy)
 PLUGIN_MANAGER.expose("PlayerProxy", PlayerProxy)
 PLUGIN_MANAGER.expose("EnemyProxy", EnemyProxy)
@@ -988,6 +1173,8 @@ __all__ = [
     "RuntimeHandles",
     "CardEditor",
     "CardZoneProxy",
+    "CardPersistenceManager",
+    "CARD_PERSISTENCE_MANAGER",
     "HPProxy",
     "PlayerProxy",
     "EnemyProxy",
