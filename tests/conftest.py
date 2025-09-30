@@ -164,7 +164,7 @@ def stubbed_runtime(monkeypatch):
     yield cardcrawl_stub, action_manager, spire_stub
 
     action_manager.clear()
-    spire_stub.calls.clear()
+    spire_stub.reset()
 
 
 @pytest.fixture()

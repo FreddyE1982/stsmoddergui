@@ -1,42 +1,32 @@
 # Futures roadmap
 
-## Module level plugin discovery
+## Completed milestones
 
-Implement automatic discovery of plugin entry points via naming conventions or
-package metadata.  This would allow dropping plugin modules into a dedicated
-folder without touching the core code.  Usage: call
-``PLUGIN_MANAGER.auto_discover("plugins")`` once implemented.
-
-## JVM dependency caching strategy
-
-Persist downloaded jars with version tracking to avoid unnecessary re-downloads
-when different wrapper versions are required.  Usage: expand
-``ensure_basemod_jar`` to accept a version string and maintain a local manifest.
-
-## Desktop jar discovery helper
-
-Provide a small helper that scans common Steam install directories and honours
-environment variables to automatically locate ``desktop-1.0.jar``. Usage: expose
-``ensure_desktop_jar()`` that either returns a valid path or raises a helpful
-error instructing users how to obtain the jar.
-
-## Interface signature caching
-
-Cache inspected Java method signatures to speed up repeated calls to heavily
-used BaseMod hooks.  Usage: extend ``JavaCallableWrapper`` with a lookup table so
-plugins do not incur repeated reflection overhead.
-
-## Advanced simple card effects
-
-Extend `SimpleCardBlueprint` with multi-target power routing, secondary magic numbers and optional follow-up actions.
-Usage: allow blueprint authors to declare additional `effects` in sequence, plus hooks for `on_draw` and
-`on_discard` so heavily scripted cards can still be described declaratively.
-
-## Inner card image caching and deduplication
-
-Cache processed inner card art keyed by source checksum so repeated calls to `innerCardImage` do not rebuild identical assets.
-Usage: extend `prepare_inner_card_image` with a hash manifest stored alongside generated files; reuse outputs when available
-and expose the manifest through the plugin layer for advanced asset tooling.
+- ✅ **Module level plugin discovery** – `PLUGIN_MANAGER.auto_discover(...)` now
+  scans packages recursively and registers plugins that follow the existing
+  naming conventions. Tests in `tests/test_plugins.py` ensure the matcher and
+  error reporting behave as expected.
+- ✅ **JVM dependency caching strategy** – dependency helpers persist resolved
+  jar paths and reuse cached files across runs. The manifest lives under
+  ``lib/dependency_manifest.json`` and is covered by
+  `tests/test_loader.py::test_ensure_basemod_jar_reuses_manifest_cache`.
+- ✅ **Desktop jar discovery helper** – `ensure_desktop_jar` consults
+  environment variables, explicit search paths and common Steam locations before
+  raising a user-facing error. Behaviour is verified in `tests/test_loader.py`.
+- ✅ **Interface signature caching** – the BaseMod proxy caches resolved
+  signatures inside `modules/basemod_wrapper/proxy.py`, ensuring repeat calls
+  avoid expensive lookups.
+- ✅ **Advanced simple card effects** – `SimpleCardBlueprint` gained secondary
+  values, chained effect descriptors, follow-up actions and draw/discard hooks.
+  See the expanded documentation in `modules/basemod_wrapper/README.md` and
+  tests in `tests/test_cards.py::test_secondary_values_follow_ups_and_hooks`.
+- ✅ **Inner card image caching and deduplication** – inner art now reuses cached
+  outputs via a manifest stored next to the generated assets. The new
+  `load_inner_card_manifest` helper exposes the data to plugins. Covered by
+  `tests/test_card_assets.py`.
+- ✅ **Plugin attribute diff subscriptions** – `PLUGIN_MANAGER.subscribe_to_exports`
+  now replays repository attribute diffs and notifies subscribers on change.
+  The behaviour is exercised in `tests/test_plugins.py`.
 
 ## LimeWire decryption pipeline
 
@@ -72,10 +62,6 @@ Teach ``ModProject.scaffold`` to generate localisation folders for multiple lang
 ## Asset templating helpers
 
 Provide optional PNG placeholders (solid alpha grids) whenever ``scaffold`` creates texture slots. Usage: add an ``include_placeholders: bool`` flag that writes simple coloured PNGs using Pillow to make generated mods immediately runnable even before artists deliver final assets.
-
-## Plugin attribute diff subscriptions
-
-Build a watcher atop ``repository_attributes`` that emits change events whenever modules expose new callables or state. Usage: extend ``PLUGIN_MANAGER`` with a ``subscribe_to_exports`` helper that hands plugins a diff of newly discovered attributes so tooling can hot-reload capabilities without rescanning the entire manifest.
 
 ## Simple card blueprint CLI preview
 

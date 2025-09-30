@@ -4,7 +4,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Sequence
 
-from .loader import ensure_basemod_environment, ensure_jpype
+from .loader import (
+    ensure_basemod_environment,
+    ensure_dependency_classpath,
+    ensure_desktop_jar,
+    ensure_jpype,
+)
 from .project import BundleOptions, ModProject, ProjectLayout, compileandbundle, create_project
 from .cards import SimpleCardBlueprint, register_simple_card
 from .keywords import (
@@ -43,9 +48,26 @@ class BaseModEnvironment:
         "com.evacipated.cardcrawl.mod.stslib",
     )
 
-    def __init__(self, base_dir: Path | None = None) -> None:
+    def __init__(
+        self,
+        base_dir: Path | None = None,
+        *,
+        basemod_version: str | None = None,
+        stslib_version: str | None = None,
+        modthespire_version: str | None = None,
+    ) -> None:
         self.base_dir = base_dir or Path(__file__).resolve().parent
-        self._jars = ensure_basemod_environment(self.base_dir)
+        self._versions = {
+            "basemod": basemod_version,
+            "stslib": stslib_version,
+            "modthespire": modthespire_version,
+        }
+        self._jars = ensure_basemod_environment(
+            self.base_dir,
+            basemod_version=basemod_version,
+            stslib_version=stslib_version,
+            modthespire_version=modthespire_version,
+        )
         self._packages: dict[str, JavaPackageWrapper] = {}
 
         for package in self.DEFAULT_PACKAGES:
@@ -62,6 +84,12 @@ class BaseModEnvironment:
         """Return the default classpath used for the JVM."""
 
         return tuple(self._jars.values())
+
+    @property
+    def dependency_versions(self) -> Dict[str, Optional[str]]:
+        """Return the dependency version hints used to bootstrap the JVM."""
+
+        return dict(self._versions)
 
     def package(self, name: str) -> JavaPackageWrapper:
         """Return a :class:`JavaPackageWrapper` for ``name``."""
@@ -378,6 +406,7 @@ PLUGIN_MANAGER.expose("stslib", stslib)
 PLUGIN_MANAGER.expose("spire", spire)
 PLUGIN_MANAGER.expose("basemod_dependency_jars", _ENVIRONMENT.dependency_jars)
 PLUGIN_MANAGER.expose("basemod_classpath", _ENVIRONMENT.classpath)
+PLUGIN_MANAGER.expose("basemod_dependency_versions", _ENVIRONMENT.dependency_versions)
 PLUGIN_MANAGER.expose("create_project", create_project)
 PLUGIN_MANAGER.expose("compileandbundle", compileandbundle)
 PLUGIN_MANAGER.expose("SimpleCardBlueprint", SimpleCardBlueprint)
@@ -386,6 +415,8 @@ PLUGIN_MANAGER.expose("ModProject", ModProject)
 PLUGIN_MANAGER.expose("ProjectLayout", ProjectLayout)
 PLUGIN_MANAGER.expose("BundleOptions", BundleOptions)
 PLUGIN_MANAGER.expose("default_bundle_options", _ENVIRONMENT.default_bundle_options)
+PLUGIN_MANAGER.expose("ensure_desktop_jar", ensure_desktop_jar)
+PLUGIN_MANAGER.expose("ensure_dependency_classpath", ensure_dependency_classpath)
 PLUGIN_MANAGER.expose_module("modules.basemod_wrapper", alias="basemod_wrapper")
 
 __all__ = [

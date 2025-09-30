@@ -325,6 +325,97 @@ def test_uses_placeholder_requires_exhaustive_keyword():
     assert "not Exhaustive" in str(excinfo.value)
 
 
+def test_secondary_values_follow_ups_and_hooks(stubbed_runtime):
+    cardcrawl_stub, action_manager, spire_stub = stubbed_runtime
+
+    class TempHPAction:
+        def __init__(self, target, source, amount) -> None:
+            self.target = target
+            self.source = source
+            self.amount = amount
+            self.label = "temp_hp"
+
+    class RemoveTempHPAction:
+        def __init__(self, target, source) -> None:
+            self.target = target
+            self.source = source
+            self.label = "remove_temp_hp"
+
+    spire_stub.register_action("AddTemporaryHPAction", TempHPAction)
+    spire_stub.register_action("RemoveAllTemporaryHPAction", RemoveTempHPAction)
+
+    project = ModProject("combo", "Combo", "Buddy", "Testing")
+    project._color_enum = "BUDDY_COLOR"
+
+    callbacks: list[tuple[str, int]] = []
+
+    def effect_callback(card, player, monster, amount):
+        callbacks.append(("effect", amount))
+
+    def follow_up_callback(card, player, monster, amount):
+        callbacks.append(("follow", amount))
+
+    blueprint = SimpleCardBlueprint(
+        identifier="BuddyCombo",
+        title="Buddy Combo",
+        description="Gain {block} Block. Apply {secondary} Weak and add temp HP.",
+        cost=1,
+        card_type="skill",
+        target="self_and_enemy",
+        rarity="rare",
+        effect="block",
+        value=9,
+        secondary_value=2,
+        secondary_upgrade=1,
+        effects=[
+            {
+                "effect": "weak",
+                "target": "enemy",
+                "amount": "secondary",
+                "follow_up": [
+                    {"action": "AddTemporaryHPAction", "args": ["monster", "player", "amount"]},
+                    {"action": "RemoveAllTemporaryHPAction", "kwargs": {"target": "player", "source": "monster"}},
+                    {"callable": follow_up_callback},
+                ],
+            },
+            {"callable": effect_callback},
+        ],
+        on_draw=[{"effect": "draw", "amount": 1}],
+        on_discard=[{"effect": "energy", "amount": 1}],
+    )
+
+    project.add_simple_card(blueprint)
+    card = project.cards["BuddyCombo"].factory()
+
+    assert getattr(card, "secondMagicNumber") == 2
+
+    player = object()
+    monster = object()
+    cardcrawl_stub.dungeons.AbstractDungeon.player = player
+
+    card.use(player, monster)
+
+    assert isinstance(action_manager.actions[0], StubGainBlockAction)
+    assert isinstance(action_manager.actions[1], StubApplyPowerAction)
+    assert isinstance(action_manager.actions[2], TempHPAction)
+    assert isinstance(action_manager.actions[3], RemoveTempHPAction)
+    assert action_manager.actions[2].amount == 2
+
+    assert callbacks == [("follow", 2), ("effect", 9)]
+
+    action_manager.clear()
+
+    card.triggerWhenDrawn()
+    assert isinstance(action_manager.actions[0], StubDrawCardAction)
+    action_manager.clear()
+
+    card.triggerOnDiscard()
+    assert isinstance(action_manager.actions[0], StubGainEnergyAction)
+
+    card.upgrade()
+    assert getattr(card, "secondMagicNumber") == 3
+
+
 def test_color_override_uses_card_enum(stubbed_runtime):
     _, _, _ = stubbed_runtime
     project = ModProject("buddy", "Buddy Mod", "Buddy", "Testing")

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Dict, Mapping, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from plugins import PLUGIN_MANAGER
 
@@ -137,6 +137,44 @@ _KEYWORD_ALIASES: Mapping[str, str] = {
 }
 
 
+KEYWORD_PLACEHOLDERS: Dict[str, str] = {
+    "exhaustive": "!stslib:ex!",
+    "persist": "!stslib:ps!",
+    "refund": "!stslib:rf!",
+}
+
+_CARD_ATTRIBUTE_NAMES: Mapping[str, str] = {
+    "damage": "damage",
+    "block": "block",
+    "magic": "magicNumber",
+    "secondary": "secondMagicNumber",
+}
+
+
+@dataclass(frozen=True)
+class ActionSpec:
+    action: Optional[str] = None
+    args: Tuple[Any, ...] = ()
+    kwargs: Mapping[str, Any] = field(default_factory=dict)
+    callback: Optional[Callable[[object, object, Optional[object], Any], None]] = None
+
+
+@dataclass(frozen=True)
+class EffectSpec:
+    effect: Optional[str]
+    target: Optional[str]
+    amount: Optional[int]
+    amount_key: Optional[str]
+    follow_up: Tuple[ActionSpec, ...] = field(default_factory=tuple)
+    callback: Optional[Callable[[object, object, Optional[object], int], None]] = None
+
+
+def register_keyword_placeholder(keyword: str, token: str) -> None:
+    """Register ``token`` as the placeholder for ``keyword`` descriptions."""
+
+    KEYWORD_PLACEHOLDERS[_canonical_keyword(keyword)] = token
+
+
 def _normalise(value: str) -> str:
     return value.replace(" ", "").replace("-", "").lower()
 
@@ -158,29 +196,27 @@ def _resolve_enum(container: object, name: str, label: str) -> object:
         raise BaseModBootstrapError(f"Unknown {label} '{name}'.") from exc
 
 
-def _format_description(description: str, value: int, *, field: str, uses: Optional[str] = None) -> str:
+def _format_description(
+    description: str,
+    value: int,
+    *,
+    field: str,
+    placeholders: Mapping[str, str],
+) -> str:
     if "{" not in description:
         return description
-    if "{uses}" in description and uses is None:
-        raise BaseModBootstrapError("Description references '{uses}' but the blueprint is not Exhaustive.")
     values = {
         "value": value,
         "damage": value if field == "damage" else 0,
         "block": value if field == "block" else 0,
         "magic": value if field == "magic" else 0,
         "amount": value,
-        "uses": uses if uses is not None else 0,
     }
+    values.update(placeholders)
     try:
         return description.format(**values)
     except Exception:
         return description
-
-
-def _uses_placeholder(blueprint: "SimpleCardBlueprint") -> Optional[str]:
-    if "exhaustive" in getattr(blueprint, "keywords", ()):  # pragma: no branch - simple containment check
-        return "!stslib:ex!"
-    return None
 
 
 def _enqueue_action(action: object) -> None:
@@ -202,6 +238,149 @@ def _canonical_keyword(value: str) -> str:
         stripped = stripped.split(":", 1)[1]
     cleaned = stripped.replace("_", "")
     return _KEYWORD_ALIASES.get(_normalise(cleaned), _normalise(cleaned))
+
+
+def _compute_placeholders(keywords: Sequence[str]) -> Dict[str, str]:
+    placeholders: Dict[str, str] = {}
+    for keyword in keywords:
+        token = KEYWORD_PLACEHOLDERS.get(keyword)
+        if token:
+            placeholders[keyword] = token
+    return placeholders
+
+
+def _ensure_tuple(value: Sequence[Any] | Any) -> Tuple[Any, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, tuple):
+        return value
+    if isinstance(value, list):
+        return tuple(value)
+    return (value,)
+
+
+def _normalise_effect_sequence(
+    blueprint: "SimpleCardBlueprint",
+    descriptors: Sequence[Any],
+    *,
+    default_target: str,
+    default_field: str,
+) -> Tuple[EffectSpec, ...]:
+    resolved: List[EffectSpec] = []
+    for descriptor in _ensure_tuple(descriptors):
+        if descriptor is None:
+            continue
+        resolved.append(
+            _normalise_effect_descriptor(
+                blueprint,
+                descriptor,
+                default_target=default_target,
+                default_field=default_field,
+            )
+        )
+    return tuple(resolved)
+
+
+def _normalise_effect_descriptor(
+    blueprint: "SimpleCardBlueprint",
+    descriptor: Any,
+    *,
+    default_target: str,
+    default_field: str,
+) -> EffectSpec:
+    if isinstance(descriptor, EffectSpec):
+        return descriptor
+    if callable(descriptor):
+        return EffectSpec(effect=None, target=None, amount=None, amount_key=None, follow_up=tuple(), callback=descriptor)
+    if isinstance(descriptor, str):
+        effect_name = _normalise(descriptor)
+        return EffectSpec(
+            effect=effect_name,
+            target=None,
+            amount=None,
+            amount_key=_resolve_amount_attribute(default_field),
+            follow_up=tuple(),
+            callback=None,
+        )
+    if isinstance(descriptor, Mapping):
+        effect_name = descriptor.get("effect") or descriptor.get("name")
+        target_value = descriptor.get("target")
+        amount_literal = descriptor.get("amount")
+        amount_key = descriptor.get("amount_key") or descriptor.get("amount_field")
+        follow_up_raw = descriptor.get("follow_up_actions") or descriptor.get("follow_up") or ()
+        callback = descriptor.get("callable")
+        literal, attribute = _normalise_amount_descriptor(amount_literal, amount_key, default_field)
+        target = _normalise_effect_target(target_value, default_target)
+        follow_up = tuple(_normalise_action_descriptor(item) for item in _ensure_tuple(follow_up_raw))
+        name = _normalise(effect_name) if effect_name else None
+        return EffectSpec(
+            effect=name,
+            target=target,
+            amount=literal,
+            amount_key=attribute,
+            follow_up=follow_up,
+            callback=callback,
+        )
+    raise BaseModBootstrapError("Unsupported effect descriptor provided to SimpleCardBlueprint.")
+
+
+def _normalise_effect_target(target: Any, default_target: str) -> Optional[str]:
+    if target is None:
+        return default_target
+    if isinstance(target, str):
+        return _coerce_mapping(target, _TARGET_ALIASES, "effect target")
+    raise BaseModBootstrapError(f"Invalid effect target '{target}'.")
+
+
+def _normalise_amount_descriptor(
+    amount: Any,
+    amount_key: Optional[str],
+    default_field: str,
+) -> Tuple[Optional[int], Optional[str]]:
+    if amount is not None:
+        if isinstance(amount, str):
+            normalised = _normalise(amount)
+            if normalised in {"value", "default"}:
+                return None, _resolve_amount_attribute(default_field)
+            return None, _resolve_amount_attribute(amount)
+        try:
+            return int(amount), None
+        except (TypeError, ValueError) as exc:
+            raise BaseModBootstrapError("Effect amounts must be integers or named card fields.") from exc
+    if amount_key:
+        normalised_key = _normalise(amount_key)
+        if normalised_key in {"value", "default"}:
+            return None, _resolve_amount_attribute(default_field)
+        return None, _resolve_amount_attribute(amount_key)
+    return None, _resolve_amount_attribute(default_field)
+
+
+def _resolve_amount_attribute(field: str) -> str:
+    normalised = _normalise(str(field))
+    mapped = _CARD_ATTRIBUTE_NAMES.get(normalised)
+    if mapped:
+        return mapped
+    if normalised in {"secondary", "second", "secondmagic", "secondarymagic", "magic2"}:
+        return _CARD_ATTRIBUTE_NAMES["secondary"]
+    if normalised in {"magic", "block", "damage"}:
+        return _CARD_ATTRIBUTE_NAMES[normalised]
+    raise BaseModBootstrapError(f"Unknown amount reference '{field}'.")
+
+
+def _normalise_action_descriptor(descriptor: Any) -> ActionSpec:
+    if isinstance(descriptor, ActionSpec):
+        return descriptor
+    if callable(descriptor):
+        return ActionSpec(callback=descriptor)
+    if isinstance(descriptor, str):
+        return ActionSpec(action=descriptor)
+    if isinstance(descriptor, Mapping):
+        action_name = descriptor.get("action") or descriptor.get("name")
+        args = tuple(descriptor.get("args", ()))
+        kwargs = dict(descriptor.get("kwargs", {}))
+        callback = descriptor.get("callable")
+        return ActionSpec(action=action_name, args=args, kwargs=kwargs, callback=callback)
+    raise BaseModBootstrapError("Invalid follow-up action descriptor provided to SimpleCardBlueprint.")
 
 
 @dataclass(slots=True)
@@ -228,7 +407,16 @@ class SimpleCardBlueprint:
     card_uses: Optional[int] = None
     card_uses_upgrade: int = 0
     attack_effect: str = "SLASH_DIAGONAL"
+    secondary_value: Optional[int] = None
+    secondary_upgrade: int = 0
+    effects: Sequence[Any] = field(default_factory=tuple)
+    on_draw: Sequence[Any] = field(default_factory=tuple)
+    on_discard: Sequence[Any] = field(default_factory=tuple)
     _inner_image_result: Optional[InnerCardImageResult] = field(default=None, init=False, repr=False)
+    _resolved_effects: Tuple[EffectSpec, ...] = field(default_factory=tuple, init=False, repr=False)
+    _on_draw_effects: Tuple[EffectSpec, ...] = field(default_factory=tuple, init=False, repr=False)
+    _on_discard_effects: Tuple[EffectSpec, ...] = field(default_factory=tuple, init=False, repr=False)
+    _placeholders: Mapping[str, str] = field(default_factory=dict, init=False, repr=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "identifier", self.identifier)
@@ -257,6 +445,22 @@ class SimpleCardBlueprint:
             canonical_keywords.append(canonical)
             seen_keywords.add(canonical)
         object.__setattr__(self, "keywords", tuple(canonical_keywords))
+
+        if isinstance(self.effects, str):
+            extra_effects = (self.effects,)
+        else:
+            extra_effects = tuple(self.effects or ())
+        if isinstance(self.on_draw, str):
+            draw_effects = (self.on_draw,)
+        else:
+            draw_effects = tuple(self.on_draw or ())
+        if isinstance(self.on_discard, str):
+            discard_effects = (self.on_discard,)
+        else:
+            discard_effects = tuple(self.on_discard or ())
+        object.__setattr__(self, "effects", extra_effects)
+        object.__setattr__(self, "on_draw", draw_effects)
+        object.__setattr__(self, "on_discard", discard_effects)
 
         value_mapping = {
             _canonical_keyword(key): int(value)
@@ -316,10 +520,73 @@ class SimpleCardBlueprint:
                     "'card_uses_upgrade' is only valid when the card is Exhaustive."
                 )
 
+        if self.secondary_value is not None:
+            try:
+                secondary_value = int(self.secondary_value)
+            except (TypeError, ValueError) as exc:
+                raise BaseModBootstrapError("'secondary_value' must be an integer.") from exc
+            object.__setattr__(self, "secondary_value", secondary_value)
+        try:
+            secondary_upgrade_value = int(self.secondary_upgrade)
+        except (TypeError, ValueError) as exc:
+            raise BaseModBootstrapError("'secondary_upgrade' must be an integer.") from exc
+        if secondary_upgrade_value < 0:
+            raise BaseModBootstrapError("'secondary_upgrade' cannot be negative.")
+        if self.secondary_value is None and secondary_upgrade_value:
+            raise BaseModBootstrapError("'secondary_upgrade' requires 'secondary_value'.")
+        object.__setattr__(self, "secondary_upgrade", secondary_upgrade_value)
+
         object.__setattr__(self, "keyword_values", value_mapping)
         object.__setattr__(self, "keyword_upgrades", upgrade_mapping)
         attack_effect = _coerce_mapping(self.attack_effect, _ATTACK_EFFECT_ALIASES, "attack effect")
         object.__setattr__(self, "attack_effect", attack_effect)
+
+        placeholders = _compute_placeholders(tuple(canonical_keywords))
+        if has_exhaustive_keyword:
+            placeholders.setdefault("uses", KEYWORD_PLACEHOLDERS.get("exhaustive", "!stslib:ex!"))
+        object.__setattr__(self, "_placeholders", placeholders)
+
+        resolved_effects: List[EffectSpec] = []
+        if self.card_type != "ATTACK" and self.effect:
+            primary_field = _EFFECT_VALUE_FIELD[self.effect]
+            resolved_effects.append(
+                _normalise_effect_descriptor(
+                    self,
+                    self.effect,
+                    default_target=self.target,
+                    default_field=primary_field,
+                )
+            )
+        additional_effects = _normalise_effect_sequence(
+            self,
+            self.effects,
+            default_target=self.target,
+            default_field=self.value_field,
+        )
+        if additional_effects:
+            resolved_effects.extend(additional_effects)
+        object.__setattr__(self, "_resolved_effects", tuple(resolved_effects))
+
+        object.__setattr__(
+            self,
+            "_on_draw_effects",
+            _normalise_effect_sequence(
+                self,
+                self.on_draw,
+                default_target=self.target,
+                default_field=self.value_field,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "_on_discard_effects",
+            _normalise_effect_sequence(
+                self,
+                self.on_discard,
+                default_target=self.target,
+                default_field=self.value_field,
+            ),
+        )
 
     @property
     def value_field(self) -> str:
@@ -419,12 +686,11 @@ class SimpleCardFactory:
             COST = blueprint.cost
 
             def __init__(self, color: object) -> None:
-                uses_placeholder = _uses_placeholder(blueprint)
                 description = _format_description(
                     blueprint.description,
                     blueprint.value,
                     field=value_field,
-                    uses=uses_placeholder,
+                    placeholders=blueprint._placeholders,
                 )
                 super().__init__(
                     self.ID,
@@ -450,6 +716,10 @@ class SimpleCardFactory:
                 else:
                     self.baseMagicNumber = blueprint.value
                     self.magicNumber = blueprint.value
+                if blueprint.secondary_value is not None:
+                    self.baseSecondMagicNumber = blueprint.secondary_value
+                    self.secondMagicNumber = blueprint.secondary_value
+                    self.isSecondMagicNumberModified = False
                 if blueprint.target == "ALL_ENEMY":
                     self.damageTypeForTurn = cardcrawl.cards.DamageInfo.DamageType.NORMAL
                 if blueprint.keywords:
@@ -478,8 +748,14 @@ class SimpleCardFactory:
             def use(self, player: object, monster: Optional[object]) -> None:
                 if blueprint.card_type == "ATTACK":
                     _play_attack(self, player, monster, blueprint, attack_effect)
+                    if blueprint._resolved_effects:
+                        _execute_effect_sequence(
+                            self, player, monster, blueprint, blueprint._resolved_effects
+                        )
                 else:
-                    _play_effect(self, player, monster, blueprint)
+                    _execute_effect_sequence(
+                        self, player, monster, blueprint, blueprint._resolved_effects
+                    )
                 _keyword_registry().trigger(self, player, monster)
 
             def upgrade(self) -> None:
@@ -492,7 +768,37 @@ class SimpleCardFactory:
                             self.upgradeBlock(blueprint.upgrade_value)
                         else:
                             self.upgradeMagicNumber(blueprint.upgrade_value)
+                    if blueprint.secondary_value is not None and blueprint.secondary_upgrade:
+                        if hasattr(self, "upgradeSecondMagicNumber"):
+                            self.upgradeSecondMagicNumber(blueprint.secondary_upgrade)
+                        else:
+                            self.baseSecondMagicNumber += blueprint.secondary_upgrade
+                            self.secondMagicNumber += blueprint.secondary_upgrade
                     self.initializeDescription()
+
+            def triggerWhenDrawn(self) -> None:
+                try:
+                    super().triggerWhenDrawn()
+                except AttributeError:
+                    pass
+                if blueprint._on_draw_effects:
+                    player = _current_player()
+                    if player is not None:
+                        _execute_effect_sequence(
+                            self, player, None, blueprint, blueprint._on_draw_effects
+                        )
+
+            def triggerOnDiscard(self) -> None:
+                try:
+                    super().triggerOnDiscard()
+                except AttributeError:
+                    pass
+                if blueprint._on_discard_effects:
+                    player = _current_player()
+                    if player is not None:
+                        _execute_effect_sequence(
+                            self, player, None, blueprint, blueprint._on_discard_effects
+                        )
 
             def makeCopy(self):
                 return type(self)(self.simple_color)
@@ -522,46 +828,203 @@ def _play_attack(card: object, player: object, monster: Optional[object], bluepr
     _enqueue_action(action)
 
 
-def _play_effect(card: object, player: object, monster: Optional[object], blueprint: SimpleCardBlueprint) -> None:
-    effect = blueprint.effect
-    if effect is None:
+def _execute_effect_sequence(
+    card: object,
+    player: object,
+    monster: Optional[object],
+    blueprint: SimpleCardBlueprint,
+    effects: Sequence[EffectSpec],
+) -> None:
+    for spec in effects:
+        _execute_effect_spec(card, player, monster, blueprint, spec)
+
+
+def _execute_effect_spec(
+    card: object,
+    player: object,
+    monster: Optional[object],
+    blueprint: SimpleCardBlueprint,
+    spec: EffectSpec,
+) -> None:
+    amount = _resolve_effect_amount(card, blueprint, spec)
+    if spec.callback is not None:
+        spec.callback(card, player, monster, amount)
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
         return
+
+    effect = spec.effect
+    if effect is None:
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
+        return
+
+    effect = _normalise(effect)
     cardcrawl = _cardcrawl()
     actions = cardcrawl.actions.common
     powers = cardcrawl.powers
+    target_label = spec.target or blueprint.target
+
     if effect == "block":
-        action = actions.GainBlockAction(player, player, card.block)
-        _enqueue_action(action)
+        if player is not None:
+            action = actions.GainBlockAction(player, player, amount)
+            _enqueue_action(action)
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
         return
     if effect == "draw":
-        action = actions.DrawCardAction(player, card.magicNumber)
-        _enqueue_action(action)
+        if player is not None:
+            action = actions.DrawCardAction(player, amount)
+            _enqueue_action(action)
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
         return
     if effect == "energy":
-        action = actions.GainEnergyAction(card.magicNumber)
+        action = actions.GainEnergyAction(amount)
         _enqueue_action(action)
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
         return
     if effect in {"strength", "dexterity", "artifact", "focus"}:
-        owner = player
-        power_cls = getattr(powers, _POWER_CLASS[effect])
-        power = power_cls(owner, card.magicNumber)
-        action = actions.ApplyPowerAction(owner, player, power, card.magicNumber)
-        _enqueue_action(action)
+        if player is not None:
+            power_cls = getattr(powers, _POWER_CLASS[effect])
+            power = power_cls(player, amount)
+            action = actions.ApplyPowerAction(player, player, power, amount)
+            _enqueue_action(action)
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
         return
-    monster = _require_monster(monster, blueprint.target, effect)
+
     if effect == "poison":
-        power_cls = getattr(powers, _POWER_CLASS[effect])
-        power = power_cls(monster, player, card.magicNumber)
-        action = actions.ApplyPowerAction(monster, player, power, card.magicNumber)
-        _enqueue_action(action)
+        for target in _resolve_monster_targets(monster, target_label, effect):
+            power_cls = getattr(powers, _POWER_CLASS[effect])
+            power = power_cls(target, player, amount)
+            action = actions.ApplyPowerAction(target, player, power, amount)
+            _enqueue_action(action)
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
         return
     if effect in {"weak", "vulnerable", "frail"}:
-        power_cls = getattr(powers, _POWER_CLASS[effect])
-        power = power_cls(monster, card.magicNumber, False)
-        action = actions.ApplyPowerAction(monster, player, power, card.magicNumber)
-        _enqueue_action(action)
+        for target in _resolve_monster_targets(monster, target_label, effect):
+            power_cls = getattr(powers, _POWER_CLASS[effect])
+            power = power_cls(target, amount, False)
+            action = actions.ApplyPowerAction(target, player, power, amount)
+            _enqueue_action(action)
+        _run_follow_up_actions(card, player, monster, blueprint, amount, spec.follow_up)
         return
+
     raise BaseModBootstrapError(f"Unhandled effect '{effect}'.")
+
+
+def _resolve_monster_targets(
+    monster: Optional[object], target_label: str, effect: str
+) -> Sequence[object]:
+    if target_label == "ALL_ENEMY":
+        return [enemy for enemy in _iter_monsters() if enemy is not None]
+    resolved = _require_monster(monster, target_label, effect)
+    return [resolved]
+
+
+def _resolve_effect_amount(card: object, blueprint: SimpleCardBlueprint, spec: EffectSpec) -> int:
+    if spec.amount is not None:
+        return int(spec.amount)
+    if spec.amount_key:
+        value = getattr(card, spec.amount_key, 0)
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return 0
+    return int(blueprint.value)
+
+
+def _run_follow_up_actions(
+    card: object,
+    player: object,
+    monster: Optional[object],
+    blueprint: SimpleCardBlueprint,
+    amount: int,
+    actions: Sequence[ActionSpec],
+) -> None:
+    if not actions:
+        return
+    spire_api = _spire()
+    for action_spec in actions:
+        if action_spec.callback is not None:
+            action_spec.callback(card, player, monster, amount)
+            continue
+        if not action_spec.action:
+            continue
+        action_cls = spire_api.action(action_spec.action)
+        args = [
+            _resolve_action_arg(
+                arg, card, player, monster, blueprint, amount, action_spec.action
+            )
+            for arg in action_spec.args
+        ]
+        kwargs = {
+            key: _resolve_action_arg(
+                value, card, player, monster, blueprint, amount, action_spec.action
+            )
+            for key, value in action_spec.kwargs.items()
+        }
+        action = action_cls(*args, **kwargs)
+        _enqueue_action(action)
+
+
+def _resolve_action_arg(
+    value: Any,
+    card: object,
+    player: object,
+    monster: Optional[object],
+    blueprint: SimpleCardBlueprint,
+    amount: int,
+    label: str,
+) -> Any:
+    if isinstance(value, str):
+        key = _normalise(value)
+        if key == "player":
+            return player
+        if key == "card":
+            return card
+        if key == "monster":
+            return _require_monster(monster, blueprint.target, label)
+        if key == "amount":
+            return amount
+        if key == "magic":
+            return getattr(card, "magicNumber", 0)
+        if key in {"secondary", "second"}:
+            return getattr(card, "secondMagicNumber", 0)
+        if key == "damage":
+            return getattr(card, "damage", 0)
+        if key == "block":
+            return getattr(card, "block", 0)
+    if isinstance(value, list):
+        return [
+            _resolve_action_arg(item, card, player, monster, blueprint, amount, label)
+            for item in value
+        ]
+    if isinstance(value, tuple):
+        return tuple(
+            _resolve_action_arg(item, card, player, monster, blueprint, amount, label)
+            for item in value
+        )
+    if isinstance(value, dict):
+        return {
+            key: _resolve_action_arg(item, card, player, monster, blueprint, amount, label)
+            for key, item in value.items()
+        }
+    return value
+
+
+def _iter_monsters() -> Sequence[object]:
+    dungeon = _cardcrawl().dungeons.AbstractDungeon
+    monsters = getattr(dungeon, "getMonsters", lambda: None)()
+    if monsters is None:
+        room = getattr(dungeon, "getCurrRoom", lambda: None)()
+        monsters = getattr(room, "monsters", None) if room else None
+    if monsters is None:
+        monsters = getattr(dungeon, "monsters", None)
+    collection = getattr(monsters, "monsters", None) if monsters is not None else None
+    if collection is None:
+        return []
+    return [enemy for enemy in collection if enemy is not None]
+
+
+def _current_player() -> Optional[object]:
+    return getattr(_cardcrawl().dungeons.AbstractDungeon, "player", None)
 
 
 def register_simple_card(project: "ModProject", blueprint: SimpleCardBlueprint) -> None:
@@ -573,6 +1036,15 @@ def register_simple_card(project: "ModProject", blueprint: SimpleCardBlueprint) 
 
 PLUGIN_MANAGER.expose("SimpleCardBlueprint", SimpleCardBlueprint)
 PLUGIN_MANAGER.expose("register_simple_card", register_simple_card)
+PLUGIN_MANAGER.expose("register_keyword_placeholder", register_keyword_placeholder)
+PLUGIN_MANAGER.expose("keyword_placeholders", KEYWORD_PLACEHOLDERS)
 PLUGIN_MANAGER.expose_module("modules.basemod_wrapper.cards", alias="basemod_cards")
 
-__all__ = ["SimpleCardBlueprint", "SimpleCardFactory", "register_simple_card"]
+__all__ = [
+    "ActionSpec",
+    "EffectSpec",
+    "SimpleCardBlueprint",
+    "SimpleCardFactory",
+    "register_simple_card",
+    "register_keyword_placeholder",
+]
