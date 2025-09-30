@@ -318,6 +318,35 @@ assembles the ModTheSpire manifest and copies assets/Python sources into the
 output directory. Drop the resulting folder into `ModTheSpire/mods/` and enable
 it from the launcher.
 
+## Extensible keyword engine
+
+Subclasses of `modules.basemod_wrapper.keywords.Keyword` automatically register
+themselves and can be mixed with the canonical StS keywords inside
+`SimpleCardBlueprint` declarations. The base class exposes high level proxies
+for manipulating combat state:
+
+- `self.hp`, `self.hp.current` and `self.hp.permanent` control the player's
+  temporary, current and maximum health.
+- `self.player` exposes block, energy and every canonical buff/debuff through
+  properties (`keyword.player.strength = 5`, `keyword.player.intangible += 1`,
+  etc.).
+- `self.enemies` resolves the targeted monster, a random foe or the full room
+  and offers fluent power access (`self.enemies.target.weak = 2`,
+  `for enemy in self.enemies.all(): enemy.block = 10`).
+- `self.cards.hand[index]` / `self.cards.draw_pile[index]` return
+  `CardEditor` helpers that mirror the `SimpleCardBlueprint` fields and can
+  persist modifications for the combat, the current run or forever. Permanent
+  edits are stored in `persistent_cards.json` and automatically reapplied at the
+  start of each new dungeon via the keyword scheduler.
+- `self.cards.hand.add_by_name("Bash")` accepts either card IDs or the title of
+  any card present in the player's decks/pools and pushes a copy into the hand.
+
+Scheduling is controlled through `self.when` (`now`, `next`, `random`,
+`nextend`, `randomend`), `self.turn_offset` for deterministic delays and
+`self.random_turn_range` for probabilistic triggers. Keywords scheduled for a
+future turn are executed by the shared `KeywordScheduler`, ensuring they play
+nicely with canonical effects and other custom keywords.
+
 ## Plugin integration
 
 Every public symbol in the wrapper is shared with the repository-wide plugin
