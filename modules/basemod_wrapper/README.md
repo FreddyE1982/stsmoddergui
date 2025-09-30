@@ -176,6 +176,7 @@ Each blueprint is a dataclass with the following key fields:
 | `attack_effect` | Visual for damage actions (`slash_diagonal`, `slash_horizontal`, `blunt_heavy`, etc.). |
 | `keywords` | Iterable of keyword flags. Canonical names (`innate`, `retain`, `stslib:Exhaustive`) are normalised automatically. |
 | `keyword_values` / `keyword_upgrades` | Numeric keyword payloads (e.g. Exhaustive counts) and their upgrade deltas. |
+| `card_uses` / `card_uses_upgrade` | Required for Exhaustive cards. Provides the base number of uses (and optional upgrade delta) that will be rendered via `{uses}`. |
 | `image` | Resource path used when you already have card art on disk. |
 | `inner_image_source` | Optional 500x380 image that will be processed into BaseMod-ready portrait/inner art pairs. |
 
@@ -202,7 +203,7 @@ strike = SimpleCardBlueprint(
 guard = SimpleCardBlueprint(
     identifier="RevenantGuard",
     title="Soul Guard",
-    description="Gain {block} Block. Exhaustive !stslib:ex!.",
+    description="Gain {block} Block. Exhaustive {uses}.",
     cost=1,
     card_type="skill",
     target="self",
@@ -211,7 +212,7 @@ guard = SimpleCardBlueprint(
     value=12,
     upgrade_value=4,
     keywords=("innate", "retain", "stslib:Exhaustive"),
-    keyword_values={"exhaustive": 2},
+    card_uses=2,
     keyword_upgrades={"exhaustive": 1},
 )
 
@@ -223,6 +224,10 @@ When registered, the blueprint generates a full `CustomCard` subclass, wires the
 correct BaseMod/StSLib actions (`DamageAction`, `GainBlockAction`,
 `ApplyPowerAction`) and exposes it to the runtime. The resulting card IDs are
 prefixed automatically with your project’s `mod_id`.
+
+Exhaustive blueprints automatically translate the `{uses}` placeholder into the
+`!stslib:ex!` runtime token so players always see the remaining uses without
+sprinkling raw StSLib variables into descriptions.
 
 #### Inner art automation
 
