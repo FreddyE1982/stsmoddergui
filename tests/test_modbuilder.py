@@ -267,3 +267,57 @@ def test_static_spine_assets_are_generated(tmp_path: Path, use_real_dependencies
     Character._prepare_static_spine(character, assets_root)
     assert character.image.staticspineatlas.endswith("pose.atlas")
     assert character.image.staticspinejson.endswith("pose.json")
+
+
+def test_character_allows_inner_card_blueprints(tmp_path: Path, use_real_dependencies: bool) -> None:
+    class StarterDeck(Deck):
+        pass
+
+    Image = ensure_pillow()
+    inner_source = tmp_path / "inner" / "common0.png"
+    inner_source.parent.mkdir(parents=True, exist_ok=True)
+    Image.new("RGBA", (500, 380), (255, 255, 255, 255)).save(inner_source)
+
+    include_cards: dict[str, bool] = {}
+
+    for index in range(60):
+        blueprint = _make_blueprint(f"Common{index}", rarity="common")
+        if index == 0:
+            blueprint.innerCardImage(str(inner_source))
+            include_cards[f"Common{index}.png"] = False
+        else:
+            include_cards[f"Common{index}.png"] = True
+        StarterDeck.addCard(blueprint)
+
+    class UnlockableDeck(Deck):
+        pass
+
+    for index in range(37):
+        UnlockableDeck.addCard(_make_blueprint(f"Uncommon{index}", rarity="uncommon"))
+        include_cards[f"Uncommon{index}.png"] = True
+    for index in range(3):
+        UnlockableDeck.addCard(_make_blueprint(f"Rare{index}", rarity="rare"))
+        include_cards[f"Rare{index}.png"] = True
+
+    class DummyCharacter(_BaseTestCharacter):
+        def __init__(self) -> None:
+            super().__init__()
+            self.start.deck = StarterDeck
+            self.unlockableDeck = UnlockableDeck
+
+    assets_root = tmp_path / "assets" / "buddy"
+    _prepare_assets(assets_root, include_cards=include_cards)
+    python_root = tmp_path / "python"
+    _prepare_python_source(python_root)
+
+    result = DummyCharacter.createMod(
+        tmp_path / "dist",
+        assets_root=assets_root,
+        python_source=python_root,
+        bundle=False,
+        register_cards=False,
+    )
+
+    assert result == (tmp_path / "dist" / "Buddy")
+    card_image = assets_root / "images" / "cards" / "Common0.png"
+    assert not card_image.exists()

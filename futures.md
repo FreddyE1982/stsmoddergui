@@ -102,3 +102,12 @@ ready-to-run `project.py`. Usage: extend `Character.createMod` with an optional
 `generate_python_package` flag that writes a minimal package embedding the
 registered decks and characters, ensuring teams without an existing Python code
 base can still rely on the automated bundler.
+
+## Inner card generation telemetry
+
+Record manifest entries whenever `Character.createMod` schedules inner card art
+generation so the bundler can report skipped outputs or stale cache hits.
+Usage: extend the card asset pipeline with a lightweight audit log that captures
+blueprint identifiers, source digests and resolved resource paths, then surface
+a `PLUGIN_MANAGER` broadcast so tooling plugins can surface progress bars or
+regeneration prompts.
