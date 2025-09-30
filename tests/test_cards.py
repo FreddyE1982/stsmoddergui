@@ -32,7 +32,7 @@ from tests.stubs import (
 )
 
 
-def test_inner_card_image_requires_exact_dimensions(tmp_path):
+def test_inner_card_image_requires_exact_dimensions(tmp_path, use_real_dependencies):
     Image = ensure_pillow()
     image_path = tmp_path / "bad.png"
     Image.new("RGBA", (250, 190), (255, 0, 0, 255)).save(image_path)
@@ -52,6 +52,32 @@ def test_inner_card_image_requires_exact_dimensions(tmp_path):
     with pytest.raises(BaseModBootstrapError) as excinfo:
         blueprint.innerCardImage(str(image_path))
     assert str(excinfo.value) == "innerCardImage MUST be 500x380"
+
+
+def test_inner_card_image_resets_blueprint_image(tmp_path, use_real_dependencies):
+    Image = ensure_pillow()
+    image_path = tmp_path / "good.png"
+    Image.new("RGBA", (500, 380), (255, 255, 255, 255)).save(image_path)
+
+    blueprint = SimpleCardBlueprint(
+        identifier="BuddyPortrait",
+        title="Buddy Portrait",
+        description="Gain {block} Block.",
+        cost=1,
+        card_type="skill",
+        target="self",
+        rarity="common",
+        effect="block",
+        value=8,
+        image="buddy/images/cards/portrait.png",
+    )
+
+    returned = blueprint.innerCardImage(str(image_path))
+
+    assert returned is blueprint
+    assert blueprint.inner_image_source == str(image_path.resolve())
+    assert blueprint.image is None
+    assert blueprint._inner_image_result is None
 
 
 def test_factory_uses_prepared_inner_card_image(monkeypatch, stubbed_runtime, tmp_path):
@@ -283,6 +309,43 @@ def test_exhaustive_requires_card_uses():
         )
 
     assert "Exhaustive cards must define 'card_uses'" in str(excinfo.value)
+
+
+def test_card_uses_must_be_positive_integer(use_real_dependencies):
+    with pytest.raises(BaseModBootstrapError) as excinfo:
+        SimpleCardBlueprint(
+            identifier="BuddyZeroUses",
+            title="Buddy Zero Uses",
+            description="Gain {block} Block.",
+            cost=1,
+            card_type="skill",
+            target="self",
+            effect="block",
+            rarity="common",
+            value=5,
+            keywords=("stslib:Exhaustive",),
+            card_uses=0,
+        )
+
+    assert "positive integer" in str(excinfo.value)
+
+
+def test_card_uses_upgrade_requires_exhaustive_keyword(use_real_dependencies):
+    with pytest.raises(BaseModBootstrapError) as excinfo:
+        SimpleCardBlueprint(
+            identifier="BuddyUpgradeUses",
+            title="Buddy Upgrade Uses",
+            description="Gain {block} Block.",
+            cost=1,
+            card_type="skill",
+            target="self",
+            effect="block",
+            rarity="common",
+            value=5,
+            card_uses_upgrade=1,
+        )
+
+    assert "only valid when the card is Exhaustive" in str(excinfo.value)
 
 
 def test_exhaustive_description_uses_dynamic_token(stubbed_runtime):

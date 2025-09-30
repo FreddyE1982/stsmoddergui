@@ -34,6 +34,22 @@ from tests.stubs import (
 )
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--use-real-dependencies",
+        action="store_true",
+        default=False,
+        help="Run tests against the real BaseMod runtime without monkeypatched stubs.",
+    )
+
+
+@pytest.fixture()
+def use_real_dependencies(request: pytest.FixtureRequest) -> bool:
+    """Return True when the caller requested real runtime dependencies."""
+
+    return bool(request.config.getoption("--use-real-dependencies"))
+
+
 @pytest.fixture()
 def stubbed_runtime(monkeypatch):
     action_manager = StubActionManager()
