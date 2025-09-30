@@ -13,6 +13,13 @@ Persist downloaded jars with version tracking to avoid unnecessary re-downloads
 when different wrapper versions are required.  Usage: expand
 ``ensure_basemod_jar`` to accept a version string and maintain a local manifest.
 
+## Desktop jar discovery helper
+
+Provide a small helper that scans common Steam install directories and honours
+environment variables to automatically locate ``desktop-1.0.jar``. Usage: expose
+``ensure_desktop_jar()`` that either returns a valid path or raises a helpful
+error instructing users how to obtain the jar.
+
 ## Interface signature caching
 
 Cache inspected Java method signatures to speed up repeated calls to heavily
