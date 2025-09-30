@@ -47,11 +47,13 @@ wrapper without tight coupling.
 
 ## Boot sequence and dependency handling
 
-`ensure_jpype()` is called as soon as the package is imported. If JPype is not
-present it is installed on the fly. The wrapper then downloads (or reuses) the
-BaseMod, ModTheSpire and StSLib jars into the module directory and launches the
-JVM with a sane default classpath. Consumers simply import and go – no manual
-setup of Java paths or environment variables.
+`ensure_jpype()` is called as soon as the package is imported. Behind the
+scenes this delegates to the currently active JVM backend – JPype by default,
+GraalPy when the experimental ``graalpy_runtime`` module is toggled on. Missing
+bridge dependencies are installed on the fly before the wrapper downloads (or
+reuses) the BaseMod, ModTheSpire and StSLib jars and launches the JVM with a
+sane default classpath. Consumers simply import and go – no manual setup of
+Java paths or environment variables.
 
 ## High level workflow
 

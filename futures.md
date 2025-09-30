@@ -42,6 +42,11 @@
   execute the entrypoint. The executable workflow is covered by
   `modules.modbuilder.runtime_env.bootstrap_python_runtime` and documented in
   `how to/load-and-play-mod.md`.
+- [complete] **GraalPy runtime playbook integration** – The new
+  `experimental.graalpy_runtime` feature provisions the GraalPy interpreter,
+  rebuilds Pillow for the host platform, registers a polyglot JVM backend and
+  exposes plugin hooks so toggling the experiment immediately reroutes all
+  BaseMod bridge calls through GraalPy.
 
 ## Upcoming work
 
@@ -151,11 +156,8 @@
   that scans the `assets/<mod_id>/localizations` tree, reports cards that only
   exist in a subset of languages, and exposes a plugin hook so translation
   workflows can gate builds when required locales are incomplete.
-- [todo] **GraalPy migration playbook integration** – Consolidate the
-  GraalPy compatibility and migration notes under
-  `modules.basemod_wrapper.experimental` into a guided activation flow.
-  Usage: ship an `experimental.graalpy` feature that surfaces the collected
-  compatibility guidance, validates the local GraalPy toolchain, and exposes
-  plugin hooks so external tooling can extend the migration checks before a
-  mod toggles into GraalPy mode.
+- [todo] **GraalPy verification harness** – Extend the GraalPy backend with
+  smoke tests that execute under the GraalPy interpreter and exercise
+  functional interface proxies, package resolution, and runtime_env bootstrap
+  plans to ensure future upgrades of GraalPy do not break the bridge.
 

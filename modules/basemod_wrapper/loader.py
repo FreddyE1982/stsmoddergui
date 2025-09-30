@@ -12,6 +12,8 @@ import zipfile
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence
 
+from .java_backend import active_backend
+
 
 BASEMOD_RELEASE_URL = "https://github.com/daviscook477/BaseMod/releases/latest/download/BaseMod.jar"
 BASEMOD_JAR_NAME = "BaseMod.jar"
@@ -28,13 +30,16 @@ class BaseModBootstrapError(RuntimeError):
 
 
 def ensure_jpype() -> None:
-    """Ensure that JPype is available, installing it on demand."""
+    """Ensure that the active JVM bridge is ready for use."""
 
-    try:
-        import jpype  # noqa: F401
-    except ModuleNotFoundError:  # pragma: no cover - installation path
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "JPype1"])
-        import jpype  # type: ignore  # noqa: F401
+    ensure_java_bridge()
+
+
+def ensure_java_bridge() -> None:
+    """Ensure the configured JVM bridge dependencies are installed."""
+
+    backend = active_backend()
+    backend.ensure_bridge()
 
 
 def _download(url: str, destination: Path) -> None:
@@ -198,16 +203,9 @@ def ensure_modthespire_jar(base_dir: Path, version: Optional[str] = None) -> Pat
 def start_jvm(classpath_entries: Sequence[Path]) -> None:
     """Start the JVM with the given classpath if it is not already running."""
 
-    import jpype
-
-    if jpype.isJVMStarted():
-        return
-
-    classpath = os.pathsep.join(str(entry) for entry in classpath_entries)
-    jpype.startJVM(classpath=[classpath])
-
-    # Enable import hooks once the JVM is up.
-    import jpype.imports  # noqa: F401
+    backend = active_backend()
+    backend.ensure_bridge()
+    backend.start_vm(tuple(classpath_entries))
 
 
 def ensure_basemod_environment(
@@ -221,7 +219,7 @@ def ensure_basemod_environment(
     """Ensure that the BaseMod + StSLib environment is ready for use."""
 
     base_dir = base_dir or Path(__file__).resolve().parent
-    ensure_jpype()
+    ensure_java_bridge()
     basemod_jar = ensure_basemod_jar(base_dir, version=basemod_version)
     stslib_jar = ensure_stslib_jar(base_dir, version=stslib_version)
     modthespire_jar = ensure_modthespire_jar(base_dir, version=modthespire_version)
@@ -288,6 +286,7 @@ def ensure_desktop_jar(
 __all__ = [
     "BaseModBootstrapError",
     "ensure_jpype",
+    "ensure_java_bridge",
     "ensure_basemod_jar",
     "ensure_basemod_environment",
     "ensure_dependency_classpath",

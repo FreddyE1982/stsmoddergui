@@ -4,7 +4,8 @@ This module makes it easier for documentation and tooling to instruct
 teammates on how to activate the Python half of a bundled mod.  Bundles
 produced by :func:`modules.modbuilder.Character.createMod` ship the Python
 package next to the compiled patch jar.  Testers still need to provision a
-Python interpreter with JPype installed and make sure the generated
+Python interpreter with the active JVM bridge installed (JPype by default,
+GraalPy when the experimental feature is toggled) and make sure the generated
 ``entrypoint`` module is reachable at game launch.
 
 The helpers below keep that workflow declarative:
@@ -14,8 +15,8 @@ The helpers below keep that workflow declarative:
   module and any dependency manifests (``requirements.txt`` / ``pyproject``).
 * :class:`PythonRuntimeDescriptor.bootstrap_plan` manufactures
   copy-paste-ready command sequences for POSIX and Windows shells so teams can
-  set up virtual environments, install JPype and point ``PYTHONPATH`` at the
-  bundled sources without guesswork.
+  set up virtual environments, install the configured JVM bridge and point
+  ``PYTHONPATH`` at the bundled sources without guesswork.
 
 The functions are exported through the global plugin manager so downstream
 tooling and documentation renderers can surface the same guidance.
@@ -43,6 +44,7 @@ from typing import (
 )
 
 from plugins import PLUGIN_MANAGER
+from modules.basemod_wrapper.java_backend import active_backend
 
 
 class PythonRuntimeError(RuntimeError):
@@ -229,10 +231,15 @@ class PythonRuntimeDescriptor:
                 f"{_windows_quote(pip_windows)} install -e {_windows_quote(editable)}"
             )
 
-        if not posix_install:
-            posix_install.append(f"{_posix_quote(pip_posix)} install JPype1")
-        if not windows_install:
-            windows_install.append(f"{_windows_quote(pip_windows)} install JPype1")
+        backend = active_backend()
+        backend.extend_bootstrap_commands(
+            posix=posix_install,
+            windows=windows_install,
+            pip_posix=pip_posix,
+            pip_windows=pip_windows,
+            requirement_files_present=bool(self.requirement_files),
+            editable_targets_present=bool(self.editable_targets),
+        )
 
         python_posix = venv_directory / "bin" / "python"
         python_windows = venv_directory / "Scripts" / "python.exe"
@@ -450,13 +457,17 @@ def execute_bootstrap_plan(
             env=environment,
             logger=logger,
         )
-    if not plan.descriptor.requirement_files and not plan.descriptor.editable_targets:
-        _run_pip(
+    backend = active_backend()
+    try:
+        backend.install_default_dependencies(
             pip_executable,
-            ["install", "--no-input", "JPype1"],
-            env=environment,
+            environment=environment,
             logger=logger,
+            requirement_files_present=bool(plan.descriptor.requirement_files),
+            editable_targets_present=bool(plan.descriptor.editable_targets),
         )
+    except RuntimeError as exc:
+        raise PythonRuntimeError(str(exc)) from exc
 
     runtime_env = _prepare_environment(environment, plan.descriptor.python_root, extra_env=extra_env)
 

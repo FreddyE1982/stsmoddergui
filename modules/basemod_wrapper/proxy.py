@@ -4,12 +4,16 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import jpype
+from .java_backend import active_backend
+
+
+def _backend():
+    return active_backend()
 
 
 @lru_cache(maxsize=None)
 def _jclass(name: str):
-    return jpype.JClass(name)
+    return _backend().jclass(name)
 
 
 def _modifier():
@@ -45,7 +49,7 @@ def _build_callable_proxy(parameter: Any, callback: Callable[..., Any]) -> Any:
             f"Interface {interface_name} does not expose an abstract method for proxying."
         )
     method_name = abstract_methods[0].getName()
-    return jpype.JProxy(interface_name, dict(**{method_name: callback}))
+    return _backend().create_proxy(interface_name, {method_name: callback})
 
 
 def _convert_argument(parameter: Any, value: Any) -> Any:
@@ -53,8 +57,8 @@ def _convert_argument(parameter: Any, value: Any) -> Any:
         return _build_callable_proxy(parameter, value)
     if parameter.isArray() and isinstance(value, (list, tuple)):
         component = parameter.getComponentType()
-        array_type = jpype.JArray(_jclass(component.getName()))
-        return array_type(value)
+        component_name = component.getName()
+        return _backend().create_array(component_name, value)
     return value
 
 
@@ -118,7 +122,8 @@ class JavaClassWrapper:
         attribute = getattr(self._class, item)
         if callable(attribute):
             return JavaCallableWrapper(self._class, item, attribute)
-        if isinstance(attribute, jpype.JClass):
+        backend = _backend()
+        if backend.is_class(attribute):
             return JavaClassWrapper(attribute)
         return attribute
 
@@ -130,10 +135,11 @@ class JavaPackageWrapper:
         self._package = package
 
     def __getattr__(self, item: str) -> Any:
-        attribute = getattr(self._package, item)
-        if isinstance(attribute, jpype._jpackage.JPackage):
+        backend = _backend()
+        attribute = backend.package_getattr(self._package, item)
+        if backend.is_package(attribute):
             return JavaPackageWrapper(attribute)
-        if isinstance(attribute, jpype.JClass):
+        if backend.is_class(attribute):
             return JavaClassWrapper(attribute)
         if callable(attribute):
             return JavaCallableWrapper(self._package, item, attribute)
@@ -141,7 +147,8 @@ class JavaPackageWrapper:
 
 
 def create_package_wrapper(package_name: str) -> JavaPackageWrapper:
-    return JavaPackageWrapper(jpype.JPackage(package_name))
+    backend = _backend()
+    return JavaPackageWrapper(backend.jpackage(package_name))
 
 
 __all__ = [

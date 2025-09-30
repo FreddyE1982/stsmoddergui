@@ -14,6 +14,7 @@ from importlib import import_module
 from functools import lru_cache
 
 from .loader import BaseModBootstrapError, ensure_dependency_classpath
+from .java_backend import active_backend
 from plugins import PLUGIN_MANAGER
 
 if TYPE_CHECKING:  # pragma: no cover - typing helper
@@ -124,11 +125,8 @@ class CharacterBlueprint:
     skeleton_scale: float = 1.0
 
     def build_player_class(self, color_enum: object, player_enum: object, color_definition: ColorDefinition) -> Type:
-        import jpype
-
         CustomPlayer = _basemod().abstracts.CustomPlayer
         EnergyManager = _cardcrawl().characters.EnergyManager
-
         class GeneratedCharacter(CustomPlayer):  # type: ignore[misc]
             ENERGY_PER_TURN = self.energy_per_turn
             START_HP = self.starting_hp
@@ -172,10 +170,10 @@ class CharacterBlueprint:
                 )
 
             def getStartingDeck(self):
-                return jpype.JArray(str)(self.blueprint.starting_deck)
+                return active_backend().create_array("java.lang.String", self.blueprint.starting_deck)
 
             def getStartingRelics(self):
-                return jpype.JArray(str)(self.blueprint.starting_relics)
+                return active_backend().create_array("java.lang.String", self.blueprint.starting_relics)
 
             def getCardColor(self):
                 return color_enum
