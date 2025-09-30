@@ -68,3 +68,12 @@ Provide optional PNG placeholders (solid alpha grids) whenever ``scaffold`` crea
 ## Plugin attribute diff subscriptions
 
 Build a watcher atop ``repository_attributes`` that emits change events whenever modules expose new callables or state. Usage: extend ``PLUGIN_MANAGER`` with a ``subscribe_to_exports`` helper that hands plugins a diff of newly discovered attributes so tooling can hot-reload capabilities without rescanning the entire manifest.
+
+## Simple card blueprint CLI preview
+
+Provide a small `python -m modules.basemod_wrapper.cards preview ...` helper that
+instantiates `SimpleCardBlueprint`s from JSON/YAML manifests and dumps the
+resulting auto-generated card classes plus resolved resource paths. Usage:
+`python -m modules.basemod_wrapper.cards preview blueprint.json` would process
+blueprints, emit a tabular summary of costs/keywords and highlight any missing
+art assets before bundling.
