@@ -4,10 +4,20 @@ from pathlib import Path
 
 import pytest
 
-from modules.modbuilder import Character, CharacterColorConfig, CharacterImageConfig, CharacterStartConfig, Deck
+from modules.modbuilder import (
+    CHARACTER_VALIDATION_HOOK,
+    Character,
+    CharacterColorConfig,
+    CharacterDeckSnapshot,
+    CharacterImageConfig,
+    CharacterStartConfig,
+    CharacterValidationReport,
+    Deck,
+)
 from modules.basemod_wrapper.cards import SimpleCardBlueprint
 from modules.basemod_wrapper.loader import BaseModBootstrapError
 from modules.basemod_wrapper.card_assets import ensure_pillow
+from plugins import PLUGIN_MANAGER, PluginRecord
 
 
 def _make_blueprint(identifier: str, rarity: str = "common", image_stub: str | None = None) -> SimpleCardBlueprint:
@@ -104,6 +114,26 @@ def test_deck_collects_cards(use_real_dependencies: bool) -> None:
     assert cards[0] is first
     assert cards[1] is second
     assert cards[2] is first
+
+
+def test_deck_statistics_reports_distribution(use_real_dependencies: bool) -> None:
+    class StatsDeck(Deck):
+        pass
+
+    common = _make_blueprint("Strike", rarity="common")
+    rare = _make_blueprint("Defend", rarity="rare")
+
+    StatsDeck.addCard(common)
+    StatsDeck.addCard(common)
+    StatsDeck.addCard(rare)
+
+    stats = StatsDeck.statistics()
+    assert stats.total_cards == 3
+    assert stats.unique_cards == 2
+    assert stats.identifier_counts["Strike"] == 2
+    assert stats.duplicate_identifiers["Strike"] == 2
+    assert pytest.approx(stats.rarity_distribution["COMMON"], rel=1e-5) == (2 / 3) * 100
+    assert pytest.approx(stats.rarity_distribution["RARE"], rel=1e-5) == (1 / 3) * 100
 
 
 def test_character_reports_missing_assets(tmp_path: Path, use_real_dependencies: bool) -> None:
@@ -321,3 +351,122 @@ def test_character_allows_inner_card_blueprints(tmp_path: Path, use_real_depende
     assert result == (tmp_path / "dist" / "Buddy")
     card_image = assets_root / "images" / "cards" / "Common0.png"
     assert not card_image.exists()
+
+
+def test_character_collect_cards_and_validate(tmp_path: Path, use_real_dependencies: bool) -> None:
+    class StarterDeck(Deck):
+        pass
+
+    include_cards: dict[str, bool] = {}
+
+    for index in range(60):
+        blueprint = _make_blueprint(f"Common{index}", rarity="common")
+        StarterDeck.addCard(blueprint)
+        include_cards[f"Common{index}.png"] = True
+
+    class UnlockableDeck(Deck):
+        pass
+
+    for index in range(37):
+        UnlockableDeck.addCard(_make_blueprint(f"Uncommon{index}", rarity="uncommon"))
+        include_cards[f"Uncommon{index}.png"] = True
+    for index in range(3):
+        UnlockableDeck.addCard(_make_blueprint(f"Rare{index}", rarity="rare"))
+        include_cards[f"Rare{index}.png"] = True
+
+    class DummyCharacter(_BaseTestCharacter):
+        def __init__(self) -> None:
+            super().__init__()
+            self.start.deck = StarterDeck
+            self.unlockableDeck = UnlockableDeck
+
+    assets_root = tmp_path / "assets" / "buddy"
+    _prepare_assets(assets_root, include_cards=include_cards)
+
+    character = DummyCharacter()
+    decks = DummyCharacter.collect_cards(character)
+    assert isinstance(decks, CharacterDeckSnapshot)
+    assert decks.start_deck is StarterDeck
+    assert decks.unlockable_deck is UnlockableDeck
+    assert decks.total_cards == 100
+    assert decks.unique_cards["Common0"].identifier == "Common0"
+
+    report = DummyCharacter.validate(character, decks=decks, assets_root=assets_root)
+    assert isinstance(report, CharacterValidationReport)
+    assert report.is_valid
+    assert report.format_errors() == ""
+
+
+def test_character_validation_hook_integration(tmp_path: Path, use_real_dependencies: bool) -> None:
+    class StarterDeck(Deck):
+        pass
+
+    include_cards: dict[str, bool] = {}
+
+    for index in range(60):
+        StarterDeck.addCard(_make_blueprint(f"Common{index}", rarity="common"))
+        include_cards[f"Common{index}.png"] = True
+
+    class UnlockableDeck(Deck):
+        pass
+
+    for index in range(37):
+        UnlockableDeck.addCard(_make_blueprint(f"Uncommon{index}", rarity="uncommon"))
+        include_cards[f"Uncommon{index}.png"] = True
+    for index in range(3):
+        UnlockableDeck.addCard(_make_blueprint(f"Rare{index}", rarity="rare"))
+        include_cards[f"Rare{index}.png"] = True
+
+    class DummyCharacter(_BaseTestCharacter):
+        def __init__(self) -> None:
+            super().__init__()
+            self.start.deck = StarterDeck
+            self.unlockableDeck = UnlockableDeck
+
+    assets_root = tmp_path / "assets" / "buddy"
+    _prepare_assets(assets_root, include_cards=include_cards)
+    python_root = tmp_path / "python"
+    _prepare_python_source(python_root)
+
+    plugin_name = "tests.validation_plugin"
+
+    class _ValidationPlugin:
+        name = "validation-plugin"
+
+        def modbuilder_character_validate(self, **kwargs):  # type: ignore[no-untyped-def]
+            report: CharacterValidationReport = kwargs["report"]
+            report.add_error("Injected plugin error")
+            return {"errors": ["Additional hook error"], "hook": CHARACTER_VALIDATION_HOOK}
+
+    plugin = _ValidationPlugin()
+    record = PluginRecord(
+        name=plugin_name,
+        module=plugin_name,
+        obj=plugin,
+        exposed=PLUGIN_MANAGER.exposed,
+    )
+    original_plugins = dict(PLUGIN_MANAGER._plugins)
+    PLUGIN_MANAGER._plugins[plugin_name] = record
+    try:
+        character = DummyCharacter()
+        decks = DummyCharacter.collect_cards(character)
+        report = DummyCharacter.validate(character, decks=decks, assets_root=assets_root)
+        assert not report.is_valid
+        assert "Injected plugin error" in report.errors
+        assert "Additional hook error" in report.errors
+        assert plugin_name in report.context
+        assert report.context[plugin_name]["hook"] == CHARACTER_VALIDATION_HOOK
+
+        with pytest.raises(BaseModBootstrapError) as excinfo:
+            DummyCharacter.createMod(
+                tmp_path / "dist",
+                assets_root=assets_root,
+                python_source=python_root,
+                bundle=False,
+                register_cards=False,
+            )
+        message = str(excinfo.value)
+        assert "Injected plugin error" in message
+        assert "Additional hook error" in message
+    finally:
+        PLUGIN_MANAGER._plugins = original_plugins
