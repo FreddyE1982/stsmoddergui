@@ -1,175 +1,335 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import Any, Dict, List, Optional
 
 import pytest
 
-from modules.basemod_wrapper.cards import SimpleCardBlueprint
-from modules.basemod_wrapper.project import ModProject
-from modules.basemod_wrapper.keywords import Keyword, keyword_scheduler
-
-
-class StubPlayer:
-    def __init__(self) -> None:
-        self.maxHealth = 80
-        self.currentHealth = 70
-        self.temp_hp = 0
-        self.hand = []
-        self.drawPile = []
-        self.discardPile = []
-        self.masterDeck = SimpleNamespace(group=[])
-        self._powers: dict[str, SimpleNamespace] = {}
-
-    def getPower(self, name: str):
-        return self._powers.get(name)
-
-    def setPower(self, name: str, amount: int) -> None:
-        self._powers[name] = SimpleNamespace(amount=amount)
-
-
-class StubCard:
-    def __init__(self) -> None:
-        self.cardID = "StubCard"
-        self.name = "Stub"
-        self.rawDescription = ""
-        self.cost = 1
+from modules.basemod_wrapper.keywords import (
+    CardEditor,
+    Keyword,
+    KeywordContext,
+    KEYWORD_REGISTRY,
+    RuntimeHandles,
+    keyword_scheduler,
+)
 
 
 @pytest.fixture(autouse=True)
-def reset_scheduler():
+def reset_scheduler() -> None:
     keyword_scheduler.reset()
     yield
     keyword_scheduler.reset()
 
 
-def test_custom_keyword_runs_during_card_use(stubbed_runtime):
-    triggered = {}
+class StubCreature:
+    def __init__(self, hp: int = 50) -> None:
+        self.maxHealth = hp
+        self.currentHealth = hp
+        self.temp_hp = 0
+        self.currentBlock = 0
+        self.hand = SimpleNamespace(group=[])
+        self.drawPile = SimpleNamespace(group=[])
+        self.discardPile = SimpleNamespace(group=[])
+        self.masterDeck = SimpleNamespace(group=[])
+        self._powers: Dict[str, int] = {}
 
-    class BuddyKeyword(Keyword):
-        def __init__(self) -> None:
-            super().__init__()
-            self.when = "now"
-
-        def apply(self, context) -> None:
-            triggered["flag"] = True
-            context.card.marker = "buddy"
-
-    project = ModProject("buddy", "Buddy", "Buddy", "Test")
-    project._color_enum = "BUDDY_COLOR"
-    blueprint = SimpleCardBlueprint(
-        identifier="BuddyCard",
-        title="Buddy Card",
-        description="Do the thing.",
-        cost=1,
-        card_type="skill",
-        target="self",
-        effect="block",
-        rarity="common",
-        value=2,
-        keywords=("BuddyKeyword",),
-    )
-    project.add_simple_card(blueprint)
-    card = project.cards["BuddyCard"].factory()
-
-    cardcrawl_stub, action_manager, _ = stubbed_runtime
-    player = StubPlayer()
-    cardcrawl_stub.dungeons.AbstractDungeon.player = player
-
-    card.use(player, None)
-
-    assert triggered["flag"] is True
-    assert getattr(card, "marker") == "buddy"
-
-
-def test_keyword_scheduler_next_turn_execution(stubbed_runtime):
-    calls = {"count": 0}
-
-    class DelayedKeyword(Keyword):
-        def __init__(self) -> None:
-            super().__init__()
-            self.when = "next"
-
-        def apply(self, context) -> None:
-            calls["count"] += 1
-
-    project = ModProject("delay", "Delay", "Delay", "Test")
-    project._color_enum = "BUDDY_COLOR"
-    blueprint = SimpleCardBlueprint(
-        identifier="DelayedCard",
-        title="Delayed",
-        description="Wait a turn.",
-        cost=1,
-        card_type="skill",
-        target="self",
-        effect="block",
-        rarity="common",
-        value=1,
-        keywords=("DelayedKeyword",),
-    )
-    project.add_simple_card(blueprint)
-    card = project.cards["DelayedCard"].factory()
-
-    cardcrawl_stub, _, _ = stubbed_runtime
-    player = StubPlayer()
-    cardcrawl_stub.dungeons.AbstractDungeon.player = player
-
-    card.use(player, None)
-
-    assert calls["count"] == 0
-    keyword_scheduler.debug_advance_turn()
-    assert calls["count"] == 1
-
-
-def test_card_editor_helpers(tmp_path, monkeypatch, stubbed_runtime):
-    recorded: list[tuple[str, dict[str, int]]] = []
-
-    class RecordingPersistence:
-        def record(self, card_id: str, payload: dict[str, int]) -> None:
-            recorded.append((card_id, payload))
-
-        def apply_to_deck(self, deck):
+    def getPower(self, name: str) -> Optional[SimpleNamespace]:
+        if name not in self._powers:
             return None
+        return SimpleNamespace(amount=self._powers[name])
 
-    from modules.basemod_wrapper import keywords as keywords_module
+    def setPower(self, name: str, amount: int) -> None:
+        if amount <= 0:
+            self._powers.pop(name, None)
+            return
+        self._powers[name] = amount
 
-    monkeypatch.setattr(keywords_module, "_CARD_PERSISTENCE", RecordingPersistence())
 
-    class EditKeyword(Keyword):
+def _linear_power(name: str):
+    class _Power:
+        def __init__(self, owner: StubCreature, *args: Any) -> None:
+            amount = int(args[-1]) if args else 0
+            existing = owner.getPower(name)
+            current = int(getattr(existing, "amount", 0))
+            owner.setPower(name, current + amount)
+            self.amount = owner.getPower(name).amount
+
+    _Power.__name__ = name
+    return _Power
+
+
+def _poison_power(owner: StubCreature, _source: Any, amount: int) -> Any:
+    existing = owner.getPower("PoisonPower")
+    current = int(getattr(existing, "amount", 0))
+    owner.setPower("PoisonPower", current + amount)
+    return SimpleNamespace(amount=owner.getPower("PoisonPower").amount)
+
+
+def _build_runtime(player: StubCreature, monsters: List[StubCreature]):
+    action_log: List[Dict[str, Any]] = []
+
+    def record(name: str, **payload: Any) -> None:
+        entry = {"name": name, **payload}
+        action_log.append(entry)
+
+    def gain_block_action(target: StubCreature, _source: StubCreature, amount: int):
+        def runner() -> None:
+            target.currentBlock += amount
+            record("gain_block", amount=amount)
+
+        return runner
+
+    def lose_block_action(target: StubCreature, _source: StubCreature, amount: int):
+        def runner() -> None:
+            target.currentBlock = max(0, target.currentBlock - amount)
+            record("lose_block", amount=amount)
+
+        return runner
+
+    def draw_action(_player: StubCreature, amount: int):
+        def runner() -> None:
+            record("draw", amount=amount)
+
+        return runner
+
+    def discard_action(_player: StubCreature, _source: StubCreature, amount: int, _random: bool):
+        def runner() -> None:
+            record("discard", amount=amount)
+
+        return runner
+
+    def apply_power_action(owner: StubCreature, _source: StubCreature, power: Any, amount: int):
+        def runner() -> None:
+            record("apply_power", power=type(power).__name__, amount=amount)
+
+        return runner
+
+    def remove_power_action(owner: StubCreature, _source: StubCreature, name: str):
+        def runner() -> None:
+            owner.setPower(name, 0)
+            record("remove_power", power=name)
+
+        return runner
+
+    def lose_hp_action(target: StubCreature, _source: StubCreature, amount: int):
+        def runner() -> None:
+            target.currentHealth = max(0, target.currentHealth - amount)
+            record("lose_hp", amount=amount)
+
+        return runner
+
+    def heal_action(target: StubCreature, _source: StubCreature, amount: int):
+        def runner() -> None:
+            target.currentHealth = min(target.maxHealth, target.currentHealth + amount)
+            record("heal", amount=amount)
+
+        return runner
+
+    def add_card_action(card: Any, amount: int):
+        def runner() -> None:
+            for _ in range(amount):
+                player.hand.group.append(card.makeCopy())
+            record("add_card", amount=amount)
+
+        return runner
+
+    class ActionManager:
+        def addToBottom(self, action: Any) -> None:
+            action()
+
+    class Dungeon:
         def __init__(self) -> None:
-            super().__init__()
-            self.when = "now"
+            self.actionManager = ActionManager()
+            self.player = player
+            self._room = SimpleNamespace(monsters=SimpleNamespace(monsters=monsters))
 
-        def apply(self, context) -> None:
-            editor = self.cards.hand.get(0)
-            editor.persist_for_combat(title="Altered")
-            editor.persist_forever(self.cards.player, cost=0)
+        def getCurrRoom(self) -> Any:
+            return self._room
 
-    project = ModProject("edit", "Edit", "Edit", "Test")
-    project._color_enum = "BUDDY_COLOR"
-    blueprint = SimpleCardBlueprint(
-        identifier="Editor",
-        title="Editor",
-        description="Change cards.",
-        cost=1,
-        card_type="skill",
-        target="self",
-        effect="block",
-        rarity="common",
-        value=1,
-        keywords=("EditKeyword",),
+    card_library: Dict[str, Any] = {}
+
+    def get_card(name: str) -> Any:
+        return card_library.get(name)
+
+    def register_card(name: str, card: Any) -> None:
+        card_library[name] = card
+
+    class StubCard:
+        def __init__(self, card_id: str) -> None:
+            self.cardID = card_id
+            self.name = card_id
+            self.rawDescription = ""
+            self.cost = 1
+
+        def makeCopy(self) -> "StubCard":
+            return StubCard(self.cardID)
+
+    register_card("Strike", StubCard("Strike"))
+
+    cardcrawl = SimpleNamespace(
+        actions=SimpleNamespace(
+            common=SimpleNamespace(
+                GainBlockAction=gain_block_action,
+                LoseBlockAction=lose_block_action,
+                DrawCardAction=draw_action,
+                DiscardAction=discard_action,
+                ApplyPowerAction=apply_power_action,
+                RemoveSpecificPowerAction=remove_power_action,
+                LoseHPAction=lose_hp_action,
+                HealAction=heal_action,
+                MakeTempCardInHandAction=add_card_action,
+            )
+        ),
+        powers=SimpleNamespace(
+            StrengthPower=_linear_power("StrengthPower"),
+            DexterityPower=_linear_power("DexterityPower"),
+            FocusPower=_linear_power("FocusPower"),
+            ArtifactPower=_linear_power("ArtifactPower"),
+            IntangiblePlayerPower=_linear_power("IntangiblePlayerPower"),
+            IntangiblePower=_linear_power("IntangiblePower"),
+            WeakPower=_linear_power("WeakPower"),
+            VulnerablePower=_linear_power("VulnerablePower"),
+            FrailPower=_linear_power("FrailPower"),
+            ConstrictedPower=_linear_power("ConstrictedPower"),
+            ShackledPower=_linear_power("ShackledPower"),
+            LockOnPower=_linear_power("LockOnPower"),
+            SlowPower=_linear_power("SlowPower"),
+            ThornsPower=_linear_power("ThornsPower"),
+            PlatedArmorPower=_linear_power("PlatedArmorPower"),
+            MetallicizePower=_linear_power("MetallicizePower"),
+        ),
+        dungeons=SimpleNamespace(AbstractDungeon=Dungeon()),
+        helpers=SimpleNamespace(CardLibrary=SimpleNamespace(getCard=get_card)),
     )
-    project.add_simple_card(blueprint)
-    card = project.cards["Editor"].factory()
+    setattr(cardcrawl.powers, "PoisonPower", _poison_power)
 
-    cardcrawl_stub, _, _ = stubbed_runtime
-    player = StubPlayer()
-    hand_card = StubCard()
-    player.hand = SimpleNamespace(group=[hand_card])
-    player.masterDeck.group.append(StubCard())
-    cardcrawl_stub.dungeons.AbstractDungeon.player = player
+    temp_hp_field = SimpleNamespace(tempHp=SimpleNamespace(get=lambda owner: owner.temp_hp))
 
-    card.use(player, None)
+    def spire_action(name: str):
+        if name == "AddTemporaryHPAction":
+            def ctor(target: StubCreature, _source: StubCreature, amount: int):
+                def runner() -> None:
+                    target.temp_hp += amount
+                    record("add_temp_hp", amount=amount)
 
-    assert hand_card.name == "Altered"
-    assert recorded[0][0] == "StubCard"
-    assert recorded[0][1]["cost"] == 0
+                return runner
+
+            return ctor
+        if name == "RemoveAllTemporaryHPAction":
+            def ctor(target: StubCreature, _source: StubCreature):
+                def runner() -> None:
+                    target.temp_hp = 0
+                    record("remove_temp_hp")
+
+                return runner
+
+            return ctor
+        raise KeyError(name)
+
+    spire = SimpleNamespace(
+        action=spire_action,
+        stslib=SimpleNamespace(patches=SimpleNamespace(tempHp=SimpleNamespace(TempHPField=temp_hp_field))),
+        register_keyword=lambda *args, **kwargs: None,
+    )
+
+    basemod = SimpleNamespace(BaseMod=SimpleNamespace(subscribe=lambda _: None))
+
+    return RuntimeHandles(cardcrawl=cardcrawl, basemod=basemod, spire=spire), action_log
+
+
+def test_keyword_auto_registers_in_registry(use_real_dependencies: bool) -> None:
+    class RegistryKeyword(Keyword):
+        def apply(self, context: KeywordContext) -> None:
+            pass
+
+    metadata = KEYWORD_REGISTRY.resolve("RegistryKeyword")
+    assert metadata is not None
+    assert metadata.keyword is not None
+
+
+def test_hp_proxy_and_arithmetic_controls_temp_hp(use_real_dependencies: bool) -> None:
+    player = StubCreature()
+    runtime, log = _build_runtime(player, [])
+
+    class HPKeyword(Keyword):
+        def apply(self, context: KeywordContext) -> None:
+            context.hp_proxy += 7
+
+    keyword = HPKeyword()
+    context = KeywordContext(keyword=keyword, player=player, monster=None, card=object(), amount=None, upgrade=None, runtime=runtime)
+    keyword.run(context)
+    keyword_scheduler.flush()
+
+    assert player.temp_hp == 7
+    assert log[-1]["name"] == "add_temp_hp"
+
+
+def test_power_proxy_applies_exact_delta(use_real_dependencies: bool) -> None:
+    player = StubCreature()
+    runtime, log = _build_runtime(player, [])
+
+    class PowerKeyword(Keyword):
+        def apply(self, context: KeywordContext) -> None:
+            context.player_proxy.powers.strength = 4
+            context.player_proxy.powers.strength = 6
+            context.player_proxy.powers.weak = 2
+
+    keyword = PowerKeyword()
+    context = KeywordContext(keyword=keyword, player=player, monster=None, card=object(), amount=None, upgrade=None, runtime=runtime)
+    keyword.run(context)
+    keyword_scheduler.flush()
+
+    assert player.getPower("StrengthPower").amount == 6
+    assert player.getPower("WeakPower").amount == 2
+    assert log[-1]["power"] == "WeakPower"
+
+
+def test_enemy_proxy_controls_target_and_hp(use_real_dependencies: bool) -> None:
+    player = StubCreature()
+    monster = StubCreature()
+    runtime, log = _build_runtime(player, [monster])
+
+    class EnemyKeyword(Keyword):
+        def apply(self, context: KeywordContext) -> None:
+            target = self.enemies.target
+            target -= 5
+            target.powers.vulnerable = 3
+
+    keyword = EnemyKeyword()
+    context = KeywordContext(keyword=keyword, player=player, monster=monster, card=object(), amount=None, upgrade=None, runtime=runtime)
+    keyword.run(context)
+    keyword_scheduler.flush()
+
+    assert monster.currentHealth == monster.maxHealth - 5
+    assert monster.getPower("VulnerablePower").amount == 3
+    assert any(entry["name"] == "lose_hp" for entry in log)
+
+
+def test_card_editor_snapshot_and_persistence(use_real_dependencies: bool) -> None:
+    player = StubCreature()
+    card = SimpleNamespace(
+        cardID="StubCard",
+        name="Original",
+        rawDescription="Deal damage.",
+        cost=2,
+        baseDamage=6,
+        initializeDescription=lambda: None,
+    )
+    player.masterDeck.group.append(SimpleNamespace(cardID="StubCard", baseDamage=6))
+    player.hand.group.append(card)
+    runtime, _ = _build_runtime(player, [])
+
+    context = KeywordContext(keyword=SimpleNamespace(), player=player, monster=None, card=card, amount=None, upgrade=None, runtime=runtime)
+    editor = context.hand[0]
+
+    snapshot = editor.snapshot("title", "cost")
+    assert snapshot == {"title": "Original", "cost": 2}
+
+    editor.persist_for_combat(title="Altered", cost=1)
+    assert card.name == "Altered"
+    assert card.cost == 1
+
+    editor.persist_for_run(player, baseDamage=9)
+    master_card = player.masterDeck.group[0]
+    assert master_card.baseDamage == 9
