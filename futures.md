@@ -45,6 +45,13 @@
 
 ## Upcoming work
 
+- [todo] **Experimental feature catalogue** – Populate
+  `modules.basemod_wrapper.experimental` with opt-in utilities that showcase
+  advanced integrations (e.g. runtime logging overlays, StSLib diagnostics,
+  analytics probes). Usage: implement each capability as a dedicated
+  submodule, document its activation hooks, and surface an `experimental.on`
+  example in the wrapper README so teams can trial features without forking
+  the stable API.
 - [todo] **LimeWire decryption pipeline** – Build a Python implementation of
   the LimeWire content decrypter so that the encrypted jars downloaded during
   bundling can be unwrapped automatically. Usage: mirror the
