@@ -37,3 +37,11 @@ Generate runtime documentation for every exposed StSLib hook, action and interfa
 ## Unified keyword profiles
 
 Allow describing complex keyword setups declaratively via JSON/YAML manifest files. Usage: add ``UnifiedSpireAPI.load_keywords(path: Path)`` that consumes manifests, registers keywords, and applies card field defaults to reduce boilerplate for large mods.
+
+## ProjectLayout localisation variants
+
+Teach ``ModProject.scaffold`` to generate localisation folders for multiple languages in one go (eng, fra, deu, zhs, etc.) and expose a helper that mirrors ``resource_path`` for localisation files. Usage: extend the scaffold signature with ``languages: Sequence[str]`` and update ``ProjectLayout`` with a mapping from language codes to directories so future tutorials can demonstrate multi-language text packs out of the box.
+
+## Asset templating helpers
+
+Provide optional PNG placeholders (solid alpha grids) whenever ``scaffold`` creates texture slots. Usage: add an ``include_placeholders: bool`` flag that writes simple coloured PNGs using Pillow to make generated mods immediately runnable even before artists deliver final assets.

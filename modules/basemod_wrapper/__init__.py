@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Sequence
 
 from .loader import ensure_basemod_environment, ensure_jpype
-from .project import BundleOptions, ModProject, compileandbundle, create_project
+from .project import BundleOptions, ModProject, ProjectLayout, compileandbundle, create_project
 
 ensure_jpype()
 from .proxy import JavaPackageWrapper, create_package_wrapper
@@ -338,6 +338,7 @@ PLUGIN_MANAGER.expose("basemod_classpath", _ENVIRONMENT.classpath)
 PLUGIN_MANAGER.expose("create_project", create_project)
 PLUGIN_MANAGER.expose("compileandbundle", compileandbundle)
 PLUGIN_MANAGER.expose("ModProject", ModProject)
+PLUGIN_MANAGER.expose("ProjectLayout", ProjectLayout)
 PLUGIN_MANAGER.expose("BundleOptions", BundleOptions)
 PLUGIN_MANAGER.expose("default_bundle_options", _ENVIRONMENT.default_bundle_options)
 PLUGIN_MANAGER.expose_module("modules.basemod_wrapper", alias="basemod_wrapper")
@@ -352,6 +353,7 @@ __all__ = [
     "stslib",
     "spire",
     "ModProject",
+    "ProjectLayout",
     "BundleOptions",
     "create_project",
     "compileandbundle",
