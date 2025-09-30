@@ -33,6 +33,15 @@ def _spire():
     return getattr(_wrapper_module(), "spire")
 
 
+@lru_cache(maxsize=1)
+def _keywords_module():
+    return import_module("modules.basemod_wrapper.keywords")
+
+
+def _keyword_registry():
+    return getattr(_keywords_module(), "KEYWORD_REGISTRY")
+
+
 _TYPE_ALIASES: Mapping[str, str] = {
     "attack": "ATTACK",
     "atk": "ATTACK",
@@ -445,9 +454,19 @@ class SimpleCardFactory:
                     self.damageTypeForTurn = cardcrawl.cards.DamageInfo.DamageType.NORMAL
                 if blueprint.keywords:
                     spire_api = _spire()
+                    registry = _keyword_registry()
                     for keyword in blueprint.keywords:
                         amount = keyword_amounts.get(keyword)
                         upgrade = keyword_upgrades.get(keyword)
+                        metadata = registry.resolve(keyword)
+                        if metadata is not None:
+                            registry.attach_to_card(
+                                self,
+                                keyword,
+                                amount=amount,
+                                upgrade=upgrade,
+                            )
+                            continue
                         spire_api.apply_keyword(
                             self,
                             keyword,
@@ -461,6 +480,7 @@ class SimpleCardFactory:
                     _play_attack(self, player, monster, blueprint, attack_effect)
                 else:
                     _play_effect(self, player, monster, blueprint)
+                _keyword_registry().trigger(self, player, monster)
 
             def upgrade(self) -> None:
                 if not self.upgraded:
