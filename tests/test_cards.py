@@ -96,6 +96,11 @@ class StubCustomCard:
         self.damageTypeForTurn = StubDamageInfo.DamageType.NORMAL
         self.isMultiDamage = False
         self.upgraded = False
+        self.exhaust = False
+        self.isInnate = False
+        self.isEthereal = False
+        self.retain = False
+        self.selfRetain = False
 
     def initializeDescription(self) -> None:
         self.description = self.rawDescription
@@ -191,8 +196,15 @@ class StubSpire:
     def __init__(self) -> None:
         self.calls = []
 
-    def apply_keyword(self, card, keyword, *, amount=None) -> None:
-        self.calls.append((card, keyword, amount))
+    def apply_keyword(self, card, keyword, *, amount=None, upgrade=None) -> None:
+        self.calls.append(
+            {
+                "card": card,
+                "keyword": keyword,
+                "amount": amount,
+                "upgrade": upgrade,
+            }
+        )
 
 
 @pytest.fixture()
@@ -422,7 +434,7 @@ def test_skill_and_power_effects(stubbed_runtime):
     block_action = action_manager.pop()
     assert isinstance(block_action, StubGainBlockAction)
     assert block_action.amount == 12
-    assert spire_stub.calls[0][1] == "retain"
+    assert spire_stub.calls[0]["keyword"] == "retain"
 
     weak_blueprint = SimpleCardBlueprint(
         identifier="BuddyGlare",
@@ -463,6 +475,40 @@ def test_skill_and_power_effects(stubbed_runtime):
     power_action = action_manager.pop()
     assert power_action.power.name == "Strength"
     assert power_action.amount == 2
+
+
+def test_keyword_normalisation_and_settings(stubbed_runtime):
+    _, _, spire_stub = stubbed_runtime
+    project = ModProject("buddy", "Buddy Mod", "Buddy", "Testing")
+    project._color_enum = "BUDDY_COLOR"
+
+    blueprint = SimpleCardBlueprint(
+        identifier="BuddyKeywords",
+        title="Buddy Keywords",
+        description="Do keyword things.",
+        cost=0,
+        card_type="skill",
+        target="self",
+        effect="block",
+        rarity="common",
+        value=0,
+        keywords=("Inate", "stslib:Exhaustive", "Exhaust", "retain", "retain"),
+        keyword_values={"stslib:exhaustive": "2"},
+        keyword_upgrades={"exhaustive": 1},
+    )
+
+    assert blueprint.keywords == ("innate", "exhaustive", "exhaust", "retain")
+    assert blueprint.keyword_values == {"exhaustive": 2}
+    assert blueprint.keyword_upgrades == {"exhaustive": 1}
+
+    project.add_simple_card(blueprint)
+    card = project.cards["BuddyKeywords"].factory()
+
+    exhaustive_call = next(call for call in spire_stub.calls if call["keyword"] == "exhaustive")
+    assert exhaustive_call["amount"] == 2
+    assert exhaustive_call["upgrade"] == 1
+
+    assert card.exhaust is False  # base keywords handled by real API, stub untouched
 
 
 def test_color_override_uses_card_enum(stubbed_runtime):

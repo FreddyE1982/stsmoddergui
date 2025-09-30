@@ -50,6 +50,13 @@ Generate runtime documentation for every exposed StSLib hook, action and interfa
 
 Allow describing complex keyword setups declaratively via JSON/YAML manifest files. Usage: add ``UnifiedSpireAPI.load_keywords(path: Path)`` that consumes manifests, registers keywords, and applies card field defaults to reduce boilerplate for large mods.
 
+## Keyword upgrade presets
+
+Expand ``SimpleCardBlueprint`` with reusable presets that bundle ``keywords``, ``keyword_values`` and ``keyword_upgrades`` for
+common archetypes (e.g. Exhaustive retainers or Persist powers). Usage: expose ``modules.basemod_wrapper.cards.keyword_preset``
+helpers that merge preset dictionaries into blueprints so mods can opt-in via a single call and plugins can contribute
+additional presets through ``PLUGIN_MANAGER`` broadcasts.
+
 ## ProjectLayout localisation variants
 
 Teach ``ModProject.scaffold`` to generate localisation folders for multiple languages in one go (eng, fra, deu, zhs, etc.) and expose a helper that mirrors ``resource_path`` for localisation files. Usage: extend the scaffold signature with ``languages: Sequence[str]`` and update ``ProjectLayout`` with a mapping from language codes to directories so future tutorials can demonstrate multi-language text packs out of the box.
