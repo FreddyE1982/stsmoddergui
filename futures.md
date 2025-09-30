@@ -111,3 +111,12 @@ Usage: extend the card asset pipeline with a lightweight audit log that captures
 blueprint identifiers, source digests and resolved resource paths, then surface
 a `PLUGIN_MANAGER` broadcast so tooling plugins can surface progress bars or
 regeneration prompts.
+
+## Deck analytics visualiser
+
+Now that `Deck.statistics()` surfaces immutable summaries for every declared
+deck, build a small analytics surface that can be reused by command line tools
+and plugins. Usage: add a reporting helper that converts the statistics into
+tabular data and optionally emits JSON artefacts for dashboards. Plugins should
+be able to subscribe to the `CHARACTER_VALIDATION_HOOK` broadcast and enrich the
+report with archetype heuristics and synergy hints for designers.

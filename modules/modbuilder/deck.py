@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from collections import Counter
-from typing import Dict, Iterable, Iterator, List, Tuple
+from dataclasses import dataclass
+from types import MappingProxyType
+from typing import Dict, Iterable, Iterator, List, Mapping, Tuple
 
 from modules.basemod_wrapper.cards import SimpleCardBlueprint
 
@@ -78,6 +80,24 @@ class Deck(metaclass=DeckMeta):
         return dict(counts)
 
     @classmethod
+    def statistics(cls) -> "DeckStatistics":
+        """Return an immutable snapshot describing the deck contents.
+
+        The statistics structure exposes a high level overview that can be used
+        by authoring tooling, plugins or validation routines.  It keeps the
+        underlying data immutable so callers can safely cache or share the
+        results without worrying about accidental mutation.
+        """
+
+        identifier_counts = Counter(cls.card_identifiers())
+        rarity_counts = Counter(card.rarity.upper() for card in cls._card_sequence)
+        return DeckStatistics(
+            total_cards=len(cls._card_sequence),
+            identifier_counts=MappingProxyType(dict(identifier_counts)),
+            rarity_counts=MappingProxyType(dict(rarity_counts)),
+        )
+
+    @classmethod
     def card_identifiers(cls) -> List[str]:
         """Return card identifiers preserving deck order."""
 
@@ -95,3 +115,40 @@ class Deck(metaclass=DeckMeta):
 
 
 __all__ = ["Deck"]
+
+
+@dataclass(frozen=True)
+class DeckStatistics:
+    """Immutable summary describing the composition of a deck."""
+
+    total_cards: int
+    identifier_counts: Mapping[str, int]
+    rarity_counts: Mapping[str, int]
+
+    @property
+    def unique_cards(self) -> int:
+        """Return how many distinct card identifiers exist within the deck."""
+
+        return len(self.identifier_counts)
+
+    @property
+    def duplicate_identifiers(self) -> Mapping[str, int]:
+        """Return identifiers that appear more than once in the deck."""
+
+        duplicates = {key: count for key, count in self.identifier_counts.items() if count > 1}
+        return MappingProxyType(duplicates)
+
+    @property
+    def rarity_distribution(self) -> Mapping[str, float]:
+        """Return rarity ratios expressed as percentages of the total deck."""
+
+        if self.total_cards == 0:
+            return MappingProxyType({})
+        distribution = {
+            rarity: (count / self.total_cards) * 100.0
+            for rarity, count in self.rarity_counts.items()
+        }
+        return MappingProxyType(distribution)
+
+
+__all__.append("DeckStatistics")

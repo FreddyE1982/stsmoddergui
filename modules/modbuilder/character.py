@@ -5,7 +5,8 @@ import math
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Type, Union
+from types import MappingProxyType
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union
 
 from modules.basemod_wrapper.card_assets import ensure_pillow
 from modules.basemod_wrapper.cards import SimpleCardBlueprint
@@ -19,10 +20,12 @@ from modules.basemod_wrapper.project import (
 )
 
 from .deck import Deck
+from plugins import PLUGIN_MANAGER
 
 
 ColorTuple = Tuple[float, float, float, float]
 RARITY_TARGETS: Mapping[str, float] = {"COMMON": 0.60, "UNCOMMON": 0.37, "RARE": 0.03}
+CHARACTER_VALIDATION_HOOK = "modbuilder_character_validate"
 
 
 @dataclass(slots=True)
@@ -61,6 +64,55 @@ class CharacterColorConfig:
     skill_bg_small: Optional[str] = None
     power_bg_small: Optional[str] = None
     orb_small: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class CharacterDeckSnapshot:
+    """Immutable view over the decks attached to a character."""
+
+    start_deck: Type[Deck]
+    unlockable_deck: Optional[Type[Deck]]
+    start_cards: Tuple[SimpleCardBlueprint, ...]
+    unlockable_cards: Tuple[SimpleCardBlueprint, ...]
+    all_cards: Tuple[SimpleCardBlueprint, ...]
+    unique_cards: Mapping[str, SimpleCardBlueprint]
+
+    @property
+    def total_cards(self) -> int:
+        return len(self.all_cards)
+
+
+@dataclass
+class CharacterValidationReport:
+    """Container collecting validation errors and plugin supplied context."""
+
+    errors: List[str] = field(default_factory=list)
+    context: Dict[str, Any] = field(default_factory=dict)
+
+    def add_error(self, message: str) -> None:
+        cleaned = str(message).strip()
+        if cleaned:
+            self.errors.append(cleaned)
+
+    def extend_errors(self, messages: Iterable[str]) -> None:
+        for message in messages:
+            self.add_error(message)
+
+    def merge(self, other: "CharacterValidationReport") -> None:
+        self.extend_errors(other.errors)
+        for key, value in other.context.items():
+            existing = self.context.get(key)
+            if isinstance(existing, dict) and isinstance(value, dict):
+                existing.update(value)
+            else:
+                self.context[key] = value
+
+    @property
+    def is_valid(self) -> bool:
+        return not self.errors
+
+    def format_errors(self) -> str:
+        return " ".join(self.errors)
 
 
 def _slugify(value: str) -> str:
@@ -124,32 +176,14 @@ class Character:
         assets_root_path = cls._resolve_assets_root(character, assets_root)
         python_source_path = cls._resolve_python_source(cls, character, python_source)
 
-        start_deck_cls = cls._coerce_deck(character.start.deck, "start")
-        unlockable_deck_cls = cls._coerce_deck(character.unlockableDeck, "unlockable")
+        decks = cls.collect_cards(character)
+        report = cls.validate(character, decks=decks, assets_root=assets_root_path)
+        if not report.is_valid:
+            raise BaseModBootstrapError(report.format_errors())
 
-        if start_deck_cls is None:
-            raise BaseModBootstrapError("Characters must declare a start deck before bundling.")
-        start_cards = list(start_deck_cls.cards())
-        unlockable_cards = list(unlockable_deck_cls.cards()) if unlockable_deck_cls else []
-        all_cards = start_cards + unlockable_cards
-        unique_cards = cls._compute_unique_cards(start_cards, unlockable_cards)
-
-        errors: List[str] = []
-        count_error = cls._validate_card_totals(all_cards)
-        if count_error:
-            errors.append(count_error)
-        ratio_error = cls._validate_rarity_ratio(all_cards)
-        if ratio_error:
-            errors.append(ratio_error)
-        asset_error = cls._validate_assets(
-            character,
-            assets_root_path,
-            unique_cards,
-        )
-        if asset_error:
-            errors.append(asset_error)
-        if errors:
-            raise BaseModBootstrapError(" ".join(errors))
+        start_cards = list(decks.start_cards)
+        unlockable_cards = list(decks.unlockable_cards)
+        unique_cards = decks.unique_cards
 
         cls._prepare_static_spine(character, assets_root_path)
 
@@ -195,6 +229,63 @@ class Character:
     # ------------------------------------------------------------------
     # Helper construction
     # ------------------------------------------------------------------
+    @classmethod
+    def collect_cards(cls, character: "Character") -> CharacterDeckSnapshot:
+        """Return the current deck configuration for ``character``."""
+
+        start_deck_cls = cls._coerce_deck(character.start.deck, "start")
+        unlockable_deck_cls = cls._coerce_deck(character.unlockableDeck, "unlockable")
+
+        if start_deck_cls is None:
+            raise BaseModBootstrapError("Characters must declare a start deck before bundling.")
+
+        start_cards = tuple(start_deck_cls.cards())
+        unlockable_cards = (
+            tuple(unlockable_deck_cls.cards()) if unlockable_deck_cls is not None else tuple()
+        )
+        all_cards = start_cards + unlockable_cards
+        unique_cards = MappingProxyType(
+            cls._compute_unique_cards(start_cards, unlockable_cards)
+        )
+        return CharacterDeckSnapshot(
+            start_deck=start_deck_cls,
+            unlockable_deck=unlockable_deck_cls,
+            start_cards=start_cards,
+            unlockable_cards=unlockable_cards,
+            all_cards=all_cards,
+            unique_cards=unique_cards,
+        )
+
+    @classmethod
+    def validate(
+        cls,
+        character: "Character",
+        *,
+        decks: Optional[CharacterDeckSnapshot] = None,
+        assets_root: Optional[Union[str, Path]] = None,
+    ) -> CharacterValidationReport:
+        """Validate deck configuration, rarities and required assets."""
+
+        decks = decks or cls.collect_cards(character)
+        report = CharacterValidationReport()
+
+        count_error = cls._validate_card_totals(decks.all_cards)
+        if count_error:
+            report.add_error(count_error)
+        ratio_error = cls._validate_rarity_ratio(decks.all_cards)
+        if ratio_error:
+            report.add_error(ratio_error)
+
+        assets_root_path: Optional[Path] = None
+        if assets_root is not None:
+            assets_root_path = Path(assets_root).resolve()
+            asset_error = cls._validate_assets(character, assets_root_path, decks.unique_cards)
+            if asset_error:
+                report.add_error(asset_error)
+
+        cls._run_validation_hooks(character, decks, report, assets_root_path)
+        return report
+
     @staticmethod
     def _coerce_deck(deck: Optional[Union[Type[Deck], Deck]], label: str) -> Optional[Type[Deck]]:
         if deck is None:
@@ -269,6 +360,65 @@ class Character:
             floors[rarity] += 1
             remainder -= 1
         return floors
+
+    @classmethod
+    def _run_validation_hooks(
+        cls,
+        character: "Character",
+        decks: CharacterDeckSnapshot,
+        report: CharacterValidationReport,
+        assets_root: Optional[Path],
+    ) -> None:
+        responses = PLUGIN_MANAGER.broadcast(
+            CHARACTER_VALIDATION_HOOK,
+            character=character,
+            decks=decks,
+            report=report,
+            assets_root=assets_root,
+            character_cls=cls,
+        )
+        for plugin_name, result in responses.items():
+            cls._ingest_validation_response(plugin_name, result, report)
+
+    @staticmethod
+    def _ingest_validation_response(
+        plugin_name: str, result: Any, report: CharacterValidationReport
+    ) -> None:
+        if result is None:
+            return
+        if isinstance(result, CharacterValidationReport):
+            report.merge(result)
+            return
+        if isinstance(result, str):
+            report.add_error(result)
+            return
+        if isinstance(result, Mapping):
+            errors = result.get("errors")
+            if errors:
+                if isinstance(errors, str):
+                    report.add_error(errors)
+                else:
+                    report.extend_errors(errors)
+            context_payload = {key: value for key, value in result.items() if key != "errors"}
+            if context_payload:
+                report.context.setdefault(plugin_name, {}).update(context_payload)
+            return
+        if isinstance(result, Iterable) and not isinstance(result, (bytes, str)):
+            for entry in result:
+                if entry is None:
+                    continue
+                if isinstance(entry, CharacterValidationReport):
+                    report.merge(entry)
+                elif isinstance(entry, str):
+                    report.add_error(entry)
+                else:
+                    raise BaseModBootstrapError(
+                        f"Plugin '{plugin_name}' returned unsupported validation entry: {entry!r}"
+                    )
+            return
+        raise BaseModBootstrapError(
+            f"Plugin '{plugin_name}' returned unsupported validation response: {result!r}"
+        )
 
     @classmethod
     def _validate_assets(
@@ -656,4 +806,12 @@ class Character:
         return directory
 
 
-__all__ = ["Character", "CharacterStartConfig", "CharacterImageConfig", "CharacterColorConfig"]
+__all__ = [
+    "Character",
+    "CharacterStartConfig",
+    "CharacterImageConfig",
+    "CharacterColorConfig",
+    "CharacterDeckSnapshot",
+    "CharacterValidationReport",
+    "CHARACTER_VALIDATION_HOOK",
+]
