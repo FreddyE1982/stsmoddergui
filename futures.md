@@ -124,3 +124,11 @@ report with archetype heuristics and synergy hints for designers.
 ## How-to recipe synchroniser
 
 Link the new `how to/` recipes with runnable sample projects so documentation never drifts from the code. Usage: add a `modules.tools.recipes` helper that parses the Markdown snippets, materialises temporary mods with `Deck`, `Character`, and `Keyword`, and exposes a CLI (`python -m modules.tools.recipes verify how to/basic-character.md`) to ensure examples still compile and bundle. Plugins should receive a broadcast before and after verification so they can contribute extra validation or telemetry.
+
+## Launcher profile validation helpers
+
+Automate sanity checks for the two launcher flows documented in `how to/load-and-play-mod.md`.
+Usage: extend the bundler with an optional `validate_launchers` flag that inspects the
+ModTheSpire output directory and Steam Workshop subscriptions via the Steam Web API so
+scripts can warn if required utilities (ModTheSpire, BaseMod, StSLib) are missing before
+testers try to run the game.
