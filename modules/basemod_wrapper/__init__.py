@@ -137,6 +137,24 @@ class UnifiedSpireAPI:
         "allenemyapplypower": "com.evacipated.cardcrawl.mod.stslib.actions.common.AllEnemyApplyPowerAction",
     }
 
+    _KEYWORD_ALIASES: Dict[str, str] = {
+        "inate": "innate",
+        "etheral": "ethereal",
+        "exhausts": "exhaust",
+        "selfretain": "retain",
+        "retainonce": "retain",
+        "stslibexhaustive": "exhaustive",
+        "stslibpersist": "persist",
+        "stslibrefund": "refund",
+    }
+
+    _BASE_KEYWORD_ATTRIBUTES: Dict[str, Sequence[str]] = {
+        "innate": ("isInnate",),
+        "ethereal": ("isEthereal",),
+        "exhaust": ("exhaust",),
+        "retain": ("selfRetain", "retain"),
+    }
+
     _BOOLEAN_KEYWORDS: Dict[str, str] = {
         "autoplay": "com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.AutoplayField.autoplay",
         "retain": "com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.AlwaysRetainField.alwaysRetain",
@@ -211,11 +229,20 @@ class UnifiedSpireAPI:
         amount: Optional[int] = None,
         upgrade: Optional[int] = None,
     ) -> None:
-        key = keyword.replace(" ", "").lower()
+        raw = keyword.strip()
+        cleaned = raw.split(":", 1)[1] if ":" in raw else raw
+        key = cleaned.replace(" ", "").replace("-", "").replace("_", "").lower()
+        key = self._KEYWORD_ALIASES.get(key, key)
+        handled = False
+        if key in self._BASE_KEYWORD_ATTRIBUTES:
+            flag = bool(value)
+            for attr in self._BASE_KEYWORD_ATTRIBUTES[key]:
+                setattr(card, attr, flag)
+            handled = True
         if key in self._BOOLEAN_KEYWORDS:
             field = self._env.resolve(self._BOOLEAN_KEYWORDS[key])
             field.set(card, bool(value))
-            return
+            handled = True
         if key in self._NUMERIC_KEYWORDS:
             if amount is None:
                 raise ValueError(f"Keyword '{keyword}' requires an 'amount'.")
@@ -225,13 +252,16 @@ class UnifiedSpireAPI:
             if upgrade:
                 upgrader = self._env.resolve(mapping["upgrader"])
                 upgrader(card, int(upgrade))
-            return
-        raise KeyError(f"Unknown keyword '{keyword}'.")
+            handled = True
+        if not handled:
+            raise KeyError(f"Unknown keyword '{keyword}'.")
 
     def keyword_fields(self) -> Dict[str, str]:
         """Expose the keyword map so callers can introspect support."""
 
         data: Dict[str, str] = {}
+        for key, attrs in self._BASE_KEYWORD_ATTRIBUTES.items():
+            data[key] = ", ".join(f"AbstractCard.{attr}" for attr in attrs)
         data.update(self._BOOLEAN_KEYWORDS)
         for key, mapping in self._NUMERIC_KEYWORDS.items():
             data[key] = mapping["setter"]

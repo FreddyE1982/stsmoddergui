@@ -293,6 +293,34 @@ If you pass `starter=True` the card also lands in the colour's basic pool. For c
 `color_id` to one of the base game enums (e.g. `RED` for the Ironclad). Whenever you need more exotic behaviour you
 can still hand craft a class — the blueprints are intentionally small wrappers for the common cases.
 
+### Keyword helpers
+
+`SimpleCardBlueprint` accepts an optional `keywords` tuple so you can toggle card flags without writing boilerplate.
+Canonical base-game keywords (`innate`, `retain`, `ethereal`, `exhaust`) flip the matching `AbstractCard` fields, while
+StSLib helpers are routed through `modules.basemod_wrapper.spire.apply_keyword`. Numeric keyword data (such as
+`exhaustive` or `persist`) can be supplied via `keyword_values` and their upgrade deltas via `keyword_upgrades`:
+
+```python
+innate_retaining_block = SimpleCardBlueprint(
+    identifier="BuddyBrace",
+    title="Buddy Brace",
+    description="Gain {block} Block. Exhaustive !stslib:ex!.",
+    cost=1,
+    card_type="skill",
+    target="self",
+    effect="block",
+    rarity="uncommon",
+    value=9,
+    upgrade_value=3,
+    keywords=("innate", "retain", "stslib:Exhaustive"),
+    keyword_values={"exhaustive": 2},
+    keyword_upgrades={"exhaustive": 1},
+)
+```
+
+Keyword names are normalised automatically, so `stslib:` prefixes, whitespace and common misspellings like `inate`
+are handled for you.
+
 ### 5. Load the mod in-game
 
 Your `entrypoint.py` already calls `enable_runtime()`, which in turn registers every BaseMod hook. Import the entrypoint in your development REPL or point your ModTheSpire bootstrapper at it; the character, colour and cards become available instantly.

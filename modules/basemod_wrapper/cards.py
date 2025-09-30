@@ -119,6 +119,15 @@ _ATTACK_EFFECT_ALIASES: Mapping[str, str] = {
 }
 
 
+_KEYWORD_ALIASES: Mapping[str, str] = {
+    "inate": "innate",
+    "etheral": "ethereal",
+    "exhausts": "exhaust",
+    "selfretain": "retain",
+    "retainonce": "retain",
+}
+
+
 def _normalise(value: str) -> str:
     return value.replace(" ", "").replace("-", "").lower()
 
@@ -169,6 +178,14 @@ def _require_monster(monster: object, target_name: str, effect: str) -> object:
     return monster
 
 
+def _canonical_keyword(value: str) -> str:
+    stripped = value.strip()
+    if ":" in stripped:
+        stripped = stripped.split(":", 1)[1]
+    cleaned = stripped.replace("_", "")
+    return _KEYWORD_ALIASES.get(_normalise(cleaned), _normalise(cleaned))
+
+
 @dataclass(slots=True)
 class SimpleCardBlueprint:
     """Describe the high level properties of a straightforward card."""
@@ -189,6 +206,7 @@ class SimpleCardBlueprint:
     starter: bool = False
     keywords: Sequence[str] = field(default_factory=tuple)
     keyword_values: Mapping[str, int] = field(default_factory=dict)
+    keyword_upgrades: Mapping[str, int] = field(default_factory=dict)
     attack_effect: str = "SLASH_DIAGONAL"
     _inner_image_result: Optional[InnerCardImageResult] = field(default=None, init=False, repr=False)
 
@@ -207,9 +225,28 @@ class SimpleCardBlueprint:
         else:
             object.__setattr__(self, "effect", None)
         if isinstance(self.keywords, str):
-            object.__setattr__(self, "keywords", (self.keywords,))
+            raw_keywords = (self.keywords,)
         else:
-            object.__setattr__(self, "keywords", tuple(self.keywords))
+            raw_keywords = tuple(self.keywords)
+        canonical_keywords = []
+        seen_keywords = set()
+        for keyword in raw_keywords:
+            canonical = _canonical_keyword(keyword)
+            if canonical in seen_keywords:
+                continue
+            canonical_keywords.append(canonical)
+            seen_keywords.add(canonical)
+        object.__setattr__(self, "keywords", tuple(canonical_keywords))
+        value_mapping = {
+            _canonical_keyword(key): int(value)
+            for key, value in (self.keyword_values or {}).items()
+        }
+        upgrade_mapping = {
+            _canonical_keyword(key): int(value)
+            for key, value in (self.keyword_upgrades or {}).items()
+        }
+        object.__setattr__(self, "keyword_values", value_mapping)
+        object.__setattr__(self, "keyword_upgrades", upgrade_mapping)
         attack_effect = _coerce_mapping(self.attack_effect, _ATTACK_EFFECT_ALIASES, "attack effect")
         object.__setattr__(self, "attack_effect", attack_effect)
 
@@ -302,7 +339,8 @@ class SimpleCardFactory:
             cardcrawl.actions.AbstractGameAction.AttackEffect, blueprint.attack_effect, "attack effect"
         )
 
-        keyword_settings: Dict[str, int] = {k: int(v) for k, v in blueprint.keyword_values.items()}
+        keyword_amounts: Dict[str, int] = {k: int(v) for k, v in blueprint.keyword_values.items()}
+        keyword_upgrades: Dict[str, int] = {k: int(v) for k, v in blueprint.keyword_upgrades.items()}
 
         class GeneratedCard(basemod.abstracts.CustomCard):  # type: ignore[misc]
             ID = blueprint.identifier
@@ -340,10 +378,14 @@ class SimpleCardFactory:
                 if blueprint.keywords:
                     spire_api = _spire()
                     for keyword in blueprint.keywords:
-                        settings = {}
-                        if keyword in keyword_settings:
-                            settings["amount"] = keyword_settings[keyword]
-                        spire_api.apply_keyword(self, keyword, amount=settings.get("amount"))
+                        amount = keyword_amounts.get(keyword)
+                        upgrade = keyword_upgrades.get(keyword)
+                        spire_api.apply_keyword(
+                            self,
+                            keyword,
+                            amount=amount,
+                            upgrade=upgrade,
+                        )
                 self.initializeDescription()
 
             def use(self, player: object, monster: Optional[object]) -> None:
