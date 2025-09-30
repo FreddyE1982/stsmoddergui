@@ -168,7 +168,54 @@ def test_character_enforces_card_counts_and_ratio(tmp_path: Path, use_real_depen
         )
     message = str(excinfo.value)
     assert "This deck has 20 cards." in message
+    assert "We need 55 more cards" in message
     assert "Card Rarity Proportions Incorrect" in message
+    assert "Add the given amount of cards of given type" in message
+    assert "25 common" in message
+    assert "28 uncommon" in message
+    assert "2 rare" in message
+
+
+def test_character_rarity_ratio_reports_removals(tmp_path: Path, use_real_dependencies: bool) -> None:
+    class StarterDeck(Deck):
+        pass
+
+    for index in range(45):
+        StarterDeck.addCard(_make_blueprint(f"Common{index}", rarity="common"))
+
+    class UnlockableDeck(Deck):
+        pass
+
+    for index in range(27):
+        UnlockableDeck.addCard(_make_blueprint(f"Uncommon{index}", rarity="uncommon"))
+    for index in range(3):
+        UnlockableDeck.addCard(_make_blueprint(f"Rare{index}", rarity="rare"))
+
+    class DummyCharacter(_BaseTestCharacter):
+        def __init__(self) -> None:
+            super().__init__()
+            self.start.deck = StarterDeck
+            self.unlockableDeck = UnlockableDeck
+
+    assets_root = tmp_path / "assets" / "buddy"
+    include_cards = {f"Common{index}.png": True for index in range(45)}
+    include_cards.update({f"Uncommon{index}.png": True for index in range(27)})
+    include_cards.update({f"Rare{index}.png": True for index in range(3)})
+    _prepare_assets(assets_root, include_cards=include_cards)
+    python_root = tmp_path / "python"
+    _prepare_python_source(python_root)
+
+    with pytest.raises(BaseModBootstrapError) as excinfo:
+        DummyCharacter.createMod(
+            tmp_path / "dist",
+            assets_root=assets_root,
+            python_source=python_root,
+            bundle=False,
+        )
+    message = str(excinfo.value)
+    assert "Card Rarity Proportions Incorrect" in message
+    assert "Remove the given amount of cards of given type" in message
+    assert "1 rare" in message
 
 
 def test_static_spine_assets_are_generated(tmp_path: Path, use_real_dependencies: bool) -> None:

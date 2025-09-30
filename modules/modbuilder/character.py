@@ -227,8 +227,6 @@ class Character:
 
     @classmethod
     def _validate_rarity_ratio(cls, cards: Sequence[SimpleCardBlueprint]) -> Optional[str]:
-        if not cards:
-            return None
         actual_counts: Dict[str, int] = {key: 0 for key in RARITY_TARGETS}
         for blueprint in cards:
             rarity = blueprint.rarity.upper()
@@ -236,24 +234,27 @@ class Character:
                 rarity = "COMMON"
             if rarity in actual_counts:
                 actual_counts[rarity] += 1
-        total = len(cards)
-        targets = cls._compute_target_counts(total)
-        adjustments: List[str] = []
+        target_total = max(len(cards), 75)
+        targets = cls._compute_target_counts(target_total)
+        additions: List[str] = []
+        removals: List[str] = []
         for rarity, required in targets.items():
             current = actual_counts.get(rarity, 0)
             diff = required - current
             if diff > 0:
-                adjustments.append(f"add {diff} {rarity.lower()}")
+                additions.append(f"{diff} {rarity.lower()}")
             elif diff < 0:
-                adjustments.append(f"remove {abs(diff)} {rarity.lower()}")
-        if not adjustments:
+                removals.append(f"{abs(diff)} {rarity.lower()}")
+        if not additions and not removals:
             return None
-        joined = ", ".join(adjustments)
-        return (
-            "Card Rarity Proportions Incorrect. "
-            "Adjust the deck by applying these changes: "
-            f"{joined}."
-        )
+        parts: List[str] = ["Card Rarity Proportions Incorrect."]
+        if additions:
+            joined = ", ".join(additions)
+            parts.append(f"Add the given amount of cards of given type: {joined}.")
+        if removals:
+            joined = ", ".join(removals)
+            parts.append(f"Remove the given amount of cards of given type: {joined}.")
+        return " ".join(parts)
 
     @staticmethod
     def _compute_target_counts(total: int) -> Dict[str, int]:
