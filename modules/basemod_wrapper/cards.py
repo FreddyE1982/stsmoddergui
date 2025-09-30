@@ -149,20 +149,29 @@ def _resolve_enum(container: object, name: str, label: str) -> object:
         raise BaseModBootstrapError(f"Unknown {label} '{name}'.") from exc
 
 
-def _format_description(description: str, value: int, *, field: str) -> str:
+def _format_description(description: str, value: int, *, field: str, uses: Optional[str] = None) -> str:
     if "{" not in description:
         return description
+    if "{uses}" in description and uses is None:
+        raise BaseModBootstrapError("Description references '{uses}' but the blueprint is not Exhaustive.")
     values = {
         "value": value,
         "damage": value if field == "damage" else 0,
         "block": value if field == "block" else 0,
         "magic": value if field == "magic" else 0,
         "amount": value,
+        "uses": uses if uses is not None else 0,
     }
     try:
         return description.format(**values)
     except Exception:
         return description
+
+
+def _uses_placeholder(blueprint: "SimpleCardBlueprint") -> Optional[str]:
+    if "exhaustive" in getattr(blueprint, "keywords", ()):  # pragma: no branch - simple containment check
+        return "!stslib:ex!"
+    return None
 
 
 def _enqueue_action(action: object) -> None:
@@ -207,6 +216,8 @@ class SimpleCardBlueprint:
     keywords: Sequence[str] = field(default_factory=tuple)
     keyword_values: Mapping[str, int] = field(default_factory=dict)
     keyword_upgrades: Mapping[str, int] = field(default_factory=dict)
+    card_uses: Optional[int] = None
+    card_uses_upgrade: int = 0
     attack_effect: str = "SLASH_DIAGONAL"
     _inner_image_result: Optional[InnerCardImageResult] = field(default=None, init=False, repr=False)
 
@@ -237,6 +248,7 @@ class SimpleCardBlueprint:
             canonical_keywords.append(canonical)
             seen_keywords.add(canonical)
         object.__setattr__(self, "keywords", tuple(canonical_keywords))
+
         value_mapping = {
             _canonical_keyword(key): int(value)
             for key, value in (self.keyword_values or {}).items()
@@ -245,6 +257,56 @@ class SimpleCardBlueprint:
             _canonical_keyword(key): int(value)
             for key, value in (self.keyword_upgrades or {}).items()
         }
+
+        uses_value: Optional[int]
+        if self.card_uses is None:
+            uses_value = None
+        else:
+            try:
+                uses_value = int(self.card_uses)
+            except (TypeError, ValueError) as exc:
+                raise BaseModBootstrapError("'card_uses' must be an integer.") from exc
+            if uses_value <= 0:
+                raise BaseModBootstrapError("'card_uses' must be a positive integer.")
+        object.__setattr__(self, "card_uses", uses_value)
+
+        try:
+            uses_upgrade_value = int(self.card_uses_upgrade)
+        except (TypeError, ValueError) as exc:
+            raise BaseModBootstrapError("'card_uses_upgrade' must be an integer.") from exc
+        if uses_upgrade_value < 0:
+            raise BaseModBootstrapError("'card_uses_upgrade' cannot be negative.")
+        object.__setattr__(self, "card_uses_upgrade", uses_upgrade_value)
+
+        has_exhaustive_keyword = "exhaustive" in canonical_keywords
+        if "{uses}" in self.description and not has_exhaustive_keyword:
+            raise BaseModBootstrapError("Description references '{uses}' but the blueprint is not Exhaustive.")
+        if has_exhaustive_keyword:
+            if uses_value is None:
+                raise BaseModBootstrapError(
+                    "Exhaustive cards must define 'card_uses' so the remaining uses can be displayed."
+                )
+            existing_amount = value_mapping.get("exhaustive")
+            if existing_amount is not None and existing_amount != uses_value:
+                raise BaseModBootstrapError(
+                    "'card_uses' must match the 'exhaustive' value supplied in 'keyword_values'."
+                )
+            value_mapping.setdefault("exhaustive", uses_value)
+            if uses_upgrade_value:
+                existing_upgrade = upgrade_mapping.get("exhaustive")
+                if existing_upgrade is not None and existing_upgrade != uses_upgrade_value:
+                    raise BaseModBootstrapError(
+                        "'card_uses_upgrade' must match the 'exhaustive' upgrade supplied in 'keyword_upgrades'."
+                    )
+                upgrade_mapping.setdefault("exhaustive", uses_upgrade_value)
+        else:
+            if uses_value is not None:
+                raise BaseModBootstrapError("'card_uses' is only valid when the card is Exhaustive.")
+            if uses_upgrade_value:
+                raise BaseModBootstrapError(
+                    "'card_uses_upgrade' is only valid when the card is Exhaustive."
+                )
+
         object.__setattr__(self, "keyword_values", value_mapping)
         object.__setattr__(self, "keyword_upgrades", upgrade_mapping)
         attack_effect = _coerce_mapping(self.attack_effect, _ATTACK_EFFECT_ALIASES, "attack effect")
@@ -348,7 +410,13 @@ class SimpleCardFactory:
             COST = blueprint.cost
 
             def __init__(self, color: object) -> None:
-                description = _format_description(blueprint.description, blueprint.value, field=value_field)
+                uses_placeholder = _uses_placeholder(blueprint)
+                description = _format_description(
+                    blueprint.description,
+                    blueprint.value,
+                    field=value_field,
+                    uses=uses_placeholder,
+                )
                 super().__init__(
                     self.ID,
                     blueprint.title,

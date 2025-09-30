@@ -57,6 +57,14 @@ common archetypes (e.g. Exhaustive retainers or Persist powers). Usage: expose `
 helpers that merge preset dictionaries into blueprints so mods can opt-in via a single call and plugins can contribute
 additional presets through ``PLUGIN_MANAGER`` broadcasts.
 
+## Generalised dynamic keyword placeholders
+
+Now that Exhaustive cards translate ``{uses}`` into the runtime ``!stslib:ex!`` token automatically, extend the formatter so
+other numeric keywords (Refund, Persist, Fleeting, Soulbound, etc.) can expose intuitive placeholders as well. Usage: build a
+mapping from keyword name to dynamic token within ``_uses_placeholder`` (renamed to a generic helper) and document the supported
+placeholders in the wrapper README. Plugins should be able to contribute additional mappings through a shared registry exposed
+on ``PLUGIN_MANAGER``.
+
 ## ProjectLayout localisation variants
 
 Teach ``ModProject.scaffold`` to generate localisation folders for multiple languages in one go (eng, fra, deu, zhs, etc.) and expose a helper that mirrors ``resource_path`` for localisation files. Usage: extend the scaffold signature with ``languages: Sequence[str]`` and update ``ProjectLayout`` with a mapping from language codes to directories so future tutorials can demonstrate multi-language text packs out of the box.

@@ -495,6 +495,7 @@ def test_keyword_normalisation_and_settings(stubbed_runtime):
         keywords=("Inate", "stslib:Exhaustive", "Exhaust", "retain", "retain"),
         keyword_values={"stslib:exhaustive": "2"},
         keyword_upgrades={"exhaustive": 1},
+        card_uses=2,
     )
 
     assert blueprint.keywords == ("innate", "exhaustive", "exhaust", "retain")
@@ -509,6 +510,64 @@ def test_keyword_normalisation_and_settings(stubbed_runtime):
     assert exhaustive_call["upgrade"] == 1
 
     assert card.exhaust is False  # base keywords handled by real API, stub untouched
+
+
+def test_exhaustive_requires_card_uses():
+    with pytest.raises(BaseModBootstrapError) as excinfo:
+        SimpleCardBlueprint(
+            identifier="BuddyNoUses",
+            title="Buddy No Uses",
+            description="Gain {block} Block.",
+            cost=1,
+            card_type="skill",
+            target="self",
+            effect="block",
+            rarity="common",
+            value=5,
+            keywords=("stslib:Exhaustive",),
+        )
+
+    assert "Exhaustive cards must define 'card_uses'" in str(excinfo.value)
+
+
+def test_exhaustive_description_uses_dynamic_token(stubbed_runtime):
+    project = ModProject("buddy", "Buddy Mod", "Buddy", "Testing")
+    project._color_enum = "BUDDY_COLOR"
+
+    blueprint = SimpleCardBlueprint(
+        identifier="BuddyUses",
+        title="Buddy Uses",
+        description="Gain {block} Block. Exhaustive {uses}.",
+        cost=1,
+        card_type="skill",
+        target="self",
+        effect="block",
+        rarity="common",
+        value=12,
+        keywords=("stslib:Exhaustive",),
+        card_uses=2,
+    )
+
+    project.add_simple_card(blueprint)
+    card = project.cards["BuddyUses"].factory()
+
+    assert card.rawDescription == "Gain 12 Block. Exhaustive !stslib:ex!."
+
+
+def test_uses_placeholder_requires_exhaustive_keyword():
+    with pytest.raises(BaseModBootstrapError) as excinfo:
+        SimpleCardBlueprint(
+            identifier="BuddyInvalidUses",
+            title="Buddy Invalid Uses",
+            description="Deal {damage} damage. Track {uses} anyway.",
+            cost=1,
+            card_type="attack",
+            target="enemy",
+            rarity="common",
+            value=7,
+        )
+
+    assert "not Exhaustive" in str(excinfo.value)
 
 
 def test_color_override_uses_card_enum(stubbed_runtime):
