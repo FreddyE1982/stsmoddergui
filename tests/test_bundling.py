@@ -5,19 +5,22 @@ import zipfile
 
 import pytest
 
-from modules.basemod_wrapper import BaseModEnvironment, create_project, spire
-from modules.basemod_wrapper.project import BundleOptions
+from modules.basemod_wrapper import (
+    BaseModEnvironment,
+    compileandbundle,
+    create_project,
+    spire,
+)
 
 
 @pytest.mark.requires_desktop_jar
-def test_compile_and_bundle_with_stslib(tmp_path, dependency_jars, desktop_jar_path):
+def test_compile_and_bundle_with_stslib(tmp_path, desktop_jar_path):
     if desktop_jar_path is None:
         pytest.skip("desktop-1.0.jar is required to compile enum patches")
 
     mod_id = "buddy"
     project = create_project(mod_id, "Buddy Mod", "OldFriend", "Test bundle with StSLib")
-    assets_dir = tmp_path / "assets" / "images"
-    assets_dir.mkdir(parents=True)
+    layout = project.scaffold(tmp_path, package_name="buddy_mod")
     texture_names = [
         "attack.png",
         "skill.png",
@@ -29,39 +32,30 @@ def test_compile_and_bundle_with_stslib(tmp_path, dependency_jars, desktop_jar_p
         "orb_small.png",
     ]
     for name in texture_names:
-        (assets_dir / name).write_text("texture", encoding="utf8")
+        (layout.images_root / name).write_text("texture", encoding="utf8")
 
     project.define_color(
         "BUDDY_BLUE",
         card_color=(0.1, 0.2, 0.9, 1.0),
         trail_color=(0.2, 0.3, 0.8, 1.0),
         slash_color=(0.3, 0.5, 1.0, 1.0),
-        attack_bg=f"resources/{mod_id}/images/attack.png",
-        skill_bg=f"resources/{mod_id}/images/skill.png",
-        power_bg=f"resources/{mod_id}/images/power.png",
-        orb=f"resources/{mod_id}/images/orb.png",
-        attack_bg_small=f"resources/{mod_id}/images/attack_small.png",
-        skill_bg_small=f"resources/{mod_id}/images/skill_small.png",
-        power_bg_small=f"resources/{mod_id}/images/power_small.png",
-        orb_small=f"resources/{mod_id}/images/orb_small.png",
+        attack_bg=project.resource_path("images/attack.png"),
+        skill_bg=project.resource_path("images/skill.png"),
+        power_bg=project.resource_path("images/power.png"),
+        orb=project.resource_path("images/orb.png"),
+        attack_bg_small=project.resource_path("images/attack_small.png"),
+        skill_bg_small=project.resource_path("images/skill_small.png"),
+        power_bg_small=project.resource_path("images/power_small.png"),
+        orb_small=project.resource_path("images/orb_small.png"),
     )
 
-    python_src = tmp_path / "python_src"
-    python_src.mkdir()
-    (python_src / "__init__.py").write_text("MOD_NAME = 'Buddy Mod'\n", encoding="utf8")
+    layout.project_module.write_text("VALUE = 123\n", encoding="utf8")
 
-    classpath = [
-        dependency_jars["basemod"],
-        dependency_jars["stslib"],
-        dependency_jars["modthespire"],
-        desktop_jar_path,
-    ]
-    options = BundleOptions(
-        java_classpath=classpath,
-        python_source=python_src,
-        assets_source=assets_dir.parent,
+    options = project.bundle_options_from_layout(
+        layout,
         output_directory=tmp_path / "dist",
         version="1.2.3",
+        additional_classpath=[desktop_jar_path],
     )
 
     output_root = project.compile_and_bundle(options)
@@ -75,8 +69,8 @@ def test_compile_and_bundle_with_stslib(tmp_path, dependency_jars, desktop_jar_p
     for name in texture_names:
         assert (resources_root / name).exists()
 
-    python_copy = output_root / "python" / python_src.name / "__init__.py"
-    assert python_copy.read_text(encoding="utf8") == "MOD_NAME = 'Buddy Mod'\n"
+    python_copy = output_root / "python" / layout.python_package.name / "project.py"
+    assert "VALUE = 123" in python_copy.read_text(encoding="utf8")
 
     patch_java = output_root / "patches" / "BuddyEnums.java"
     assert patch_java.exists()
@@ -86,48 +80,38 @@ def test_compile_and_bundle_with_stslib(tmp_path, dependency_jars, desktop_jar_p
 
 
 @pytest.mark.requires_desktop_jar
-def test_compile_and_bundle_without_stslib(tmp_path, dependency_jars, desktop_jar_path):
+def test_compile_and_bundle_without_stslib(tmp_path, desktop_jar_path):
     if desktop_jar_path is None:
         pytest.skip("desktop-1.0.jar is required to compile enum patches")
 
     mod_id = "nostslib"
     project = create_project(mod_id, "Vanilla Mod", "Buddy", "Bundle without StSLib")
-    assets_dir = tmp_path / "assets"
-    assets_dir.mkdir()
-    (assets_dir / "placeholder.txt").write_text("asset", encoding="utf8")
+    layout = project.scaffold(tmp_path, package_name="vanilla_mod")
+    (layout.resource_root / "placeholder.txt").write_text("asset", encoding="utf8")
     project.define_color(
         "VANILLA",
         card_color=(0.4, 0.4, 0.4, 1.0),
         trail_color=(0.5, 0.5, 0.5, 1.0),
         slash_color=(0.6, 0.6, 0.6, 1.0),
-        attack_bg=f"resources/{mod_id}/attack.png",
-        skill_bg=f"resources/{mod_id}/skill.png",
-        power_bg=f"resources/{mod_id}/power.png",
-        orb=f"resources/{mod_id}/orb.png",
-        attack_bg_small=f"resources/{mod_id}/attack_s.png",
-        skill_bg_small=f"resources/{mod_id}/skill_s.png",
-        power_bg_small=f"resources/{mod_id}/power_s.png",
-        orb_small=f"resources/{mod_id}/orb_s.png",
+        attack_bg=project.resource_path("attack.png"),
+        skill_bg=project.resource_path("skill.png"),
+        power_bg=project.resource_path("power.png"),
+        orb=project.resource_path("orb.png"),
+        attack_bg_small=project.resource_path("attack_s.png"),
+        skill_bg_small=project.resource_path("skill_s.png"),
+        power_bg_small=project.resource_path("power_s.png"),
+        orb_small=project.resource_path("orb_s.png"),
     )
 
-    python_src = tmp_path / "py"
-    python_src.mkdir()
-    (python_src / "mod.py").write_text("VALUE = 7\n", encoding="utf8")
+    layout.python_package.joinpath("mod.py").write_text("VALUE = 7\n", encoding="utf8")
 
-    classpath = [
-        dependency_jars["basemod"],
-        dependency_jars["modthespire"],
-        desktop_jar_path,
-    ]
-    options = BundleOptions(
-        java_classpath=classpath,
-        python_source=python_src,
-        assets_source=assets_dir,
+    output_root = compileandbundle(
+        project,
+        layout=layout,
         output_directory=tmp_path / "dist",
         dependencies=("basemod",),
+        additional_classpath=[desktop_jar_path],
     )
-
-    output_root = project.compile_and_bundle(options)
     manifest = json.loads((output_root / "ModTheSpire.json").read_text(encoding="utf8"))
     assert manifest["dependencies"] == ["basemod"]
     assert (output_root / f"{mod_id}_patches.jar").exists()

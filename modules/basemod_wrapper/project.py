@@ -13,7 +13,7 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type
 from importlib import import_module
 from functools import lru_cache
 
-from .loader import BaseModBootstrapError
+from .loader import BaseModBootstrapError, ensure_dependency_classpath
 from plugins import PLUGIN_MANAGER
 
 ColorTuple = Tuple[float, float, float, float]
@@ -185,6 +185,34 @@ class CardRegistration:
     make_basic: bool = False
 
 
+@dataclass(frozen=True)
+class ProjectLayout:
+    """Represents the auto generated on-disk structure of a mod project."""
+
+    mod_id: str
+    root: Path
+    package_name: str
+    python_root: Path
+    python_package: Path
+    cards_package: Path
+    resource_root: Path
+    images_root: Path
+    cards_image_root: Path
+    character_image_root: Path
+    orbs_image_root: Path
+    localization_root: Path
+    entrypoint: Path
+    project_module: Path
+
+    def resource_path(self, *parts: str) -> str:
+        """Return a resource path relative to the game resources folder."""
+
+        cleaned = "/".join(str(part).strip("/\\") for part in parts if part)
+        if not cleaned:
+            return self.mod_id
+        return f"{self.mod_id}/{cleaned}"
+
+
 @dataclass
 class BundleOptions:
     java_classpath: Sequence[Path]
@@ -220,6 +248,7 @@ class ModProject:
         self._subscriber = None
         self._color_enum = None
         self._player_enum = None
+        self.layout: Optional[ProjectLayout] = None
 
     # ------------------------------------------------------------------
     # configuration API
@@ -275,9 +304,207 @@ class ModProject:
         blueprint.color = self.color_definition
         self.character_blueprints.append(blueprint)
 
+    def resource_path(self, *segments: str) -> str:
+        """Return a resources-relative path for the current mod."""
+
+        cleaned = "/".join(str(part).strip("/\\") for part in segments if part)
+        if not cleaned:
+            return self.mod_id
+        return f"{self.mod_id}/{cleaned}"
+
     # ------------------------------------------------------------------
     # runtime integration
     # ------------------------------------------------------------------
+    def scaffold(
+        self,
+        base_directory: Path,
+        *,
+        package_name: Optional[str] = None,
+        language: str = "eng",
+    ) -> ProjectLayout:
+        """Create a ready-to-fill project structure on disk.
+
+        The scaffold includes a Python package, entrypoint and placeholder
+        resource directories.  Existing files are preserved which allows the
+        method to be rerun safely during iteration.
+        """
+
+        package = (package_name or self.mod_id).replace("-", "_")
+        root = Path(base_directory).resolve()
+        project_root = root / self.mod_id
+        python_root = project_root / "python"
+        python_package = python_root / package
+        cards_package = python_package / "cards"
+        resource_root = project_root / "assets" / self.mod_id
+        images_root = resource_root / "images"
+        cards_image_root = images_root / "cards"
+        character_image_root = images_root / "character"
+        orbs_image_root = images_root / "orbs"
+        localization_root = resource_root / "localizations" / language
+        entrypoint = python_package / "entrypoint.py"
+        project_module = python_package / "project.py"
+
+        for directory in (
+            project_root,
+            python_root,
+            python_package,
+            cards_package,
+            resource_root,
+            images_root,
+            cards_image_root,
+            character_image_root,
+            orbs_image_root,
+            localization_root,
+        ):
+            directory.mkdir(parents=True, exist_ok=True)
+
+        init_files = [python_package / "__init__.py", cards_package / "__init__.py"]
+        for init_file in init_files:
+            if not init_file.exists():
+                init_file.write_text("\n", encoding="utf8")
+
+        if not project_module.exists():
+            template = textwrap.dedent(
+                """
+                \"\"\"Project definition for {name}.\"\"\"
+
+                from modules.basemod_wrapper import create_project
+
+
+                PROJECT = create_project(
+                    "{mod_id}",
+                    "{name}",
+                    "{author}",
+                    "{description}",
+                    version="{version}",
+                )
+
+
+                def configure() -> None:
+                    \"\"\"Configure colours, cards and characters.\"\"\"
+
+                    # Example colour definition:
+                    # PROJECT.define_color(
+                    #     "{mod_id_upper}_COLOR",
+                    #     card_color=(0.5, 0.2, 0.7, 1.0),
+                    #     trail_color=(0.4, 0.1, 0.6, 1.0),
+                    #     slash_color=(0.7, 0.3, 0.9, 1.0),
+                    #     attack_bg=PROJECT.resource_path("images/cards/attack.png"),
+                    #     skill_bg=PROJECT.resource_path("images/cards/skill.png"),
+                    #     power_bg=PROJECT.resource_path("images/cards/power.png"),
+                    #     orb=PROJECT.resource_path("images/cards/orb.png"),
+                    #     attack_bg_small=PROJECT.resource_path("images/cards/attack_small.png"),
+                    #     skill_bg_small=PROJECT.resource_path("images/cards/skill_small.png"),
+                    #     power_bg_small=PROJECT.resource_path("images/cards/power_small.png"),
+                    #     orb_small=PROJECT.resource_path("images/cards/orb_small.png"),
+                    # )
+
+                    # Register cards:
+                    # @PROJECT.card("MyCard", basic=True)
+                    # def make_my_card():
+                    #     from .cards.example import ExampleCard
+                    #     return ExampleCard()
+
+                    # Register characters:
+                    # from modules.basemod_wrapper.project import CharacterAssets, CharacterBlueprint
+                    # PROJECT.add_character(
+                    #     CharacterBlueprint(
+                    #         identifier="{mod_id}_character",
+                    #         character_name="Example",
+                    #         description="An example hero.",
+                    #         assets=CharacterAssets(
+                    #             shoulder_image=PROJECT.resource_path("images/character/shoulder.png"),
+                    #             shoulder2_image=PROJECT.resource_path("images/character/shoulder2.png"),
+                    #             corpse_image=PROJECT.resource_path("images/character/corpse.png"),
+                    #         ),
+                    #         starting_deck=[],
+                    #         starting_relics=[],
+                    #         loadout_description="Describe your hero here.",
+                    #     )
+                    # )
+
+
+                def enable_runtime() -> None:
+                    \"\"\"Apply configuration and register BaseMod hooks.\"\"\"
+
+                    configure()
+                    PROJECT.enable_runtime()
+                """
+            )
+            template = template.format(
+                name=self.name,
+                mod_id=self.mod_id,
+                author=self.author,
+                description=self.description,
+                version=self.version,
+                mod_id_upper=self.mod_id.upper(),
+            )
+            project_module.write_text(template.strip() + "\n", encoding="utf8")
+
+        if not entrypoint.exists():
+            entrypoint.write_text(
+                textwrap.dedent(
+                    """
+                    \"\"\"Runtime entrypoint used by ModTheSpire.\"\"\"
+
+                    from .project import enable_runtime
+
+
+                    def initialize():
+                        \"\"\"Entry hook that ModTheSpire should invoke.\"\"\"
+
+                        enable_runtime()
+
+
+                    initialize()
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf8",
+            )
+
+        readme = project_root / "README.txt"
+        if not readme.exists():
+            readme.write_text(
+                textwrap.dedent(
+                    f"""
+                    {self.name} scaffolding
+                    ==========================
+
+                    python/        Python package containing all mod logic.
+                    assets/        Game-ready resources (copied into resources/{self.mod_id}).
+
+                    Update python/{package}/project.py to declare colours, cards and
+                    characters.  Assets should be placed inside assets/{self.mod_id}/.
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf8",
+            )
+
+        localization_stub = localization_root / "cards.json"
+        if not localization_stub.exists():
+            localization_stub.write_text("{}\n", encoding="utf8")
+
+        layout = ProjectLayout(
+            mod_id=self.mod_id,
+            root=project_root,
+            package_name=package,
+            python_root=python_root,
+            python_package=python_package,
+            cards_package=cards_package,
+            resource_root=resource_root,
+            images_root=images_root,
+            cards_image_root=cards_image_root,
+            character_image_root=character_image_root,
+            orbs_image_root=orbs_image_root,
+            localization_root=localization_root,
+            entrypoint=entrypoint,
+            project_module=project_module,
+        )
+        self.layout = layout
+        return layout
+
     def enable_runtime(self) -> None:
         if self._subscriber is not None:
             return
@@ -353,7 +580,47 @@ class ModProject:
 
     # bundling
     # ------------------------------------------------------------------
-    def compile_and_bundle(self, options: BundleOptions) -> Path:
+    def bundle_options_from_layout(
+        self,
+        layout: ProjectLayout,
+        *,
+        output_directory: Optional[Path] = None,
+        version: Optional[str] = None,
+        sts_version: Optional[str] = None,
+        mts_version: Optional[str] = None,
+        dependencies: Optional[Sequence[str]] = None,
+        additional_classpath: Optional[Sequence[Path]] = None,
+    ) -> BundleOptions:
+        """Produce :class:`BundleOptions` using a :class:`ProjectLayout`."""
+
+        jars = ensure_dependency_classpath(layout.root)
+        classpath: List[Path] = [jars["basemod"], jars["modthespire"]]
+        stslib_dependency = dependencies is None or "stslib" in dependencies
+        if stslib_dependency and "stslib" in jars:
+            classpath.append(jars["stslib"])
+        elif "stslib" in jars and jars["stslib"] not in classpath:
+            classpath.append(jars["stslib"])
+        if additional_classpath:
+            classpath.extend(additional_classpath)
+
+        opts = BundleOptions(
+            java_classpath=tuple(dict.fromkeys(classpath)),
+            python_source=layout.python_package,
+            assets_source=layout.resource_root,
+            output_directory=output_directory or (layout.root / "dist"),
+            version=version or self.version,
+            sts_version=sts_version or "2020-12-01",
+            mts_version=mts_version or "3.30.1",
+            dependencies=dependencies or ("basemod", "stslib"),
+        )
+        return opts
+
+    def compile_and_bundle(
+        self,
+        options: BundleOptions,
+        *,
+        layout: Optional[ProjectLayout] = None,
+    ) -> Path:
         output_dir = options.output_directory
         output_dir.mkdir(parents=True, exist_ok=True)
         mod_root = output_dir / self.name.replace(" ", "")
@@ -457,7 +724,34 @@ def create_project(mod_id: str, name: str, author: str, description: str, versio
     return project
 
 
-def compileandbundle(project: ModProject, options: BundleOptions) -> Path:
+def compileandbundle(
+    project: ModProject,
+    options: Optional[BundleOptions] = None,
+    *,
+    layout: Optional[ProjectLayout] = None,
+    output_directory: Optional[Path] = None,
+    version: Optional[str] = None,
+    sts_version: Optional[str] = None,
+    mts_version: Optional[str] = None,
+    dependencies: Optional[Sequence[str]] = None,
+    additional_classpath: Optional[Sequence[Path]] = None,
+) -> Path:
+    """Bundle ``project`` either from explicit ``options`` or a ``layout``."""
+
+    if options is None:
+        if layout is None:
+            raise BaseModBootstrapError(
+                "compileandbundle requires either BundleOptions or a ProjectLayout."
+            )
+        options = project.bundle_options_from_layout(
+            layout,
+            output_directory=output_directory,
+            version=version,
+            sts_version=sts_version,
+            mts_version=mts_version,
+            dependencies=dependencies,
+            additional_classpath=additional_classpath,
+        )
     return project.compile_and_bundle(options)
 
 
@@ -470,6 +764,7 @@ __all__ = [
     "CharacterAssets",
     "CharacterBlueprint",
     "CardRegistration",
+    "ProjectLayout",
     "BundleOptions",
     "ModProject",
     "create_project",
