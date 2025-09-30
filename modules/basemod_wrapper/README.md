@@ -179,6 +179,16 @@ in the custom card constructor:
 7. `starter` — flag the card as part of the basic card pool.
 8. `rarity` — `basic`, `common`, `uncommon`, `rare`, `special` or `curse`.
 
+### Automatic inner art processing
+
+If you rely on the default BaseMod card frames you no longer have to manually slice the inner card artwork. Call
+``SimpleCardBlueprint.innerCardImage("art/Strike.png")`` with a **500x380** PNG and the wrapper will clone the
+[StSModdingToolCardImagesCreator](https://github.com/JohnnyBazooka89/StSModdingToolCardImagesCreator), build it (once) and
+generate both the 250x190 in-game art and the 500x380 portrait variant. The correct pair is picked automatically based on the
+blueprint’s card type (`attack`, `skill`, or `power`) and copied into `assets/<mod_id>/images/cards/`. The blueprint’s
+``image`` path is updated to the resource string (`<mod_id>/images/cards/<Identifier>.png`) so BaseMod can discover the
+portrait companion (`_p`) without extra configuration.
+
 ### Attack examples
 
 ```python

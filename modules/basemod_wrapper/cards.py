@@ -4,11 +4,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import import_module
-from typing import Callable, Dict, Mapping, Optional, Sequence
+from pathlib import Path
+from typing import TYPE_CHECKING, Callable, Dict, Mapping, Optional, Sequence
 
 from plugins import PLUGIN_MANAGER
 
 from .loader import BaseModBootstrapError
+from .card_assets import InnerCardImageResult, prepare_inner_card_image, validate_inner_card_image
+
+if TYPE_CHECKING:  # pragma: no cover - typing helper
+    from .project import ModProject
 
 
 @lru_cache(maxsize=1)
@@ -179,11 +184,13 @@ class SimpleCardBlueprint:
     upgrade_value: int = 0
     effect: Optional[str] = None
     image: Optional[str] = None
+    inner_image_source: Optional[str] = None
     color_id: Optional[str] = None
     starter: bool = False
     keywords: Sequence[str] = field(default_factory=tuple)
     keyword_values: Mapping[str, int] = field(default_factory=dict)
     attack_effect: str = "SLASH_DIAGONAL"
+    _inner_image_result: Optional[InnerCardImageResult] = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "identifier", self.identifier)
@@ -213,6 +220,25 @@ class SimpleCardBlueprint:
         if not self.effect:
             return "magic"
         return _EFFECT_VALUE_FIELD[self.effect]
+
+    def innerCardImage(self, path: str) -> "SimpleCardBlueprint":
+        resolved = validate_inner_card_image(Path(path))
+        object.__setattr__(self, "inner_image_source", str(resolved))
+        object.__setattr__(self, "_inner_image_result", None)
+        object.__setattr__(self, "image", None)
+        return self
+
+    def inner_card_image(self, path: str) -> "SimpleCardBlueprint":
+        return self.innerCardImage(path)
+
+    def _ensure_inner_card_image(self, project: "ModProject") -> Optional[InnerCardImageResult]:
+        if not self.inner_image_source:
+            return None
+        if self._inner_image_result is None:
+            result = prepare_inner_card_image(project, self)
+            object.__setattr__(self, "_inner_image_result", result)
+            object.__setattr__(self, "image", result.resource_path)
+        return self._inner_image_result
 
 
 class SimpleCardFactory:
@@ -269,6 +295,7 @@ class SimpleCardFactory:
                 f"Effect '{blueprint.effect}' requires an enemy-facing target (ENEMY or SELF_AND_ENEMY)."
             )
 
+        blueprint._ensure_inner_card_image(self.project)
         image_path = blueprint.image or self.project.resource_path(f"images/cards/{blueprint.identifier}.png")
         value_field = blueprint.value_field
         attack_effect = _resolve_enum(

@@ -7,6 +7,7 @@ import pytest
 from modules.basemod_wrapper.cards import SimpleCardBlueprint
 from modules.basemod_wrapper.loader import BaseModBootstrapError
 from modules.basemod_wrapper.project import ModProject
+from modules.basemod_wrapper.card_assets import InnerCardImageResult, ensure_pillow
 
 
 class StubActionManager:
@@ -262,6 +263,71 @@ def stubbed_runtime(monkeypatch):
 
     action_manager.clear()
     spire_stub.calls.clear()
+
+
+def test_inner_card_image_requires_exact_dimensions(tmp_path):
+    Image = ensure_pillow()
+    image_path = tmp_path / "bad.png"
+    Image.new("RGBA", (250, 190), (255, 0, 0, 255)).save(image_path)
+
+    blueprint = SimpleCardBlueprint(
+        identifier="BuddyBlock",
+        title="Buddy Block",
+        description="Gain {block} block.",
+        cost=1,
+        card_type="skill",
+        target="self",
+        rarity="common",
+        value=5,
+        effect="block",
+    )
+
+    with pytest.raises(BaseModBootstrapError) as excinfo:
+        blueprint.innerCardImage(str(image_path))
+    assert str(excinfo.value) == "innerCardImage MUST be 500x380"
+
+
+def test_factory_uses_prepared_inner_card_image(monkeypatch, stubbed_runtime, tmp_path):
+    Image = ensure_pillow()
+    source = tmp_path / "source.png"
+    Image.new("RGBA", (500, 380), (0, 0, 255, 255)).save(source)
+
+    project = ModProject("buddy", "Buddy Mod", "Buddy", "Testing")
+    project._color_enum = "BUDDY_COLOR"
+
+    blueprint = SimpleCardBlueprint(
+        identifier="BuddyStrike",
+        title="Buddy Strike",
+        description="Deal {damage} damage.",
+        cost=1,
+        card_type="attack",
+        target="enemy",
+        rarity="common",
+        value=9,
+    ).innerCardImage(str(source))
+
+    expected = InnerCardImageResult(
+        resource_path="buddy/images/cards/BuddyStrike.png",
+        small_asset_path=tmp_path / "dest.png",
+        portrait_asset_path=tmp_path / "dest_p.png",
+    )
+    calls = {"count": 0}
+
+    def fake_prepare(proj, bp):
+        calls["count"] += 1
+        assert proj is project
+        assert bp is blueprint
+        return expected
+
+    monkeypatch.setattr("modules.basemod_wrapper.cards.prepare_inner_card_image", fake_prepare)
+
+    project.add_simple_card(blueprint)
+    registration = project.cards["BuddyStrike"]
+    card = registration.factory()
+
+    assert blueprint.image == expected.resource_path
+    assert card.IMG == expected.resource_path
+    assert calls["count"] == 1
 
 
 def test_attack_blueprint_registers_basic_card(stubbed_runtime):
