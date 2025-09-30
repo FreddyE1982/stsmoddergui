@@ -106,6 +106,17 @@
   `python -m modules.basemod_wrapper.cards preview blueprint.json` would
   process blueprints, emit a tabular summary of costs/keywords and highlight
   any missing art assets before bundling.
+- [todo] **Simple card playtest art overrides** – Add a `playtest: bool = False`
+  flag to the existing simple card configuration (the helper that currently
+  wires `SimpleCardBlueprint` into the runtime card factory). When the flag is
+  enabled, the pipeline must procedurally generate a solid-black PNG that
+  matches the expected inner card resolution, persist it in the managed asset
+  cache, and force every registered card's inner art reference to point at this
+  default placeholder. Usage: expose the toggle on all relevant blueprint and
+  scaffolding helpers, make sure the generated art participates in the
+  manifest/telemetry systems so plugins can detect the override, and document
+  the flag in the simple card how-to with a reminder that production builds
+  should leave `playtest` disabled.
 - [todo] **Keyword timeline hooks** – Expand the newly introduced `Keyword`
   scheduler so keywords can subscribe to additional combat lifecycle events
   (enemy intent changes, card draws, shuffles). Usage: expose optional
