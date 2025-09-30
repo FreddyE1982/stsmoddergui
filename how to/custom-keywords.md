@@ -62,11 +62,11 @@ This guide builds on [Build a starter-friendly character with bundled decks](./b
            upgrade_value=4,
            keywords=("PhaseShift",),
            keyword_values={"PhaseShift": 7},
-       )
+       ).innerCardImage("resources/Buddy/images/cards/inner/BuddyPhaseGuard.png")
    )
    ```
 
-2. If you want a starter card to showcase the mechanic immediately, register it on `StarterDeck` in the same fashion. You still use `Deck.addCard` so validation keeps working.
+2. If you want a starter card to showcase the mechanic immediately, register it on `StarterDeck` in the same fashion. You still use `Deck.addCard` so validation keeps working. Do not forget to drop the 500x380 PNG into `resources/Buddy/images/cards/inner/` – the manifest driven cache guarantees the tool only reprocesses art when the source changes.
 
 3. Rerun `Deck.statistics()` to confirm the rarity ratios still match your goals.
 

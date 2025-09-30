@@ -82,11 +82,11 @@ Continuing from the previous guides, we now tap into the advanced facilities bun
            keywords=("EchoImprint",),
            keyword_values={"EchoImprint": 3},
            keyword_upgrades={"EchoImprint": 1},
-       )
+       ).innerCardImage("resources/Buddy/images/cards/inner/BuddyEchoBlade.png")
    )
    ```
 
-2. Starter decks can showcase the mechanic immediately if you also append a cheaper blueprint there. Either way, stick to `Deck.addCard` so that the validation phase keeps your totals balanced.
+2. Starter decks can showcase the mechanic immediately if you also append a cheaper blueprint there. Either way, stick to `Deck.addCard` so that the validation phase keeps your totals balanced. Remember that every new blueprint needs a matching 500x380 PNG inner art file – the pipeline reuses `.inner_card_manifest.json` so reruns skip redundant processing.
 
 ## 3. Bundle the evolved mod
 
