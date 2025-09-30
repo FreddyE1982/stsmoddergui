@@ -19,6 +19,7 @@ from modules.basemod_wrapper.project import (
     create_project,
 )
 
+from .analytics import build_deck_analytics
 from .deck import Deck
 from plugins import PLUGIN_MANAGER
 
@@ -268,6 +269,14 @@ class Character:
 
         decks = decks or cls.collect_cards(character)
         report = CharacterValidationReport()
+
+        analytics = build_deck_analytics(
+            character,
+            decks,
+            rarity_targets=RARITY_TARGETS,
+        )
+        report.context.setdefault("analytics", analytics)
+        report.context.setdefault("analytics_table", analytics.as_table())
 
         count_error = cls._validate_card_totals(decks.all_cards)
         if count_error:

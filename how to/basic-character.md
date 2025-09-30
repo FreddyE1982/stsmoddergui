@@ -123,10 +123,44 @@ This walkthrough leans entirely on the repository's highest level helpers – `D
            )
    ```
 
-2. Let `Character.collect_cards` and `Character.validate` do the heavy lifting. They ensure the decks conform to rarity targets
-   and that every blueprint has matching art before any bundling happens. When `staticspineanimation` is set, the helper also
-   generates the matching `.atlas` and `.json` skeleton files next to the PNG and wires them into the runtime automatically, so
-   you can ship a static pose without touching Spine.
+2. Let `Character.collect_cards` and `Character.validate` do the heavy lifting **before** you even think about bundling. Call
+   them once the starter and unlockable decks are populated – typically right after instantiating your `Character` subclass or
+   inside quick authoring notebooks. The helpers ensure the decks conform to rarity targets, every blueprint has matching art,
+   and they attach a ready-to-consume analytics table to the validation report so plugins and designers can explore the deck
+   mix without extra tooling. When `staticspineanimation` is set, the helper also generates the matching `.atlas` and `.json`
+   skeleton files next to the PNG and wires them into the runtime automatically, so you can ship a static pose without touching
+   Spine.
+
+   ```python
+   buddy = Buddy()
+
+   decks = Buddy.collect_cards(buddy)
+   print(decks)
+   # CharacterDeckSnapshot(
+   #     start_deck=<class 'StarterDeck'>,
+   #     unlockable_deck=<class 'Unlockables'>,
+   #     start_cards=(SimpleCardBlueprint(identifier='BuddyStrike', ...), ...),
+   #     unlockable_cards=(SimpleCardBlueprint(identifier='BuddyFinisher', ...),),
+   #     all_cards=(...),
+   #     unique_cards=mappingproxy({'BuddyStrike': SimpleCardBlueprint(...), ...}),
+   # )
+
+   report = Buddy.validate(buddy, decks=decks, assets_root=Path("resources/Buddy"))
+   print(report.is_valid, report.errors, report.context["analytics"].combined.total_cards)
+   # True [] 75
+
+   # If something is wrong, every issue is captured in the report:
+   decks = Buddy.collect_cards(buddy)
+   report = Buddy.validate(buddy, decks=decks, assets_root=Path("resources/Missing"))
+   print(report.is_valid)
+   print(report.errors)
+   # False
+   # [
+   #   "This deck has 12 cards. We need 63 more cards to be able to compile the mod.",
+   #   "Card Rarity Proportions Incorrect. Add the given amount of cards of given type: 15 common, 13 uncommon, 2 rare.",
+   #   "BuddyStrike card image '.../BuddyStrike.png' is missing",
+   # ]
+   ```
 
 ## 3. Bundle a runnable mod package
 

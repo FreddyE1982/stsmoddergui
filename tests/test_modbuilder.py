@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -13,7 +14,11 @@ from modules.modbuilder import (
     CharacterStartConfig,
     CharacterValidationReport,
     Deck,
+    DeckAnalytics,
+    DeckAnalyticsRow,
+    build_deck_analytics,
 )
+from modules.modbuilder.character import RARITY_TARGETS
 from modules.basemod_wrapper.cards import SimpleCardBlueprint
 from modules.basemod_wrapper.loader import BaseModBootstrapError
 from modules.basemod_wrapper.card_assets import ensure_pillow
@@ -395,6 +400,54 @@ def test_character_collect_cards_and_validate(tmp_path: Path, use_real_dependenc
     assert isinstance(report, CharacterValidationReport)
     assert report.is_valid
     assert report.format_errors() == ""
+    assert isinstance(report.context["analytics"], DeckAnalytics)
+    assert isinstance(report.context["analytics_table"], tuple)
+    assert report.context["analytics"].combined.total_cards == decks.total_cards
+
+
+def test_build_deck_analytics_generates_rows(tmp_path: Path, use_real_dependencies: bool) -> None:
+    class StarterDeck(Deck):
+        display_name = "Buddy Starter"
+
+    StarterDeck.addCard(_make_blueprint("Common0", rarity="common"))
+    StarterDeck.addCard(_make_blueprint("Common0", rarity="common"))
+    StarterDeck.addCard(_make_blueprint("Uncommon0", rarity="uncommon"))
+
+    class Unlockables(Deck):
+        display_name = "Buddy Unlocks"
+
+    Unlockables.addCard(_make_blueprint("Rare0", rarity="rare"))
+    Unlockables.addCard(_make_blueprint("Rare1", rarity="rare"))
+
+    class DummyCharacter(_BaseTestCharacter):
+        def __init__(self) -> None:
+            super().__init__()
+            self.start.deck = StarterDeck
+            self.unlockableDeck = Unlockables
+
+    character = DummyCharacter()
+    decks = DummyCharacter.collect_cards(character)
+
+    analytics = build_deck_analytics(character, decks, rarity_targets=RARITY_TARGETS)
+
+    assert isinstance(analytics, DeckAnalytics)
+    assert all(isinstance(row, DeckAnalyticsRow) for row in analytics.rows)
+    assert analytics.rows[0].label.startswith("Buddy starter")
+    assert analytics.rows[-1].total_cards == len(decks.all_cards)
+
+    table = analytics.as_table()
+    assert isinstance(table, tuple)
+    assert table[0]["duplicates"]["Common0"] == 2
+
+    mapping = analytics.by_label()
+    assert analytics.rows[1].label in mapping
+
+    output_path = analytics.write_json(tmp_path / "analytics" / "summary.json")
+    assert output_path.exists()
+
+    data = json.loads(output_path.read_text(encoding="utf-8"))
+    assert data["rows"][-1]["total_cards"] == analytics.combined.total_cards
+    assert data["rarity_targets"] == dict(RARITY_TARGETS)
 
 
 def test_character_validation_hook_integration(tmp_path: Path, use_real_dependencies: bool) -> None:
