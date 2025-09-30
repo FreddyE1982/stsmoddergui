@@ -10,18 +10,39 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type
 
-from . import basemod, cardcrawl, libgdx
+from importlib import import_module
+from functools import lru_cache
+
 from .loader import BaseModBootstrapError
 from plugins import PLUGIN_MANAGER
 
 ColorTuple = Tuple[float, float, float, float]
 
 
+@lru_cache(maxsize=1)
+def _wrapper_module():
+    """Return the lazily imported :mod:`modules.basemod_wrapper` package."""
+
+    return import_module("modules.basemod_wrapper")
+
+
+def _basemod():
+    return getattr(_wrapper_module(), "basemod")
+
+
+def _cardcrawl():
+    return getattr(_wrapper_module(), "cardcrawl")
+
+
+def _libgdx():
+    return getattr(_wrapper_module(), "libgdx")
+
+
 def _coerce_color(value: ColorTuple) -> object:
     """Convert a RGBA tuple into a libGDX ``Color`` instance."""
 
     try:
-        return libgdx.graphics.Color(*value)
+        return _libgdx().graphics.Color(*value)
     except Exception as exc:  # pragma: no cover - dependent on JVM deps
         raise BaseModBootstrapError(
             "libGDX colour initialisation failed. Ensure the Slay the Spire jars"
@@ -47,7 +68,7 @@ class ColorDefinition:
     slash_color: ColorTuple
 
     def register(self) -> object:
-        basemod.BaseMod.addColor(
+        _basemod().BaseMod.addColor(
             self.identifier,
             _coerce_color(self.color),
             _coerce_color(self.trail_color),
@@ -61,7 +82,7 @@ class ColorDefinition:
             self.power_bg_small,
             self.orb_small,
         )
-        return cardcrawl.cards.AbstractCard.CardColor.valueOf(self.identifier)
+        return _cardcrawl().cards.AbstractCard.CardColor.valueOf(self.identifier)
 
 
 @dataclass(slots=True)
@@ -99,8 +120,8 @@ class CharacterBlueprint:
     def build_player_class(self, color_enum: object, player_enum: object, color_definition: ColorDefinition) -> Type:
         import jpype
 
-        CustomPlayer = basemod.abstracts.CustomPlayer
-        EnergyManager = cardcrawl.characters.EnergyManager
+        CustomPlayer = _basemod().abstracts.CustomPlayer
+        EnergyManager = _cardcrawl().characters.EnergyManager
 
         class GeneratedCharacter(CustomPlayer):  # type: ignore[misc]
             ENERGY_PER_TURN = self.energy_per_turn
@@ -151,7 +172,7 @@ class CharacterBlueprint:
                 return _coerce_color(color_definition.slash_color)
 
             def getEnergyNumFont(self):
-                return cardcrawl.helpers.FontHelper.energyNumFontRed
+                return _cardcrawl().helpers.FontHelper.energyNumFontRed
 
         GeneratedCharacter.blueprint = self  # type: ignore[attr-defined]
         GeneratedCharacter.__name__ = f"{self.identifier}Character"
@@ -265,7 +286,7 @@ class ModProject:
 
         color_enum = self.color_definition.register()
         try:
-            player_enum = cardcrawl.characters.AbstractPlayer.PlayerClass.valueOf(self.mod_id.upper())
+            player_enum = _cardcrawl().characters.AbstractPlayer.PlayerClass.valueOf(self.mod_id.upper())
         except Exception as exc:  # pragma: no cover - depends on patch availability
             raise BaseModBootstrapError(
                 f"Player class {self.mod_id.upper()} is not available. Run compileandbundle() "
@@ -284,7 +305,7 @@ class ModProject:
                 project._register_characters()
 
             def receivePostInitialize(self):
-                basemod.BaseMod.registerModBadge(
+                _basemod().BaseMod.registerModBadge(
                     project.color_definition.attack_bg,
                     project.name,
                     project.description,
@@ -293,28 +314,28 @@ class ModProject:
                 )
 
         subscriber = _Subscriber()
-        basemod.BaseMod.subscribe(subscriber)
+        _basemod().BaseMod.subscribe(subscriber)
         self._subscriber = subscriber
 
     def _register_cards(self) -> None:
         for identifier, registration in self.cards.items():
             card = registration.factory()
-            basemod.BaseMod.addCard(card)
+            _basemod().BaseMod.addCard(card)
             if registration.make_basic:
-                basemod.BaseMod.addBasicCard(card)
+                _basemod().BaseMod.addBasicCard(card)
 
     def _register_characters(self) -> None:
         if not self.color_definition:
             raise BaseModBootstrapError("Cannot register characters without a colour definition.")
         try:
-            color_enum = cardcrawl.cards.AbstractCard.CardColor.valueOf(self.color_definition.identifier)
+            color_enum = _cardcrawl().cards.AbstractCard.CardColor.valueOf(self.color_definition.identifier)
         except Exception as exc:  # pragma: no cover - depends on patch availability
             raise BaseModBootstrapError(
                 f"Card color {self.color_definition.identifier} is not available. "
                 "Ensure your enum patch has been compiled and is on the classpath."
             ) from exc
         try:
-            player_enum = cardcrawl.characters.AbstractPlayer.PlayerClass.valueOf(self.mod_id.upper())
+            player_enum = _cardcrawl().characters.AbstractPlayer.PlayerClass.valueOf(self.mod_id.upper())
         except Exception as exc:  # pragma: no cover - depends on patch availability
             raise BaseModBootstrapError(
                 f"Player class {self.mod_id.upper()} is not available. Run compileandbundle() "
@@ -322,7 +343,7 @@ class ModProject:
             ) from exc
         for blueprint in self.character_blueprints:
             character_cls = blueprint.build_player_class(color_enum, player_enum, self.color_definition)
-            basemod.BaseMod.addCharacter(
+            _basemod().BaseMod.addCharacter(
                 character_cls(),
                 blueprint.assets.shoulder_image,
                 blueprint.assets.shoulder2_image,

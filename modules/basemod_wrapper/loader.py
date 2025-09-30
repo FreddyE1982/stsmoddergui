@@ -5,16 +5,19 @@ import os
 import shutil
 import subprocess
 import sys
-from pathlib import Path
-from typing import Dict, Iterable, Optional, Sequence
-
+import tempfile
 import urllib.request
+import zipfile
+from pathlib import Path
+from typing import Dict, Optional, Sequence
 
 
 BASEMOD_RELEASE_URL = "https://github.com/daviscook477/BaseMod/releases/latest/download/BaseMod.jar"
 BASEMOD_JAR_NAME = "BaseMod.jar"
 STSLIB_RELEASE_URL = "https://github.com/kiooeht/StSLib/releases/latest/download/StSLib.jar"
 STSLIB_JAR_NAME = "StSLib.jar"
+MODTHESPIRE_RELEASE_URL = "https://github.com/kiooeht/ModTheSpire/releases/latest/download/ModTheSpire.zip"
+MODTHESPIRE_JAR_NAME = "ModTheSpire.jar"
 
 
 class BaseModBootstrapError(RuntimeError):
@@ -55,6 +58,29 @@ def ensure_stslib_jar(base_dir: Path) -> Path:
     return jar_path
 
 
+def ensure_modthespire_jar(base_dir: Path) -> Path:
+    """Download and extract the ModTheSpire jar if it is missing."""
+
+    jar_path = base_dir / "lib" / MODTHESPIRE_JAR_NAME
+    if jar_path.exists():
+        return jar_path
+
+    archive_fd, archive_name = tempfile.mkstemp(prefix="modthespire", suffix=".zip")
+    archive_path = Path(archive_name)
+    os.close(archive_fd)
+    try:
+        _download(MODTHESPIRE_RELEASE_URL, archive_path)
+        with zipfile.ZipFile(archive_path) as archive:
+            with archive.open(MODTHESPIRE_JAR_NAME) as source, jar_path.open("wb") as target:
+                shutil.copyfileobj(source, target)
+    finally:
+        try:
+            archive_path.unlink()
+        except FileNotFoundError:
+            pass
+    return jar_path
+
+
 def start_jvm(classpath_entries: Sequence[Path]) -> None:
     """Start the JVM with the given classpath if it is not already running."""
 
@@ -81,11 +107,12 @@ def ensure_basemod_environment(
     ensure_jpype()
     basemod_jar = ensure_basemod_jar(base_dir)
     stslib_jar = ensure_stslib_jar(base_dir)
-    classpath = [basemod_jar, stslib_jar]
+    modthespire_jar = ensure_modthespire_jar(base_dir)
+    classpath = [basemod_jar, stslib_jar, modthespire_jar]
     if extra_classpath:
         classpath.extend(extra_classpath)
     start_jvm(classpath)
-    return {"basemod": basemod_jar, "stslib": stslib_jar}
+    return {"basemod": basemod_jar, "stslib": stslib_jar, "modthespire": modthespire_jar}
 
 
 def ensure_dependency_classpath(base_dir: Optional[Path] = None) -> Dict[str, Path]:
@@ -95,6 +122,7 @@ def ensure_dependency_classpath(base_dir: Optional[Path] = None) -> Dict[str, Pa
     return {
         "basemod": ensure_basemod_jar(base_dir),
         "stslib": ensure_stslib_jar(base_dir),
+        "modthespire": ensure_modthespire_jar(base_dir),
     }
 
 
@@ -106,4 +134,5 @@ __all__ = [
     "ensure_dependency_classpath",
     "start_jvm",
     "ensure_stslib_jar",
+    "ensure_modthespire_jar",
 ]
