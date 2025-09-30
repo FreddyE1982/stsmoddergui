@@ -24,6 +24,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+import time
 from typing import Any, Callable, Dict, Iterable, MutableMapping, Optional, Sequence
 
 from plugins import PLUGIN_MANAGER
@@ -39,6 +40,11 @@ from ..java_backend import (
 )
 
 import shlex
+
+_SIMULATE_ENV = "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE"
+_SIMULATE_EXECUTABLE_ENV = "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE"
+_ALLOW_FALLBACK_ENV = "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK"
+
 
 __all__ = ["activate", "deactivate", "GraalPyProvisioningState"]
 
@@ -98,6 +104,35 @@ def _ensure_graalpy_installed() -> Path:
             "GraalPy installation completed but no interpreter executable could be located."
         )
     return executable
+
+
+def _simulate_provisioning(executable: Optional[Path] = None) -> GraalPyProvisioningState:
+    base_dir = Path(__file__).resolve().parents[2]
+    manifest_directory = base_dir / "lib" / "graalpy"
+    manifest_directory.mkdir(parents=True, exist_ok=True)
+
+    simulated_executable = executable or Path(
+        os.environ.get(_SIMULATE_EXECUTABLE_ENV, sys.executable)
+    )
+    manifest = {
+        "platform": platform.system() or "Unknown",
+        "architecture": platform.machine() or "Unknown",
+        "graalpy_version": "simulation",
+        "pillow_version": "simulation",
+        "executable": str(simulated_executable),
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "mode": "simulated",
+    }
+    manifest_path = manifest_directory / "pillow_build.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf8")
+    return GraalPyProvisioningState(
+        executable=simulated_executable,
+        platform=manifest["platform"],
+        architecture=manifest["architecture"],
+        graalpy_version=manifest["graalpy_version"],
+        pillow_version=manifest["pillow_version"],
+        manifest_path=manifest_path,
+    )
 
 
 def _run_graalpy(executable: Path, arguments: Sequence[str]) -> subprocess.CompletedProcess[str]:
@@ -322,15 +357,44 @@ def activate() -> GraalPyProvisioningState:
 
     global _PREVIOUS_BACKEND, _PROVISIONING_STATE
 
-    executable = _ensure_graalpy_installed()
-    preparer = GraalPyPackagePreparer(executable)
-    provisioning_state = preparer.prepare()
+    simulate = os.environ.get(_SIMULATE_ENV, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "simulate",
+    }
+
+    allow_fallback = simulate or os.environ.get(_ALLOW_FALLBACK_ENV, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "fallback",
+    } or platform.python_implementation().lower() != "graalpy"
+
+    if simulate:
+        executable_env = os.environ.get(_SIMULATE_EXECUTABLE_ENV)
+        executable = Path(executable_env) if executable_env else None
+        provisioning_state = _simulate_provisioning(executable)
+    else:
+        executable = _ensure_graalpy_installed()
+        preparer = GraalPyPackagePreparer(executable)
+        provisioning_state = preparer.prepare()
 
     if "graalpy" not in available_backends():
         register_backend(GraalPyBackend())
 
-    _PREVIOUS_BACKEND = active_backend().name
-    use_backend("graalpy")
+    previous_backend = active_backend().name
+    try:
+        use_backend("graalpy")
+    except RuntimeError as exc:
+        if not allow_fallback:
+            raise
+        _PREVIOUS_BACKEND = None
+        PLUGIN_MANAGER.expose("experimental_graalpy_state_error", exc)
+        if active_backend().name != previous_backend:
+            use_backend(previous_backend)
+    else:
+        _PREVIOUS_BACKEND = previous_backend
     _PROVISIONING_STATE = provisioning_state
 
     PLUGIN_MANAGER.expose("experimental_graalpy_state", provisioning_state)
@@ -345,6 +409,7 @@ def deactivate() -> None:
         use_backend(_PREVIOUS_BACKEND)
         _PREVIOUS_BACKEND = None
     PLUGIN_MANAGER.expose("experimental_graalpy_state", _PROVISIONING_STATE)
+    PLUGIN_MANAGER.expose("experimental_graalpy_state_error", None)
 
 
 PLUGIN_MANAGER.expose("experimental_graalpy_activate", activate)

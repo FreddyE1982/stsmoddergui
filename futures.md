@@ -160,4 +160,10 @@
   smoke tests that execute under the GraalPy interpreter and exercise
   functional interface proxies, package resolution, and runtime_env bootstrap
   plans to ensure future upgrades of GraalPy do not break the bridge.
+- [todo] **Cinematic rivalry timeline visualiser** – Build on the new
+  `experimental.graalpy_cinematic_rivalries` module by emitting structured
+  JSON timelines for every updated `RivalryScript`. Usage: expose
+  `export_timelines(path: Path)` on the module so tooling can persist annotated
+  turn-by-turn breakdowns, then document how plugins can subscribe to the
+  timeline feed to generate UI overlays or debugging notebooks.
 
