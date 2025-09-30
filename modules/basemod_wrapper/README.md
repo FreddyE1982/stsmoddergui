@@ -183,6 +183,17 @@ Each blueprint is a dataclass with the following key fields:
 You can also call `blueprint.innerCardImage("art/Strike.png")` (or the snake
 case alias `inner_card_image`) to register a source image after initialisation.
 
+Additional helpers keep the declarative ergonomics intact:
+
+- `secondary_value` / `secondary_upgrade` initialise and upgrade a secondary
+  magic number without manual bookkeeping.
+- `effects`, `on_draw` and `on_discard` accept dictionaries (or callables)
+  describing extra payloads. They can reference card fields (`damage`, `block`,
+  `magic`, `secondary`, etc.) and enqueue StSLib actions via the shared
+  `UnifiedSpireAPI`.
+- `register_keyword_placeholder(keyword, token)` lets you expose custom
+  `{placeholder}` tokens in descriptions so third-party keywords render cleanly.
+
 ```python
 from modules.basemod_wrapper import SimpleCardBlueprint
 
@@ -218,6 +229,33 @@ guard = SimpleCardBlueprint(
 
 PROJECT.add_simple_card(strike)
 PROJECT.add_simple_card(guard)
+
+combo = SimpleCardBlueprint(
+    identifier="RevenantCombo",
+    title="Soul Combo",
+    description="Gain {block} Block. Apply {secondary} Weak.",
+    cost=1,
+    card_type="skill",
+    target="enemy",
+    rarity="rare",
+    effect="block",
+    value=9,
+    secondary_value=2,
+    effects=[
+        {
+            "effect": "weak",
+            "amount": "secondary",
+            "follow_up": [
+                {"action": "AddTemporaryHPAction", "args": ["monster", "player", "amount"]},
+                {"action": "RemoveAllTemporaryHPAction", "kwargs": {"target": "player"}},
+            ],
+        }
+    ],
+    on_draw={"effect": "draw", "amount": 1},
+    on_discard={"effect": "energy", "amount": 1},
+)
+
+PROJECT.add_simple_card(combo)
 ```
 
 When registered, the blueprint generates a full `CustomCard` subclass, wires the

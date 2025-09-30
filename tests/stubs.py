@@ -188,6 +188,7 @@ class StubCardColor:
 class StubSpire:
     def __init__(self) -> None:
         self.calls = []
+        self._actions: dict[str, type] = {}
 
     def apply_keyword(self, card, keyword, *, amount=None, upgrade=None) -> None:
         self.calls.append(
@@ -198,4 +199,17 @@ class StubSpire:
                 "upgrade": upgrade,
             }
         )
+
+    def register_action(self, name: str, action_cls):
+        self._actions[name] = action_cls
+
+    def action(self, name: str):
+        try:
+            return self._actions[name]
+        except KeyError as exc:
+            raise KeyError(f"Stub action '{name}' has not been registered.") from exc
+
+    def reset(self) -> None:
+        self.calls.clear()
+        self._actions.clear()
 

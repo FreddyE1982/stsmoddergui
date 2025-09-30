@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Any, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import jpype
 
@@ -65,6 +65,13 @@ class JavaCallableWrapper:
         self._owner = owner
         self._name = name
         self._callable = callable_obj
+        self._methods_cache: Optional[List[Any]] = None
+        self._signature_cache: Dict[int, List[Tuple[Any, ...]]] = {}
+
+    def _methods(self) -> List[Any]:
+        if self._methods_cache is None:
+            self._methods_cache = list(_iter_methods(self._owner, self._name))
+        return self._methods_cache
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         if kwargs:
@@ -72,17 +79,24 @@ class JavaCallableWrapper:
                 f"Java callable '{self._name}' does not accept keyword arguments."
             )
 
-        methods = list(_iter_methods(self._owner, self._name))
+        methods = self._methods()
         if not methods:
             return self._callable(*args)
 
-        for method in methods:
-            parameters = method.getParameterTypes()
-            if len(parameters) != len(args):
-                continue
+        arity = len(args)
+        signatures = self._signature_cache.get(arity)
+        if signatures is None:
+            signatures = []
+            for method in methods:
+                parameters = method.getParameterTypes()
+                if len(parameters) == arity:
+                    signatures.append(tuple(parameters))
+            self._signature_cache[arity] = signatures
+
+        for signature in signatures:
             converted = []
             try:
-                for parameter, value in zip(parameters, args):
+                for parameter, value in zip(signature, args):
                     converted.append(_convert_argument(parameter, value))
             except TypeError:
                 continue
