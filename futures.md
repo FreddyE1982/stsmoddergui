@@ -120,3 +120,7 @@ and plugins. Usage: add a reporting helper that converts the statistics into
 tabular data and optionally emits JSON artefacts for dashboards. Plugins should
 be able to subscribe to the `CHARACTER_VALIDATION_HOOK` broadcast and enrich the
 report with archetype heuristics and synergy hints for designers.
+
+## How-to recipe synchroniser
+
+Link the new `how to/` recipes with runnable sample projects so documentation never drifts from the code. Usage: add a `modules.tools.recipes` helper that parses the Markdown snippets, materialises temporary mods with `Deck`, `Character`, and `Keyword`, and exposes a CLI (`python -m modules.tools.recipes verify how to/basic-character.md`) to ensure examples still compile and bundle. Plugins should receive a broadcast before and after verification so they can contribute extra validation or telemetry.
