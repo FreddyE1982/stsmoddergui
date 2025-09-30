@@ -25,6 +25,7 @@ from .keywords import (
     apply_persistent_card_changes,
     keyword_scheduler,
 )
+from . import experimental
 
 ensure_jpype()
 from .proxy import JavaPackageWrapper, create_package_wrapper
@@ -421,6 +422,7 @@ PLUGIN_MANAGER.expose("ModProject", ModProject)
 PLUGIN_MANAGER.expose("ProjectLayout", ProjectLayout)
 PLUGIN_MANAGER.expose("BundleOptions", BundleOptions)
 PLUGIN_MANAGER.expose("default_bundle_options", _ENVIRONMENT.default_bundle_options)
+PLUGIN_MANAGER.expose("experimental", experimental)
 PLUGIN_MANAGER.expose("ensure_desktop_jar", ensure_desktop_jar)
 PLUGIN_MANAGER.expose("ensure_dependency_classpath", ensure_dependency_classpath)
 PLUGIN_MANAGER.expose_module("modules.basemod_wrapper", alias="basemod_wrapper")
@@ -434,6 +436,7 @@ __all__ = [
     "libgdx",
     "stslib",
     "spire",
+    "experimental",
     "ModProject",
     "ProjectLayout",
     "BundleOptions",
