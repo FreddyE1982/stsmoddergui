@@ -7,19 +7,46 @@ ones declared on :class:`modules.basemod_wrapper.cards.SimpleCardBlueprint`.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import import_module
 import json
 import random
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+import re
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
 import weakref
+
+
+def _normalize_identifier(value: str) -> str:
+    cleaned = value.strip()
+    return "".join(ch for ch in cleaned.lower() if ch.isalnum())
+
+
+def _camelize(value: str) -> str:
+    parts = [part for part in re.split(r"[^0-9a-zA-Z]+", value) if part]
+    return "".join(part[:1].upper() + part[1:] for part in parts)
+
 
 from plugins import PLUGIN_MANAGER
 
 
 _RANDOM = random.Random()
+
+
+@dataclass(frozen=True)
+class RuntimeHandles:
+    """Bundle live handles to the BaseMod runtime."""
+
+    cardcrawl: Any
+    basemod: Any
+    spire: Any
+
+    @classmethod
+    def current(cls) -> "RuntimeHandles":
+        """Return handles backed by the active runtime modules."""
+
+        return cls(cardcrawl=_cardcrawl(), basemod=_basemod(), spire=_spire())
 
 
 @lru_cache(maxsize=1)
@@ -211,10 +238,16 @@ class CardEditor:
         "rarity": "rarity",
         "target": "target",
         "card_type": "type",
+        "secondary_value": "baseSecondMagicNumber",
+        "image": "textureImg",
     }
 
     def __init__(self, card: Any) -> None:
         self._card = card
+
+    @property
+    def card(self) -> Any:
+        return self._card
 
     def apply(self, **fields: Any) -> None:
         for key, value in fields.items():
@@ -224,6 +257,22 @@ class CardEditor:
                 continue
             if hasattr(self._card, key):
                 setattr(self._card, key, value)
+
+    def snapshot(self, *fields: str) -> Dict[str, Any]:
+        if not fields:
+            fields = tuple(self._SUPPORTED_FIELDS)
+        result: Dict[str, Any] = {}
+        for field in fields:
+            attr = self._SUPPORTED_FIELDS.get(field, field)
+            if hasattr(self._card, attr):
+                result[field] = getattr(self._card, attr)
+        return result
+
+    def __getattr__(self, item: str) -> Any:
+        attr = self._SUPPORTED_FIELDS.get(item, item)
+        if hasattr(self._card, attr):
+            return getattr(self._card, attr)
+        raise AttributeError(item)
 
     def persist_for_combat(self, **fields: Any) -> None:
         self.apply(**fields)
@@ -255,9 +304,10 @@ class CardEditor:
 class CardZoneProxy:
     """Expose card piles with editing helpers."""
 
-    def __init__(self, owner: Any, accessor: Callable[[], Iterable[Any]]) -> None:
-        self._owner = owner
+    def __init__(self, context: "KeywordContext", accessor: Callable[[], Iterable[Any]], *, label: str) -> None:
+        self._context = context
         self._accessor = accessor
+        self._label = label
 
     def __len__(self) -> int:
         collection = self._accessor()
@@ -274,8 +324,13 @@ class CardZoneProxy:
         card = group[index]
         return CardEditor(card)
 
+    def __getitem__(self, index: int) -> CardEditor:
+        return self.get(index)
+
     def add_by_name(self, name: str) -> None:
-        cardcrawl = _cardcrawl()
+        if self._label != "hand":
+            raise KeywordError("Cards can only be added directly to the hand from keywords.")
+        cardcrawl = self._context.runtime.cardcrawl
         library = cardcrawl.helpers.CardLibrary
         card = library.getCard(name)
         if card is None:
@@ -287,7 +342,62 @@ class CardZoneProxy:
         cardcrawl.dungeons.AbstractDungeon.actionManager.addToBottom(action)
 
 
-class HPProxy:
+class ComparableInt:
+    """Mixin that provides arithmetic and comparison helpers."""
+
+    def _value(self) -> int:
+        raise NotImplementedError
+
+    def __int__(self) -> int:
+        return self._value()
+
+    def __float__(self) -> float:
+        return float(self._value())
+
+    def _coerce_other(self, other: Any) -> int:
+        if isinstance(other, ComparableInt):
+            return int(other)
+        try:
+            return int(other)
+        except (TypeError, ValueError) as exc:
+            raise TypeError(f"Cannot interpret {other!r} as an integer") from exc
+
+    def __add__(self, other: Any) -> int:
+        return self._value() + self._coerce_other(other)
+
+    def __radd__(self, other: Any) -> int:
+        return self._coerce_other(other) + self._value()
+
+    def __sub__(self, other: Any) -> int:
+        return self._value() - self._coerce_other(other)
+
+    def __rsub__(self, other: Any) -> int:
+        return self._coerce_other(other) - self._value()
+
+    def __eq__(self, other: Any) -> bool:  # type: ignore[override]
+        try:
+            other_value = self._coerce_other(other)
+        except TypeError:
+            return False
+        return self._value() == other_value
+
+    def __lt__(self, other: Any) -> bool:
+        return self._value() < self._coerce_other(other)
+
+    def __le__(self, other: Any) -> bool:
+        return self._value() <= self._coerce_other(other)
+
+    def __gt__(self, other: Any) -> bool:
+        return self._value() > self._coerce_other(other)
+
+    def __ge__(self, other: Any) -> bool:
+        return self._value() >= self._coerce_other(other)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self._value()})"
+
+
+class HPProxy(ComparableInt):
     """Expose HP related operations for the active player."""
 
     def __init__(self, context: "KeywordContext") -> None:
@@ -295,7 +405,7 @@ class HPProxy:
 
     @property
     def value(self) -> int:
-        temp_field = _spire().stslib.patches.tempHp.TempHPField.tempHp
+        temp_field = self._context.runtime.spire.stslib.patches.tempHp.TempHPField.tempHp
         return int(temp_field.get(self._context.player))
 
     def _set_temp_hp(self, value: int) -> None:
@@ -305,14 +415,14 @@ class HPProxy:
         if delta == 0:
             return
         if delta > 0:
-            action_cls = _spire().action("AddTemporaryHPAction")
+            action_cls = self._context.runtime.spire.action("AddTemporaryHPAction")
             action = action_cls(player, player, delta)
         else:
-            action_cls = _spire().action("RemoveAllTemporaryHPAction")
+            action_cls = self._context.runtime.spire.action("RemoveAllTemporaryHPAction")
             action = action_cls(player, player)
         self._context.enqueue_action(action)
 
-    def __int__(self) -> int:
+    def _value(self) -> int:
         return self.value
 
     def __iadd__(self, other: int) -> "HPProxy":
@@ -332,7 +442,7 @@ class HPProxy:
         player = self._context.player
         current = int(player.maxHealth)
         delta = int(value) - current
-        cardcrawl = _cardcrawl()
+        cardcrawl = self._context.runtime.cardcrawl
         if delta == 0:
             return
         if delta > 0:
@@ -351,49 +461,84 @@ class PlayerProxy:
 
     def __init__(self, context: "KeywordContext") -> None:
         self._context = context
+        self._powers = PowerProxy(self._context, self._context.player, owner_label="player")
 
-    def _get_power(self, power_name: str) -> int:
-        player = self._context.player
-        power = player.getPower(power_name)
-        if power is None:
-            return 0
-        return int(getattr(power, "amount", 0))
-
-    def _set_power(self, power_name: str, amount: int) -> None:
-        player = self._context.player
-        current = self._get_power(power_name)
-        delta = int(amount) - current
-        if delta == 0:
-            return
-        powers = _cardcrawl().powers
-        power_cls = getattr(powers, power_name)
-        power = power_cls(player, delta)
-        action = _cardcrawl().actions.common.ApplyPowerAction(player, player, power, delta)
-        self._context.enqueue_action(action)
+    @property
+    def powers(self) -> "PowerProxy":
+        return self._powers
 
     @property
     def strength(self) -> int:
-        return self._get_power("StrengthPower")
+        return self.powers.StrengthPower
 
     @strength.setter
     def strength(self, value: int) -> None:
-        self._set_power("StrengthPower", value)
+        self.powers.StrengthPower = value
 
     @property
     def dexterity(self) -> int:
-        return self._get_power("DexterityPower")
+        return self.powers.DexterityPower
 
     @dexterity.setter
     def dexterity(self, value: int) -> None:
-        self._set_power("DexterityPower", value)
+        self.powers.DexterityPower = value
 
     @property
     def artifact(self) -> int:
-        return self._get_power("ArtifactPower")
+        return self.powers.ArtifactPower
 
     @artifact.setter
     def artifact(self, value: int) -> None:
-        self._set_power("ArtifactPower", value)
+        self.powers.ArtifactPower = value
+
+    @property
+    def focus(self) -> int:
+        return self.powers.FocusPower
+
+    @focus.setter
+    def focus(self, value: int) -> None:
+        self.powers.FocusPower = value
+
+    @property
+    def block(self) -> int:
+        return int(getattr(self._context.player, "currentBlock", 0))
+
+    @block.setter
+    def block(self, value: int) -> None:
+        player = self._context.player
+        current = int(getattr(player, "currentBlock", 0))
+        delta = int(value) - current
+        if delta == 0:
+            return
+        cardcrawl = self._context.runtime.cardcrawl
+        if delta > 0:
+            action = cardcrawl.actions.common.GainBlockAction(player, player, delta)
+        else:
+            action = cardcrawl.actions.common.LoseBlockAction(player, player, abs(delta))
+        self._context.enqueue_action(action)
+
+    @property
+    def energy(self) -> int:
+        manager = getattr(self._context.player, "energy", None)
+        if manager is None:
+            return 0
+        return int(getattr(manager, "energy", 0))
+
+    @energy.setter
+    def energy(self, value: int) -> None:
+        manager = getattr(self._context.player, "energy", None)
+        if manager is None:
+            raise KeywordError("Player energy manager is unavailable.")
+        manager.energy = int(value)
+
+    def draw_cards(self, amount: int) -> None:
+        action = self._context.runtime.cardcrawl.actions.common.DrawCardAction(self._context.player, int(amount))
+        self._context.enqueue_action(action)
+
+    def discard(self, amount: int) -> None:
+        action_cls = self._context.runtime.cardcrawl.actions.common.DiscardAction
+        action = action_cls(self._context.player, self._context.player, int(amount), False)
+        self._context.enqueue_action(action)
 
 
 class EnemyProxy:
@@ -402,29 +547,34 @@ class EnemyProxy:
     def __init__(self, context: "KeywordContext") -> None:
         self._context = context
 
+    def _wrap(self, monster: Optional[Any]) -> "MonsterHandle":
+        if monster is None:
+            raise KeywordError("No monster available for keyword interaction.")
+        return MonsterHandle(self._context, monster)
+
     @property
-    def target(self) -> Any:
+    def target(self) -> "MonsterHandle":
         if self._context.monster is not None:
-            return self._context.monster
+            return self._wrap(self._context.monster)
         return self.random
 
     @property
-    def random(self) -> Any:
-        dungeon = _cardcrawl().dungeons.AbstractDungeon
+    def random(self) -> "MonsterHandle":
+        dungeon = self._context.runtime.cardcrawl.dungeons.AbstractDungeon
         current_room = getattr(dungeon, "getCurrRoom", lambda: None)()
         monsters = getattr(current_room, "monsters", None)
         if monsters is None:
-            return None
+            raise KeywordError("No monsters available in the current room.")
         chooser = getattr(monsters, "getRandomMonster", None)
         if chooser:
-            return chooser(True)
+            return self._wrap(chooser(True))
         group = getattr(monsters, "monsters", None)
         if group:
-            return _RANDOM.choice(list(group))
-        return None
+            return self._wrap(_RANDOM.choice(list(group)))
+        raise KeywordError("No monsters available in the current room.")
 
-    def all(self) -> Iterable[Any]:
-        dungeon = _cardcrawl().dungeons.AbstractDungeon
+    def all(self) -> Iterable["MonsterHandle"]:
+        dungeon = self._context.runtime.cardcrawl.dungeons.AbstractDungeon
         current_room = getattr(dungeon, "getCurrRoom", lambda: None)()
         monsters = getattr(current_room, "monsters", None)
         if monsters is None:
@@ -432,7 +582,49 @@ class EnemyProxy:
         group = getattr(monsters, "monsters", None)
         if group is None:
             return ()
-        return tuple(group)
+        return tuple(self._wrap(monster) for monster in group)
+
+
+@dataclass
+class MonsterHandle(ComparableInt):
+    context: "KeywordContext"
+    monster: Any
+    powers: "PowerProxy" = field(init=False)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "powers", PowerProxy(self.context, self.monster, owner_label="enemy"))
+
+    def _value(self) -> int:
+        return int(getattr(self.monster, "currentHealth", 0))
+
+    @property
+    def max(self) -> int:
+        return int(getattr(self.monster, "maxHealth", 0))
+
+    @property
+    def hp(self) -> int:
+        return self._value()
+
+    @hp.setter
+    def hp(self, value: int) -> None:
+        current = self._value()
+        delta = int(value) - current
+        if delta == 0:
+            return
+        runtime = self.context.runtime.cardcrawl
+        if delta > 0:
+            action = runtime.actions.common.HealAction(self.monster, self.context.player, delta)
+        else:
+            action = runtime.actions.common.LoseHPAction(self.monster, self.context.player, abs(delta))
+        self.context.enqueue_action(action)
+
+    def __iadd__(self, other: int) -> "MonsterHandle":
+        self.hp = self._value() + int(other)
+        return self
+
+    def __isub__(self, other: int) -> "MonsterHandle":
+        self.hp = self._value() - int(other)
+        return self
 
 
 @dataclass
@@ -443,22 +635,170 @@ class KeywordContext:
     card: Any
     amount: Optional[int]
     upgrade: Optional[int]
+    runtime: Optional[RuntimeHandles] = None
 
     def __post_init__(self) -> None:
+        self.runtime = self.runtime or RuntimeHandles.current()
         self.scheduler = _SCHEDULER
         self.hp_proxy = HPProxy(self)
         self.player_proxy = PlayerProxy(self)
         self.enemy_proxy = EnemyProxy(self)
-        self.hand = CardZoneProxy(self.player, lambda: getattr(self.player, "hand", []))
-        self.draw_pile = CardZoneProxy(self.player, lambda: getattr(self.player, "drawPile", []))
-        self.discard_pile = CardZoneProxy(self.player, lambda: getattr(self.player, "discardPile", []))
+        self.hand = CardZoneProxy(self, lambda: getattr(self.player, "hand", []), label="hand")
+        self.draw_pile = CardZoneProxy(self, lambda: getattr(self.player, "drawPile", []), label="draw")
+        self.discard_pile = CardZoneProxy(
+            self, lambda: getattr(self.player, "discardPile", []), label="discard"
+        )
 
     def enqueue_action(self, action: Any) -> None:
         def _runner() -> None:
-            manager = _cardcrawl().dungeons.AbstractDungeon.actionManager
+            manager = self.runtime.cardcrawl.dungeons.AbstractDungeon.actionManager
             manager.addToBottom(action)
 
         self.scheduler.enqueue_immediate(_runner)
+
+    def apply_power(self, owner: Any, power_name: str, amount: int, *, source: Optional[Any] = None) -> None:
+        if amount == 0:
+            return
+        powers = self.runtime.cardcrawl.powers
+        try:
+            power_cls = getattr(powers, power_name)
+        except AttributeError as exc:
+            raise KeywordError(f"Unknown power '{power_name}'.") from exc
+        source = source or self.player
+        amount = int(amount)
+        if amount == 0:
+            return
+        power = _instantiate_power(power_cls, owner, source, amount)
+        action = self.runtime.cardcrawl.actions.common.ApplyPowerAction(owner, source, power, amount)
+        self.enqueue_action(action)
+
+    def remove_power(self, owner: Any, power_name: str) -> None:
+        action_cls = self.runtime.cardcrawl.actions.common.RemoveSpecificPowerAction
+        action = action_cls(owner, self.player, power_name)
+        self.enqueue_action(action)
+
+
+def _instantiate_power(power_cls: Any, owner: Any, source: Any, amount: int) -> Any:
+    attempts: List[Tuple[Any, ...]] = [
+        (owner, amount),
+        (owner, amount, False),
+        (owner, amount, True),
+        (owner, source, amount),
+        (owner, source, amount, False),
+        (owner, source, amount, True),
+        (owner,),
+    ]
+    for args in attempts:
+        try:
+            return power_cls(*args)
+        except TypeError:
+            continue
+    tried = [len(args) for args in attempts]
+    raise KeywordError(f"Could not instantiate power '{power_cls.__name__}'. Tried constructor arity {tried}.")
+
+
+class PowerProxy:
+    """Expose powers on creatures with pythonic accessors."""
+
+    _PLAYER_ALIASES: Dict[str, str] = {
+        "strength": "StrengthPower",
+        "dexterity": "DexterityPower",
+        "focus": "FocusPower",
+        "artifact": "ArtifactPower",
+        "intangible": "IntangiblePlayerPower",
+        "buffer": "BufferPower",
+        "metallicize": "MetallicizePower",
+        "platedarmor": "PlatedArmorPower",
+        "thorns": "ThornsPower",
+        "vigor": "VigorPower",
+        "combust": "CombustPower",
+        "barricade": "BarricadePower",
+        "flamebarrier": "FlameBarrierPower",
+        "echoform": "EchoPower",
+        "electrodynamics": "ElectrodynamicsPower",
+        "creativeai": "CreativeAIPower",
+        "staticdischarge": "StaticDischargePower",
+        "blur": "BlurPower",
+    }
+
+    _ENEMY_ALIASES: Dict[str, str] = {
+        "weak": "WeakPower",
+        "vulnerable": "VulnerablePower",
+        "frail": "FrailPower",
+        "poison": "PoisonPower",
+        "artifact": "ArtifactPower",
+        "strength": "StrengthPower",
+        "dexterity": "DexterityPower",
+        "focus": "FocusPower",
+        "intangible": "IntangiblePower",
+        "constricted": "ConstrictedPower",
+        "shackled": "ShackledPower",
+        "lockon": "LockOnPower",
+        "slow": "SlowPower",
+        "thorns": "ThornsPower",
+    }
+
+    def __init__(self, context: KeywordContext, owner: Any, *, owner_label: str) -> None:
+        self._context = context
+        self._owner = owner
+        self._owner_label = owner_label
+
+    def _alias_mapping(self) -> Dict[str, str]:
+        if self._owner_label == "player":
+            return self._PLAYER_ALIASES
+        return self._ENEMY_ALIASES
+
+    def _resolve_name(self, name: str) -> str:
+        if name.endswith("Power"):
+            return name
+        normalized = _normalize_identifier(name)
+        aliases = self._alias_mapping()
+        if normalized in aliases:
+            return aliases[normalized]
+        if normalized.endswith("power"):
+            base_key = normalized[:-5]
+            if base_key in aliases:
+                return aliases[base_key]
+            camel_base = _camelize(base_key)
+            if camel_base:
+                return f"{camel_base}Power"
+        camel = _camelize(name)
+        if camel:
+            if camel.endswith("Power"):
+                return camel
+            return f"{camel}Power"
+        return name
+
+    def __getattr__(self, item: str) -> int:
+        power_name = self._resolve_name(item)
+        owner = self._owner
+        power = getattr(owner, "getPower", lambda _: None)(power_name)
+        if power is None:
+            return 0
+        return int(getattr(power, "amount", 0))
+
+    def __setattr__(self, key: str, value: int) -> None:
+        if key.startswith("_"):
+            object.__setattr__(self, key, value)
+            return
+        power_name = self._resolve_name(key)
+        amount = int(value)
+        owner = self._owner
+        current_power = getattr(owner, "getPower", lambda _: None)(power_name)
+        current_amount = int(getattr(current_power, "amount", 0)) if current_power is not None else 0
+        if amount <= 0:
+            self._context.remove_power(self._owner, power_name)
+            return
+        delta = amount - current_amount
+        if delta == 0:
+            return
+        source = self._context.player if self._owner_label == "enemy" else owner
+        self._context.apply_power(owner, power_name, delta, source=source)
+
+    def __dir__(self) -> Iterator[str]:  # pragma: no cover - trivial helper
+        base = set(super().__dir__())  # type: ignore[arg-type]
+        base.update(self._alias_mapping().keys())
+        return sorted(base)
 
 
 class KeywordMeta(type):
@@ -630,11 +970,29 @@ PLUGIN_MANAGER.expose("KeywordRegistry", KeywordRegistry)
 PLUGIN_MANAGER.expose("KEYWORD_REGISTRY", KEYWORD_REGISTRY)
 PLUGIN_MANAGER.expose("keyword_scheduler", _SCHEDULER)
 PLUGIN_MANAGER.expose("apply_persistent_card_changes", apply_persistent_card_changes)
+PLUGIN_MANAGER.expose("KeywordContext", KeywordContext)
+PLUGIN_MANAGER.expose("RuntimeHandles", RuntimeHandles)
+PLUGIN_MANAGER.expose("CardEditor", CardEditor)
+PLUGIN_MANAGER.expose("CardZoneProxy", CardZoneProxy)
+PLUGIN_MANAGER.expose("HPProxy", HPProxy)
+PLUGIN_MANAGER.expose("PlayerProxy", PlayerProxy)
+PLUGIN_MANAGER.expose("EnemyProxy", EnemyProxy)
+PLUGIN_MANAGER.expose("MonsterHandle", MonsterHandle)
+PLUGIN_MANAGER.expose("PowerProxy", PowerProxy)
 
 __all__ = [
     "Keyword",
     "KeywordRegistry",
     "KeywordScheduler",
+    "KeywordContext",
+    "RuntimeHandles",
+    "CardEditor",
+    "CardZoneProxy",
+    "HPProxy",
+    "PlayerProxy",
+    "EnemyProxy",
+    "MonsterHandle",
+    "PowerProxy",
     "KEYWORD_REGISTRY",
     "keyword_scheduler",
     "apply_persistent_card_changes",

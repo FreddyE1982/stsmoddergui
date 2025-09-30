@@ -81,6 +81,19 @@ that the scheduler wires into BaseMod subscribers, and surface the registration
 points on ``PLUGIN_MANAGER`` so third-party extensions can augment the event
 matrix without monkeypatching the core implementation.
 
+## Power instantiation metadata registry
+
+The heuristic-based power instantiation in `modules.basemod_wrapper.keywords`
+works for the majority of base game powers but still guesses constructor
+signatures at runtime. Introduce a metadata registry that enumerates the known
+constructor signatures for Slay the Spire powers and exposes an override hook
+for modded ones. Usage: ship a JSON manifest under ``research/`` describing the
+expected positional parameters, whether a power consumes the player as source,
+and any supplementary flags (e.g. `isSourceMonster`). `KeywordContext` would
+consult the registry before falling back to heuristics, while plugins could
+register additional entries via ``PLUGIN_MANAGER.expose(...)`` to guarantee
+future compatibility.
+
 ## Character builder scaffolding
 
 Teach the high-level `Character` helper to generate self-contained runtime
