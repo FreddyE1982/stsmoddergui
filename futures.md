@@ -151,4 +151,11 @@
   that scans the `assets/<mod_id>/localizations` tree, reports cards that only
   exist in a subset of languages, and exposes a plugin hook so translation
   workflows can gate builds when required locales are incomplete.
+- [todo] **GraalPy migration playbook integration** – Consolidate the
+  GraalPy compatibility and migration notes under
+  `modules.basemod_wrapper.experimental` into a guided activation flow.
+  Usage: ship an `experimental.graalpy` feature that surfaces the collected
+  compatibility guidance, validates the local GraalPy toolchain, and exposes
+  plugin hooks so external tooling can extend the migration checks before a
+  mod toggles into GraalPy mode.
 
