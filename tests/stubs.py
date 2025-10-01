@@ -114,6 +114,58 @@ class StubCustomCard:
         self.magicNumber = self.baseMagicNumber
 
 
+class StubRelicTier:
+    COMMON = "COMMON"
+    UNCOMMON = "UNCOMMON"
+    RARE = "RARE"
+    BOSS = "BOSS"
+    SHOP = "SHOP"
+
+    @staticmethod
+    def valueOf(name: str):
+        return getattr(StubRelicTier, name)
+
+
+class StubLandingSound:
+    FLAT = "FLAT"
+    SOLID = "SOLID"
+    CLINK = "CLINK"
+    MAGICAL = "MAGICAL"
+
+    @staticmethod
+    def valueOf(name: str):
+        return getattr(StubLandingSound, name)
+
+
+class StubRelicType:
+    SHARED = "SHARED"
+    RED = "RED"
+    GREEN = "GREEN"
+    BLUE = "BLUE"
+    PURPLE = "PURPLE"
+    CUSTOM = "CUSTOM"
+
+    @staticmethod
+    def valueOf(name: str):
+        return getattr(StubRelicType, name)
+
+
+class StubCustomRelic:
+    def __init__(self, relic_id: str, image: str, tier: object, sound: object) -> None:
+        self.relicId = relic_id
+        self.imgUrl = image
+        self.tier = tier
+        self.landing_sound = sound
+        self.counter = 0
+        self.grayscale = False
+        self.name = relic_id
+        self.description = ""
+        self.flavorText = ""
+
+    def makeCopy(self):
+        return type(self)(self.relicId, self.imgUrl, self.tier, self.landing_sound)
+
+
 class StubStrengthPower:
     def __init__(self, owner, amount) -> None:
         self.owner = owner

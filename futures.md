@@ -223,3 +223,8 @@
   script paths/resources, validates JSON/YAML structure ahead of bundling, and
   publishes a manifest to `PLUGIN_MANAGER` so CI pipelines can diff mechanic
   packs for unexpected mutations.
+- [todo] **Adaptive telemetry core visual pass** – Produce production-quality relic art
+  and outline textures for the new Adaptive Telemetry Core relic. Usage: create
+  high contrast PNGs under `assets/adaptive_evolver/images/relics/` and update
+  the relic documentation with sizing guidelines so bundling workflows include
+  finalised art instead of placeholders.

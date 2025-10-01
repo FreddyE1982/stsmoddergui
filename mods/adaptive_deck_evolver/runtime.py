@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
 from modules.basemod_wrapper.cards import SimpleCardBlueprint
+from modules.basemod_wrapper.relics import RELIC_REGISTRY
 from modules.basemod_wrapper.experimental.graalpy_rule_weaver import (
     MechanicActivation,
     MechanicMutation,
@@ -153,6 +154,8 @@ class AdaptiveMechanicMod:
         self._base_deck_ids: set[str] = set(self.profile.deck.keys())
         self._project = None
         self.latest_plan: Optional[DeckMutationPlan] = None
+        self._relic_records = {record.identifier: record for record in RELIC_REGISTRY.for_mod(mod_id)}
+        self._active_combat_relics: Dict[str, Tuple[object, ...]] = {}
 
     # ------------------------------------------------------------------
     def attach_deck(self, deck: type[Deck]) -> None:
@@ -198,6 +201,16 @@ class AdaptiveMechanicMod:
             notes=notes,
         )
         self._recorders[recorder.combat_id] = recorder
+        active_relics = []
+        for relic_id in recorder.relics:
+            record = self._relic_records.get(relic_id)
+            if record is None:
+                continue
+            relic_instance = record.spawn_instance()
+            active_relics.append(relic_instance)
+            relic_instance.on_combat_begin(self, recorder)
+        if active_relics:
+            self._active_combat_relics[recorder.combat_id] = tuple(active_relics)
         return recorder
 
     def complete_combat(
@@ -220,6 +233,9 @@ class AdaptiveMechanicMod:
         )
         style_vector = self.heuristic.ingest_combat(session)
         plan = self.engine.plan_evolution(style_vector=style_vector)
+        active_relics = self._active_combat_relics.pop(combat_id, ())
+        for relic in active_relics:
+            relic.on_plan_finalised(self, plan)
         self.engine.apply(plan)
         self.latest_plan = plan
         if self.deck is not None:
@@ -292,6 +308,9 @@ class AdaptiveMechanicMod:
         mutation = self._build_runtime_mutation()
         if hasattr(project, "register_mechanic_mutation"):
             project.register_mechanic_mutation(mutation, activate=False)
+        if hasattr(project, "register_relic_record"):
+            for record in self._relic_records.values():
+                project.register_relic_record(record)
 
     # ------------------------------------------------------------------
     def _build_runtime_mutation(self) -> MechanicMutation:
@@ -357,4 +376,5 @@ class AdaptiveMechanicMod:
         self.heuristic = FightingStyleHeuristic(self.profile)
         self.engine = DeckEvolutionEngine(self.profile, self.heuristic)
         self._base_deck_ids = set()
+        self._active_combat_relics.clear()
         return self.profile

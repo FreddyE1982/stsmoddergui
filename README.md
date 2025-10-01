@@ -18,6 +18,7 @@ directly to Python developers.
   single `.pystsmod` archive plus a ModTheSpire loader jar for memory-only
   deployment workflows.
 - Runtime bootstrap helpers (`modules.modbuilder.runtime_env`) that describe bundled Python packages and generate platform-specific activation commands.
+- Auto-registering `Relic` base class with a global registry so adaptive mods can expose gameplay artefacts without manual BaseMod wiring.
 - Forward-looking roadmap documented in `futures.md`.
 - Built-in deck analytics helper that converts validation snapshots into tables and JSON artefacts for dashboards and plugins.
 - Mechanics-only mod support that activates the `experimental.graalpy_rule_weaver`

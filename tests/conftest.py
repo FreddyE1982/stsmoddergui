@@ -10,13 +10,16 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from modules.basemod_wrapper import cards as cards_module
+from modules.basemod_wrapper import relics as relics_module
 from modules.basemod_wrapper import keywords as keywords_module
+from modules.basemod_wrapper import project as project_module
 from tests.stubs import (
     StubActionManager,
     StubApplyPowerAction,
     StubArtifactPower,
     StubCardColor,
     StubCustomCard,
+    StubCustomRelic,
     StubDamageAction,
     StubDamageAllEnemiesAction,
     StubDamageInfo,
@@ -25,7 +28,10 @@ from tests.stubs import (
     StubFocusPower,
     StubGainBlockAction,
     StubGainEnergyAction,
+    StubLandingSound,
     StubPoisonPower,
+    StubRelicTier,
+    StubRelicType,
     StubSpire,
     StubStrengthPower,
     StubVulnerablePower,
@@ -51,7 +57,7 @@ def use_real_dependencies(request: pytest.FixtureRequest) -> bool:
 
 
 @pytest.fixture()
-def stubbed_runtime(monkeypatch):
+def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
     action_manager = StubActionManager()
     attack_effects = SimpleNamespace(
         SLASH_DIAGONAL="SLASH_DIAGONAL",
@@ -125,23 +131,46 @@ def stubbed_runtime(monkeypatch):
         actions=actions_namespace,
         powers=powers_namespace,
         dungeons=dungeon_namespace,
+        relics=SimpleNamespace(
+            AbstractRelic=SimpleNamespace(
+                RelicTier=StubRelicTier,
+                LandingSound=StubLandingSound,
+                RelicType=StubRelicType,
+            )
+        ),
         helpers=SimpleNamespace(CardLibrary=SimpleNamespace(getCard=lambda name: None)),
     )
     spire_stub = StubSpire()
 
     class StubBaseMod:
+        relics_registered: list[tuple[object, object]] = []
+        custom_pool_relics: list[tuple[object, object]] = []
+
         @staticmethod
         def subscribe(_):
             return None
 
+        @classmethod
+        def addRelic(cls, relic, relic_type):
+            cls.relics_registered.append((relic, relic_type))
+
+        @classmethod
+        def addRelicToCustomPool(cls, relic, color):
+            cls.custom_pool_relics.append((relic, color))
+
     basemod_stub = SimpleNamespace(
-        abstracts=SimpleNamespace(CustomCard=StubCustomCard),
+        abstracts=SimpleNamespace(CustomCard=StubCustomCard, CustomRelic=StubCustomRelic),
         BaseMod=StubBaseMod,
     )
 
     monkeypatch.setattr(cards_module, "_cardcrawl", lambda: cardcrawl_stub)
     monkeypatch.setattr(cards_module, "_basemod", lambda: basemod_stub)
     monkeypatch.setattr(cards_module, "_spire", lambda: spire_stub)
+    monkeypatch.setattr(relics_module, "_cardcrawl", lambda: cardcrawl_stub)
+    monkeypatch.setattr(relics_module, "_basemod", lambda: basemod_stub)
+    relics_module._custom_relic_base.cache_clear()
+    monkeypatch.setattr(project_module, "_cardcrawl", lambda: cardcrawl_stub)
+    monkeypatch.setattr(project_module, "_basemod", lambda: basemod_stub)
 
     class StubTempHPField:
         @staticmethod
@@ -181,6 +210,8 @@ def stubbed_runtime(monkeypatch):
 
     action_manager.clear()
     spire_stub.reset()
+    StubBaseMod.relics_registered.clear()
+    StubBaseMod.custom_pool_relics.clear()
 
 
 @pytest.fixture()
