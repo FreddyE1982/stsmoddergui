@@ -38,6 +38,11 @@ are also published to the global plugin manager (`plugins.PLUGIN_MANAGER`):
   distribution.
 - `SimpleCardBlueprint` and `register_simple_card`: declarative helpers for
   building everyday cards without hand-written subclasses.
+- `OverlayManager` and `show_overlay`: runtime overlay director that lets mods
+  project arbitrary textures anywhere on screen without pausing combat, map
+  navigation or event flows. Overlays support z-index ordering, start delays,
+  finite lifetimes, anchor-based positioning and plugin-visible lifecycle
+  events (`on_overlay_shown`, `on_overlay_updated`, `on_overlay_hidden`).
 - `Relic` and `RELIC_REGISTRY`: declarative relic base class with automatic
   registration and plugin-friendly discovery.
 - `BaseModEnvironment`: access to the resolved dependency jars and default
@@ -46,6 +51,36 @@ are also published to the global plugin manager (`plugins.PLUGIN_MANAGER`):
 All of these symbols are exposed to plugins via
 `PLUGIN_MANAGER.expose(...)` so third-party helpers can inspect or extend the
 wrapper without tight coupling.
+
+### Runtime overlays without boilerplate
+
+```python
+from modules.basemod_wrapper import show_overlay
+
+handle = show_overlay(
+    "assets/revenant/images/ui/shadow_warning.png",
+    x=1820,
+    y=1020,
+    width=320,
+    height=128,
+    anchor="top_right",
+    z_index=15,
+    duration=4.5,
+    metadata={"context": "shadow_tide_warning"},
+)
+
+# Update while it is visible.
+handle.update(opacity=0.75, rotation=15)
+
+# Hide early if combat state changes.
+handle.hide(reason="player_evaded")
+```
+
+Plugins can observe overlay activity by implementing the optional hooks
+`on_overlay_shown`, `on_overlay_updated` and `on_overlay_hidden`. Each callback
+receives an :class:`OverlaySnapshot` alongside the active
+:class:`OverlayManager`, enabling dashboards, telemetry streams or alternative
+UI renderers to stay in sync with the live runtime.
 
 ## Boot sequence and dependency handling
 

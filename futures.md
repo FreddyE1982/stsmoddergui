@@ -63,6 +63,12 @@
   submodule, document its activation hooks, and surface an `experimental.on`
   example in the wrapper README so teams can trial features without forking
   the stable API.
+- [todo] **Overlay animation presets** – Extend the runtime overlay director
+  with reusable easing timelines (fade, slide, pulse) and scripted sequences.
+  Usage: add `OverlayAnimation` descriptors that the manager can attach to an
+  overlay, tick animations alongside duration tracking, and broadcast progress
+  updates through `PLUGIN_MANAGER` so plugins can mirror transitions or extend
+  them with custom shaders.
 - [todo] **In-process compact loader activation** – Teach the compact bundling
   pipeline to hydrate `.pystsmod` archives directly inside the ModTheSpire
   JVM. Usage: extend the generated loader jar to bootstrap the Python runtime,
