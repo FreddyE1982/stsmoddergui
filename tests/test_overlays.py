@@ -1,6 +1,9 @@
+import gc
+
 import pytest
 
-from modules.basemod_wrapper.overlays import OverlayManager
+from modules.basemod_wrapper.keywords import KEYWORD_REGISTRY, Keyword, RuntimeHandles
+from modules.basemod_wrapper.overlays import OverlayManager, overlay_manager
 
 
 class DummyTexture:
@@ -122,3 +125,142 @@ def test_overlay_manager_z_order_and_updates(use_real_dependencies):
 
     manager.clear()
     assert manager.active_overlay_ids == ()
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_overlay_trigger_card_event(use_real_dependencies):
+    assert isinstance(use_real_dependencies, bool)
+    manager = OverlayManager(auto_register=False)
+    texture = DummyTexture(64, 64, name="card_ping")
+
+    handle = manager.register_trigger(
+        "card_used",
+        match={"card_id": "Strike_R"},
+        source=texture,
+        overlay_kwargs={
+            "x": 120,
+            "y": 340,
+            "metadata": {"kind": "card"},
+            "z_index": 7,
+        },
+        overlay_identifier="card_used_overlay",
+    )
+
+    class DummyCard:
+        def __init__(self, card_id: str) -> None:
+            self.cardID = card_id
+            self.name = card_id
+
+    manager.handle_event("card_used", card=DummyCard("Defend_R"), card_id="Defend_R")
+    assert manager.active_overlay_ids == ()
+
+    manager.handle_event("card_used", card=DummyCard("Strike_R"), card_id="Strike_R")
+    assert manager.active_overlay_ids == ("card_used_overlay",)
+    snapshot = manager.overlay_snapshot("card_used_overlay")
+    assert snapshot.metadata["kind"] == "card"
+    assert pytest.approx(snapshot.x) == 120.0
+    assert pytest.approx(snapshot.y) == 340.0
+
+    manager.debug_tick(0.5)
+    manager.handle_event("card_used", card=DummyCard("Strike_R"), card_id="Strike_R")
+    assert manager.active_overlay_ids == ("card_used_overlay",)
+
+    handle.unregister()
+    manager.clear()
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_keyword_trigger_overlays(use_real_dependencies):
+    assert isinstance(use_real_dependencies, bool)
+    manager = overlay_manager()
+    manager.clear()
+    manager.clear_triggers()
+
+    texture = DummyTexture(48, 48, name="keyword_flash")
+    captured_ids = []
+
+    def builder(payload):
+        captured_ids.append(payload.get("card_id"))
+        return {
+            "source": texture,
+            "x": 42,
+            "y": 128,
+            "metadata": {
+                "keyword": payload.get("keyword_id"),
+                "amount": payload.get("amount"),
+            },
+            "identifier": "keyword_overlay",
+        }
+
+    trigger_handle = manager.register_trigger(
+        "keyword_triggered",
+        predicate=lambda payload: payload.get("keyword_id") == "flash",
+        builder=builder,
+        once=True,
+    )
+
+    class FlashKeyword(Keyword):
+        def __init__(self) -> None:
+            super().__init__(name="Flash")
+
+        def apply(self, context):
+            self.context = context
+
+    keyword = FlashKeyword()
+    KEYWORD_REGISTRY.register(keyword)
+
+    class DummyCard:
+        def __init__(self) -> None:
+            self.cardID = "TestCard"
+
+    card = DummyCard()
+    KEYWORD_REGISTRY.attach_to_card(card, "Flash", amount=3, upgrade=None)
+
+    class DummyEnergy:
+        def __init__(self) -> None:
+            self.energy = 3
+
+    class DummyPlayer:
+        def __init__(self) -> None:
+            self.hand = []
+            self.drawPile = []
+            self.discardPile = []
+            self.energy = DummyEnergy()
+            self.currentBlock = 0
+
+    class DummyDungeon:
+        actionManager = type("Mgr", (), {"addToBottom": staticmethod(lambda action: None)})()
+        player = None
+
+        @staticmethod
+        def getCurrRoom():
+            return type("Room", (), {"monsters": None})()
+
+    class DummyCardCrawl:
+        actions = type("Actions", (), {"common": type("Common", (), {})()})()
+        powers = type("Powers", (), {})()
+        helpers = type("Helpers", (), {"CardLibrary": type("Library", (), {})()})()
+        dungeons = type("Dungeons", (), {"AbstractDungeon": DummyDungeon})()
+
+    runtime = RuntimeHandles(cardcrawl=DummyCardCrawl(), basemod=None, spire=None)
+
+    player = DummyPlayer()
+    KEYWORD_REGISTRY.trigger(card, player, None, runtime=runtime)
+
+    assert manager.active_overlay_ids == ("keyword_overlay",)
+    assert trigger_handle.identifier not in manager.active_trigger_ids
+    assert captured_ids == ["TestCard"]
+    snapshot = manager.overlay_snapshot("keyword_overlay")
+    assert snapshot.metadata["keyword"] == "flash"
+    assert snapshot.metadata["amount"] == 3
+
+    manager.hide_overlay("keyword_overlay")
+    manager.clear_triggers()
+    manager.clear()
+
+    # Cleanup registry entries created for the test
+    KEYWORD_REGISTRY._card_keywords.pop(card, None)
+    for key in list(KEYWORD_REGISTRY._keywords):
+        if KEYWORD_REGISTRY._keywords[key].keyword is keyword:
+            del KEYWORD_REGISTRY._keywords[key]
+    gc.collect()

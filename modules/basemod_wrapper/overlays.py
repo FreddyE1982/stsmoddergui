@@ -27,7 +27,12 @@ The public API intentionally mirrors common game UI terminology:
 The manager broadcasts lifecycle events (``on_overlay_shown``,
 ``on_overlay_updated`` and ``on_overlay_hidden``) through the global
 ``PLUGIN_MANAGER`` so tooling plugins can mirror overlay state or react to
-changes without tight coupling.
+changes without tight coupling.  Event-driven triggers can be registered via
+``OverlayManager.register_trigger`` or :func:`register_overlay_trigger` to show,
+update or hide overlays automatically when gameplay events such as
+``"card_used"`` or ``"keyword_triggered"`` occur.  Every dispatched event also
+fires ``on_overlay_event`` for plugins that need to observe trigger execution or
+publish their own overlay automation logic.
 """
 from __future__ import annotations
 
@@ -37,7 +42,20 @@ import itertools
 import math
 from pathlib import Path
 import time
-from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple, Union, Protocol, runtime_checkable
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    Protocol,
+    runtime_checkable,
+)
 import weakref
 
 from plugins import PLUGIN_MANAGER
@@ -47,11 +65,15 @@ __all__ = [
     "OverlaySnapshot",
     "OverlayHandle",
     "OverlayManager",
+    "OverlayTriggerHandle",
     "overlay_manager",
     "show_overlay",
     "hide_overlay",
     "update_overlay",
     "clear_overlays",
+    "register_overlay_trigger",
+    "unregister_overlay_trigger",
+    "handle_overlay_event",
 ]
 
 ColorTuple = Tuple[float, float, float, float]
@@ -214,6 +236,26 @@ class OverlayHandle:
 
 
 @dataclass
+class OverlayTriggerHandle:
+    """Handle returned by :meth:`OverlayManager.register_trigger`."""
+
+    identifier: str
+    _manager_ref: "weakref.ReferenceType[OverlayManager]"
+
+    @property
+    def manager(self) -> "OverlayManager":
+        manager = self._manager_ref()
+        if manager is None:  # pragma: no cover - manager GC'd
+            raise OverlayError("Overlay manager is no longer available.")
+        return manager
+
+    def unregister(self) -> None:
+        """Remove the associated trigger from the manager."""
+
+        self.manager.unregister_trigger(self.identifier)
+
+
+@dataclass
 class _Overlay:
     identifier: str
     texture: _OverlayTexture
@@ -256,6 +298,20 @@ class _Overlay:
         )
 
 
+@dataclass
+class _OverlayTrigger:
+    identifier: str
+    event: str
+    predicate: Callable[[Mapping[str, Any]], bool]
+    builder: Callable[[Mapping[str, Any]], Optional[MutableMapping[str, Any]]]
+    once: bool
+    overlay_identifier: Optional[str]
+    replace_existing: Optional[bool]
+    cooldown: Optional[float]
+    last_fired_time: Optional[float] = None
+    last_overlay_identifier: Optional[str] = None
+
+
 class OverlayManager:
     """Manage the lifecycle of runtime overlays."""
 
@@ -264,9 +320,12 @@ class OverlayManager:
         self._sorted_cache: list[_Overlay] = []
         self._dirty = False
         self._id_counter = itertools.count(1)
+        self._trigger_counter = itertools.count(1)
         self._time = 0.0
         self._last_monotonic = time.monotonic()
         self._registered = False
+        self._triggers: Dict[str, _OverlayTrigger] = {}
+        self._triggers_by_event: Dict[str, list[_OverlayTrigger]] = {}
         if auto_register:
             self._register_with_basemod()
 
@@ -291,6 +350,20 @@ class OverlayManager:
 
     def receiveRender(self, sprite_batch: Any) -> None:  # pragma: no cover - requires JVM
         self.render_to(sprite_batch)
+
+    def receiveCardUsed(self, card: Any) -> None:  # pragma: no cover - requires JVM
+        card_id = getattr(card, "cardID", None)
+        payload: Dict[str, Any] = {
+            "card": card,
+            "card_id": card_id,
+            "card_name": getattr(card, "name", None),
+            "card_type": getattr(getattr(card, "type", None), "name", None),
+            "card_rarity": getattr(getattr(card, "rarity", None), "name", None),
+            "card_color": getattr(getattr(card, "color", None), "name", None),
+            "uuid": str(getattr(card, "uuid", "")) if hasattr(card, "uuid") else None,
+            "upgraded": bool(getattr(card, "upgraded", False)),
+        }
+        self.handle_event("card_used", **payload)
 
     # ------------------------------------------------------------------
     # Time keeping
@@ -341,6 +414,9 @@ class OverlayManager:
     # ------------------------------------------------------------------
     def _generate_identifier(self) -> str:
         return f"overlay_{next(self._id_counter)}"
+
+    def _generate_trigger_identifier(self) -> str:
+        return f"overlay_trigger_{next(self._trigger_counter)}"
 
     def _resolve_anchor(self, anchor: Union[str, AnchorTuple]) -> AnchorTuple:
         if isinstance(anchor, str):
@@ -572,6 +648,232 @@ class OverlayManager:
             self.hide_overlay(identifier, reason="cleared")
 
     # ------------------------------------------------------------------
+    # Trigger registration
+    # ------------------------------------------------------------------
+    def _normalise_event(self, event: str) -> str:
+        if not isinstance(event, str):
+            raise OverlayError("Event name must be a string.")
+        key = event.strip().lower()
+        if not key:
+            raise OverlayError("Event name cannot be empty.")
+        return key
+
+    def _make_predicate(
+        self,
+        match: Optional[Mapping[str, Any]],
+        predicate: Optional[Callable[[Mapping[str, Any]], bool]],
+    ) -> Callable[[Mapping[str, Any]], bool]:
+        checks: list[Callable[[Mapping[str, Any]], bool]] = []
+        if match:
+            def _match(payload: Mapping[str, Any]) -> bool:
+                for key, expected in match.items():
+                    actual = payload.get(key)
+                    if callable(expected):
+                        if not expected(actual):
+                            return False
+                        continue
+                    if isinstance(expected, (set, frozenset, list, tuple)):
+                        if actual not in expected:
+                            return False
+                        continue
+                    if actual != expected:
+                        return False
+                return True
+
+            checks.append(_match)
+        if predicate is not None:
+            checks.append(predicate)
+        if not checks:
+            return lambda payload: True
+
+        def _combined(payload: Mapping[str, Any]) -> bool:
+            return all(check(payload) for check in checks)
+
+        return _combined
+
+    def _coerce_builder(
+        self,
+        *,
+        source: Optional[OverlaySource],
+        overlay_kwargs: Optional[Mapping[str, Any]],
+        factory: Optional[Callable[[Mapping[str, Any]], MutableMapping[str, Any]]],
+    ) -> Callable[[Mapping[str, Any]], Optional[MutableMapping[str, Any]]]:
+        if factory is not None:
+            def _factory(payload: Mapping[str, Any]) -> Optional[MutableMapping[str, Any]]:
+                result = factory(payload)
+                if result is None:
+                    return None
+                return dict(result)
+
+            return _factory
+
+        if source is None:
+            raise OverlayError("Either 'source' or 'builder' must be provided when registering a trigger.")
+
+        options = dict(overlay_kwargs or {})
+        metadata = options.get("metadata")
+        if metadata is not None and not isinstance(metadata, Mapping):
+            raise OverlayError("Trigger metadata must be a mapping when provided.")
+
+        def _builder(payload: Mapping[str, Any]) -> MutableMapping[str, Any]:
+            resolved_source = source(payload) if callable(source) else source
+            if resolved_source is None:
+                raise OverlayError("Trigger source callable returned None.")
+            spec: Dict[str, Any] = {
+                "source": resolved_source,
+            }
+            spec.update(options)
+            if metadata is not None:
+                spec["metadata"] = dict(metadata)
+            return spec
+
+        return _builder
+
+    def register_trigger(
+        self,
+        event: str,
+        *,
+        match: Optional[Mapping[str, Any]] = None,
+        predicate: Optional[Callable[[Mapping[str, Any]], bool]] = None,
+        source: Optional[Union[OverlaySource, Callable[[Mapping[str, Any]], OverlaySource]]] = None,
+        overlay_kwargs: Optional[Mapping[str, Any]] = None,
+        builder: Optional[Callable[[Mapping[str, Any]], MutableMapping[str, Any]]] = None,
+        identifier: Optional[str] = None,
+        overlay_identifier: Optional[str] = None,
+        replace_existing: Optional[bool] = None,
+        once: bool = False,
+        cooldown: Optional[float] = None,
+    ) -> OverlayTriggerHandle:
+        """Register an automatic overlay trigger for ``event``."""
+
+        if cooldown is not None and cooldown < 0:
+            raise OverlayError("Cooldown must be positive when provided.")
+        event_key = self._normalise_event(event)
+        trigger_id = identifier or self._generate_trigger_identifier()
+        if trigger_id in self._triggers:
+            raise OverlayError(f"Overlay trigger '{trigger_id}' is already registered.")
+        predicate_fn = self._make_predicate(match, predicate)
+        builder_fn = self._coerce_builder(
+            source=source,
+            overlay_kwargs=overlay_kwargs,
+            factory=builder,
+        )
+        trigger = _OverlayTrigger(
+            identifier=trigger_id,
+            event=event_key,
+            predicate=predicate_fn,
+            builder=builder_fn,
+            once=once,
+            overlay_identifier=overlay_identifier,
+            replace_existing=replace_existing if replace_existing is not None else (overlay_identifier is not None),
+            cooldown=cooldown,
+        )
+        self._triggers[trigger_id] = trigger
+        self._triggers_by_event.setdefault(event_key, []).append(trigger)
+        self._register_with_basemod()
+        return OverlayTriggerHandle(trigger_id, weakref.ref(self))
+
+    def unregister_trigger(self, identifier: str) -> None:
+        trigger = self._triggers.pop(identifier, None)
+        if trigger is None:
+            return
+        bucket = self._triggers_by_event.get(trigger.event)
+        if bucket is not None:
+            self._triggers_by_event[trigger.event] = [item for item in bucket if item.identifier != identifier]
+            if not self._triggers_by_event[trigger.event]:
+                self._triggers_by_event.pop(trigger.event, None)
+
+    def clear_triggers(self, event: Optional[str] = None) -> None:
+        """Remove registered triggers, optionally filtered by ``event``."""
+
+        if event is None:
+            self._triggers.clear()
+            self._triggers_by_event.clear()
+            return
+        event_key = self._normalise_event(event)
+        for trigger in list(self._triggers_by_event.get(event_key, [])):
+            self._triggers.pop(trigger.identifier, None)
+        self._triggers_by_event.pop(event_key, None)
+
+    @property
+    def active_trigger_ids(self) -> Tuple[str, ...]:
+        return tuple(self._triggers.keys())
+
+    def handle_event(self, event: str, **payload: Any) -> None:
+        """Dispatch ``event`` to registered overlay triggers."""
+
+        event_key = self._normalise_event(event)
+        triggers = list(self._triggers_by_event.get(event_key, []))
+        if not triggers:
+            PLUGIN_MANAGER.broadcast(
+                "on_overlay_event",
+                event=event_key,
+                payload=dict(payload),
+                manager=self,
+                triggers=(),
+            )
+            return
+        executed: list[str] = []
+        now = self._time
+        for trigger in list(triggers):
+            if trigger.identifier not in self._triggers:
+                continue
+            if not trigger.predicate(payload):
+                continue
+            if trigger.cooldown is not None and trigger.last_fired_time is not None:
+                if now - trigger.last_fired_time < trigger.cooldown:
+                    continue
+            try:
+                spec_mapping = trigger.builder(payload)
+            except Exception as exc:  # pragma: no cover - defensive
+                raise OverlayError(
+                    f"Overlay trigger '{trigger.identifier}' failed to build an overlay payload: {exc}"
+                ) from exc
+            if not spec_mapping:
+                continue
+            spec = dict(spec_mapping)
+            action = str(spec.pop("action", "show")).lower()
+            overlay_id = spec.pop("identifier", None) or trigger.overlay_identifier or trigger.last_overlay_identifier
+            if action == "show":
+                source = spec.pop("source", None)
+                if source is None:
+                    raise OverlayError(
+                        f"Overlay trigger '{trigger.identifier}' must provide a 'source' when showing an overlay."
+                    )
+                if overlay_id is not None and "identifier" not in spec:
+                    spec["identifier"] = overlay_id
+                if trigger.replace_existing is not None and "replace_existing" not in spec:
+                    spec["replace_existing"] = trigger.replace_existing
+                handle = self.show_overlay(source, **spec)
+                trigger.last_overlay_identifier = handle.identifier
+            elif action == "update":
+                if overlay_id is None:
+                    raise OverlayError(
+                        f"Overlay trigger '{trigger.identifier}' attempted to update an unknown overlay."
+                    )
+                self.update_overlay(overlay_id, **spec)
+                trigger.last_overlay_identifier = overlay_id
+            elif action == "hide":
+                if overlay_id is None:
+                    continue
+                reason = spec.pop("reason", None)
+                self.hide_overlay(overlay_id, reason=reason)
+                trigger.last_overlay_identifier = overlay_id
+            else:
+                raise OverlayError(f"Unsupported trigger action '{action}' for overlay trigger '{trigger.identifier}'.")
+            trigger.last_fired_time = now
+            executed.append(trigger.identifier)
+            if trigger.once:
+                self.unregister_trigger(trigger.identifier)
+        PLUGIN_MANAGER.broadcast(
+            "on_overlay_event",
+            event=event_key,
+            payload=dict(payload),
+            manager=self,
+            triggers=tuple(executed),
+        )
+
+    # ------------------------------------------------------------------
     # Rendering helpers
     # ------------------------------------------------------------------
     def _sorted_overlays(self) -> Iterable[_Overlay]:
@@ -710,8 +1012,30 @@ def clear_overlays() -> None:
     _OVERLAY_MANAGER.clear()
 
 
+def register_overlay_trigger(*args: Any, **kwargs: Any) -> OverlayTriggerHandle:
+    """Proxy to :meth:`OverlayManager.register_trigger`."""
+
+    return _OVERLAY_MANAGER.register_trigger(*args, **kwargs)
+
+
+def unregister_overlay_trigger(identifier: str) -> None:
+    """Proxy to :meth:`OverlayManager.unregister_trigger`."""
+
+    _OVERLAY_MANAGER.unregister_trigger(identifier)
+
+
+def handle_overlay_event(event: str, **payload: Any) -> None:
+    """Proxy to :meth:`OverlayManager.handle_event`."""
+
+    _OVERLAY_MANAGER.handle_event(event, **payload)
+
+
 PLUGIN_MANAGER.expose("overlay_manager", overlay_manager)
 PLUGIN_MANAGER.expose("OverlayManager", OverlayManager)
 PLUGIN_MANAGER.expose("OverlayHandle", OverlayHandle)
 PLUGIN_MANAGER.expose("OverlaySnapshot", OverlaySnapshot)
+PLUGIN_MANAGER.expose("OverlayTriggerHandle", OverlayTriggerHandle)
+PLUGIN_MANAGER.expose("register_overlay_trigger", register_overlay_trigger)
+PLUGIN_MANAGER.expose("unregister_overlay_trigger", unregister_overlay_trigger)
+PLUGIN_MANAGER.expose("handle_overlay_event", handle_overlay_event)
 PLUGIN_MANAGER.expose_module("modules.basemod_wrapper.overlays", alias="overlays")
