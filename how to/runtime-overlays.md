@@ -58,6 +58,54 @@ All geometry and style properties can be changed via
 handle.update(x=player.drawX + 120, y=player.drawY + 300, rotation=22)
 ```
 
+### Event-driven overlays
+
+Use :func:`modules.basemod_wrapper.overlays.register_overlay_trigger` to spawn or
+update overlays when gameplay hooks fire. The manager currently emits built-in
+events such as ``"card_used"`` and ``"keyword_triggered"`` and any other module
+can call :func:`modules.basemod_wrapper.overlays.handle_overlay_event` to
+publish custom events. Triggers receive the event payload so overlays can adapt
+their appearance dynamically.
+
+```python
+from modules.basemod_wrapper.overlays import register_overlay_trigger
+
+register_overlay_trigger(
+    "card_used",
+    match={"card_id": "Strike_R"},
+    source="assets/ui/strike-flash.png",
+    overlay_kwargs={
+        "x": 1280,
+        "y": 720,
+        "anchor": "center",
+        "duration": 1.5,
+        "metadata": {"source": "Strike_R"},
+    },
+    overlay_identifier="strike_flash",
+)
+
+def keyword_overlay_builder(payload):
+    amount = payload.get("amount", 0)
+    return {
+        "source": "assets/ui/keyword-toast.png",
+        "x": 1640,
+        "y": 960,
+        "metadata": {
+            "keyword": payload.get("keyword_id"),
+            "amount": amount,
+        },
+        "duration": 2.0,
+        "identifier": "keyword_toast",
+    }
+
+register_overlay_trigger(
+    "keyword_triggered",
+    predicate=lambda payload: payload.get("keyword_id") == "flash",
+    builder=keyword_overlay_builder,
+    once=False,
+)
+```
+
 ### Cleaning up
 
 Call `handle.hide()` or `overlay_manager().hide_overlay(identifier)` to remove an

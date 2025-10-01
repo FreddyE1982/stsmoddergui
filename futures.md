@@ -69,6 +69,12 @@
   overlay, tick animations alongside duration tracking, and broadcast progress
   updates through `PLUGIN_MANAGER` so plugins can mirror transitions or extend
   them with custom shaders.
+- [todo] **Overlay trigger diagnostics console** – Build a live inspector that
+  lists registered overlay triggers, highlights their predicates and shows the
+  last payload each trigger consumed. Usage: add `overlay_manager().trigger_map()`
+  and a lightweight CLI/overlay that visualises trigger cooldowns plus recent
+  executions so designers can iterate on automation rules without diving into
+  logs.
 - [todo] **In-process compact loader activation** – Teach the compact bundling
   pipeline to hydrate `.pystsmod` archives directly inside the ModTheSpire
   JVM. Usage: extend the generated loader jar to bootstrap the Python runtime,

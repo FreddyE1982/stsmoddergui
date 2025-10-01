@@ -82,6 +82,15 @@ receives an :class:`OverlaySnapshot` alongside the active
 :class:`OverlayManager`, enabling dashboards, telemetry streams or alternative
 UI renderers to stay in sync with the live runtime.
 
+Event-driven automation is available through
+``OverlayManager.register_trigger`` (or the module-level
+``register_overlay_trigger`` helper). Triggers listen for overlay events (for
+example ``"card_used"`` when a card is played or ``"keyword_triggered"`` when a
+keyword fires) and can show, update or hide overlays without manual plumbing.
+Modules and plugins can publish their own events via
+``handle_overlay_event`` which in turn notifies triggers and emits an
+``on_overlay_event`` broadcast for observers.
+
 ## Boot sequence and dependency handling
 
 `ensure_jpype()` is called as soon as the package is imported. Behind the

@@ -66,6 +66,25 @@ def _cardcrawl():
     return getattr(_wrapper_module(), "cardcrawl")
 
 
+@lru_cache(maxsize=1)
+def _overlay_accessor():
+    try:
+        from modules.basemod_wrapper import overlays
+    except Exception:  # pragma: no cover - overlay module unavailable
+        return None
+    return overlays
+
+
+def _overlay_manager():
+    module = _overlay_accessor()
+    if module is None:
+        return None
+    try:
+        return module.overlay_manager()
+    except Exception:  # pragma: no cover - runtime not initialised
+        return None
+
+
 def _normalize_keyword(name: str) -> str:
     cleaned = name.strip()
     if ":" in cleaned:
@@ -1102,6 +1121,19 @@ class KeywordRegistry:
                 upgrade=payload.get("upgrade"),
                 runtime=runtime,
             )
+            manager = _overlay_manager()
+            if manager is not None:
+                manager.handle_event(
+                    "keyword_triggered",
+                    keyword=keyword,
+                    keyword_id=keyword.keyword_id,
+                    card=card,
+                    card_id=getattr(card, "cardID", None),
+                    player=player,
+                    monster=monster,
+                    amount=payload.get("amount"),
+                    upgrade=payload.get("upgrade"),
+                )
             when = getattr(keyword, "when", "now").lower()
             offset = max(1, int(getattr(keyword, "turn_offset", 1) or 1))
             random_range = getattr(keyword, "random_turn_range", (1, 3))
