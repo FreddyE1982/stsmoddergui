@@ -35,6 +35,16 @@ from .keywords import (
 )
 from .relics import Relic, RELIC_REGISTRY
 from .stances import Stance, STANCE_REGISTRY
+from .overlays import (
+    OverlayHandle,
+    OverlayManager,
+    OverlaySnapshot,
+    clear_overlays,
+    hide_overlay,
+    overlay_manager,
+    show_overlay,
+    update_overlay,
+)
 from . import experimental
 
 ensure_jpype()
@@ -470,4 +480,16 @@ __all__ = [
     "KEYWORD_REGISTRY",
     "keyword_scheduler",
     "apply_persistent_card_changes",
+    "Relic",
+    "RELIC_REGISTRY",
+    "Stance",
+    "STANCE_REGISTRY",
+    "OverlayManager",
+    "OverlayHandle",
+    "OverlaySnapshot",
+    "overlay_manager",
+    "show_overlay",
+    "update_overlay",
+    "hide_overlay",
+    "clear_overlays",
 ]

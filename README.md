@@ -17,6 +17,9 @@ directly to Python developers.
 - Optional compact packaging via `BundlePackaging.COMPACT` that emits a
   single `.pystsmod` archive plus a ModTheSpire loader jar for memory-only
   deployment workflows.
+- Runtime overlay director that lets mods project arbitrary graphics anywhere
+  on screen without pausing combat or map navigation, complete with z-index
+  control, timed visibility and plugin-visible lifecycle events.
 - Runtime bootstrap helpers (`modules.modbuilder.runtime_env`) that describe bundled Python packages and generate platform-specific activation commands.
 - Auto-registering `Relic` base class with a global registry so adaptive mods can expose gameplay artefacts without manual BaseMod wiring.
 - Forward-looking roadmap documented in `futures.md`.
