@@ -6,11 +6,12 @@ import os
 import shutil
 import subprocess
 import textwrap
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence, Tuple, Type
+from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type
 
 from importlib import import_module
+import importlib.resources as import_resources
 from functools import lru_cache
 
 from .loader import BaseModBootstrapError, ensure_dependency_classpath
@@ -198,6 +199,92 @@ class CardRegistration:
     make_basic: bool = False
 
 
+@dataclass(slots=True)
+class _MechanicsRuntimePlan:
+    blueprint_providers: List[Callable[[], Iterable["SimpleCardBlueprint"]]] = field(
+        default_factory=list
+    )
+    mutations: List[Tuple[object, bool]] = field(default_factory=list)
+    script_loaders: List[Tuple[Callable[[], Path], bool]] = field(default_factory=list)
+    resource_scripts: List[Tuple[str, str, bool]] = field(default_factory=list)
+    hooks: List[Callable[[object], None]] = field(default_factory=list)
+    loaded_scripts: set[str] = field(default_factory=set)
+
+    def register_blueprint_provider(
+        self, provider: Callable[[], Iterable["SimpleCardBlueprint"]]
+    ) -> None:
+        if not callable(provider):
+            raise TypeError("Blueprint provider must be callable.")
+        if provider not in self.blueprint_providers:
+            self.blueprint_providers.append(provider)
+
+    def register_mutation(self, mutation: object, *, activate: bool = False) -> None:
+        for index, (existing, existing_activate) in enumerate(self.mutations):
+            if existing is mutation:
+                if activate and not existing_activate:
+                    self.mutations[index] = (existing, True)
+                return
+        self.mutations.append((mutation, activate))
+
+    def register_script_loader(
+        self, loader: Path | str | Callable[[], Path], *, activate: bool = True
+    ) -> None:
+        if callable(loader):
+            resolver: Callable[[], Path] = loader  # type: ignore[assignment]
+        else:
+            path = Path(loader)
+
+            def resolver(path: Path = path) -> Path:
+                return path
+
+        self.script_loaders.append((resolver, activate))
+
+    def register_script_resource(
+        self, package: str, resource: str, activate: bool = True
+    ) -> None:
+        if not package or not resource:
+            raise ValueError("Package and resource names must be provided for mechanic scripts.")
+        self.resource_scripts.append((package, resource, activate))
+
+    def register_hook(self, hook: Callable[[object], None]) -> None:
+        if not callable(hook):
+            raise TypeError("Mechanic hooks must be callable.")
+        self.hooks.append(hook)
+
+    def resolve_script_loader(self, loader: Callable[[], Path]) -> Path:
+        path = Path(loader())
+        if not path.exists():
+            raise BaseModBootstrapError(f"Mechanic rule script '{path}' does not exist.")
+        return path
+
+    def record_loaded_script(self, path: Path, *, key: Optional[str] = None) -> Optional[str]:
+        resolved = Path(path)
+        if not resolved.exists():
+            raise BaseModBootstrapError(f"Mechanic rule script '{resolved}' does not exist.")
+        if key is None:
+            try:
+                key = str(resolved.resolve())
+            except OSError:
+                key = str(resolved)
+        if key in self.loaded_scripts:
+            return None
+        self.loaded_scripts.add(key)
+        return key
+
+    def open_resource(self, package: str, resource: str):
+        try:
+            ref = import_resources.files(package).joinpath(resource)
+        except ModuleNotFoundError as exc:
+            raise BaseModBootstrapError(
+                f"Unable to locate package '{package}' for mechanic rule script '{resource}'."
+            ) from exc
+        if not ref.exists():
+            raise BaseModBootstrapError(
+                f"Mechanic rule script '{resource}' is not bundled with package '{package}'."
+            )
+        return import_resources.as_file(ref)
+
+
 @dataclass(frozen=True)
 class ProjectLayout:
     """Represents the auto generated on-disk structure of a mod project."""
@@ -262,6 +349,7 @@ class ModProject:
         self._color_enum = None
         self._player_enum = None
         self.layout: Optional[ProjectLayout] = None
+        self._mechanics_plan = _MechanicsRuntimePlan()
 
     # ------------------------------------------------------------------
     # configuration API
@@ -323,6 +411,130 @@ class ModProject:
             raise BaseModBootstrapError("define_color must be called before adding characters.")
         blueprint.color = self.color_definition
         self.character_blueprints.append(blueprint)
+
+    # ------------------------------------------------------------------
+    # mechanics runtime configuration
+    # ------------------------------------------------------------------
+    def register_mechanic_blueprint_provider(
+        self, provider: Callable[[], Iterable["SimpleCardBlueprint"]]
+    ) -> None:
+        """Expose card blueprints to the mechanics runtime.
+
+        Mechanics-only mods frequently adjust card data without registering new
+        cards.  Providers added here are forwarded to the
+        :mod:`experimental.graalpy_rule_weaver` engine whenever
+        :meth:`enable_mechanics_runtime` is invoked.  Providers are de-duplicated
+        so calling this multiple times with the same callable is safe.
+        """
+
+        self._mechanics_plan.register_blueprint_provider(provider)
+
+    def register_mechanic_mutation(self, mutation: object, *, activate: bool = False) -> None:
+        """Register a :class:`MechanicMutation` for automatic installation.
+
+        ``mutation`` should be an instance of
+        :class:`experimental.graalpy_rule_weaver.MechanicMutation`.  Activation
+        happens during :meth:`enable_mechanics_runtime`.  Passing
+        ``activate=True`` ensures the mutation is immediately applied once the
+        runtime spins up, while ``False`` merely registers it for manual
+        activation later.
+        """
+
+        self._mechanics_plan.register_mutation(mutation, activate=activate)
+
+    def register_mechanic_script_path(
+        self, path: Path | str | Callable[[], Path], *, activate: bool = True
+    ) -> None:
+        """Schedule a rule script located on disk.
+
+        ``path`` can be a :class:`pathlib.Path`, a string resolved relative to
+        the current working directory, or a callable that returns the absolute
+        path to the script when invoked.  Scripts are loaded at most once per
+        project even if :meth:`enable_mechanics_runtime` is called multiple
+        times.
+        """
+
+        self._mechanics_plan.register_script_loader(path, activate=activate)
+
+    def register_mechanic_script_resource(
+        self, package: str, resource: str, *, activate: bool = True
+    ) -> None:
+        """Schedule a rule script bundled as a package resource.
+
+        This helper resolves ``resource`` using :mod:`importlib.resources`
+        relative to ``package`` at runtime.  It keeps mechanics-only mods
+        self-contained even when deployed as zipped Python packages.
+        """
+
+        self._mechanics_plan.register_script_resource(package, resource, activate=activate)
+
+    def register_mechanic_hook(self, hook: Callable[[object], None]) -> None:
+        """Register a callback invoked with the rule weaver engine.
+
+        Hooks are executed during :meth:`enable_mechanics_runtime` after the
+        engine has been activated and blueprint providers have been registered.
+        They provide an escape hatch for advanced configuration such as dynamic
+        mutation factories.
+        """
+
+        self._mechanics_plan.register_hook(hook)
+
+    def enable_mechanics_runtime(self) -> object:
+        """Activate mechanics-only runtime helpers without registering cards.
+
+        The method switches on the :mod:`experimental.graalpy_rule_weaver`
+        experiment, forwards all registered blueprint providers, loads rule
+        scripts and applies eager mutations.  The underlying engine instance is
+        returned so callers can perform additional configuration.
+        """
+
+        from modules.basemod_wrapper import experimental
+
+        module = experimental.on("graalpy_rule_weaver")
+        engine = module.get_engine()
+        plan = self._mechanics_plan
+
+        for provider in plan.blueprint_providers:
+            engine.register_blueprint_provider(provider)
+
+        for mutation, activate in plan.mutations:
+            if not isinstance(mutation, module.MechanicMutation):
+                raise BaseModBootstrapError(
+                    "register_mechanic_mutation expects MechanicMutation instances from experimental.graalpy_rule_weaver."
+                )
+            engine.register_mutation(mutation, activate=activate)
+
+        for loader, activate in plan.script_loaders:
+            script_path = plan.resolve_script_loader(loader)
+            key = plan.record_loaded_script(script_path)
+            if key is None:
+                continue
+            engine.load_script(script_path, activate=activate)
+
+        for package, resource, activate in plan.resource_scripts:
+            with plan.open_resource(package, resource) as script_path:
+                key = plan.record_loaded_script(
+                    script_path, key=f"resource:{package}:{resource}"
+                )
+                if key is None:
+                    continue
+                engine.load_script(script_path, activate=activate)
+
+        for hook in plan.hooks:
+            hook(engine)
+
+        PLUGIN_MANAGER.expose(
+            f"mod_project:{self.mod_id}:mechanics_runtime",
+            {
+                "scripts": tuple(sorted(plan.loaded_scripts)),
+                "mutations": tuple(
+                    getattr(mutation, "identifier", repr(mutation))
+                    for mutation, _ in plan.mutations
+                ),
+            },
+        )
+
+        return engine
 
     def resource_path(self, *segments: str) -> str:
         """Return a resources-relative path for the current mod."""
@@ -452,12 +664,33 @@ class ModProject:
                     #     )
                     # )
 
+                    # Mechanics-only rule weaving (optional):
+                    # from pathlib import Path
+                    # PROJECT.register_mechanic_script_path(
+                    #     lambda: Path(__file__).with_name("mechanics") / "rules.json"
+                    # )
+                    # PROJECT.register_mechanic_script_resource(
+                    #     "{package}.mechanics",
+                    #     "buddy_rules.json",
+                    # )
+                    #
+                    # from modules.basemod_wrapper.experimental import graalpy_rule_weaver
+                    # mutation = graalpy_rule_weaver.MechanicMutation(...)
+                    # PROJECT.register_mechanic_mutation(mutation, activate=True)
+
 
                 def enable_runtime() -> None:
                     \"\"\"Apply configuration and register BaseMod hooks.\"\"\"
 
                     configure()
                     PROJECT.enable_runtime()
+
+
+                def enable_mechanics_runtime() -> None:
+                    \"\"\"Activate mechanics-only tweaks without registering cards.\"\"\"
+
+                    configure()
+                    PROJECT.enable_mechanics_runtime()
                 """
             )
             template = template.format(
@@ -467,6 +700,7 @@ class ModProject:
                 description=self.description,
                 version=self.version,
                 mod_id_upper=self.mod_id.upper(),
+                package=package,
             )
             project_module.write_text(template.strip() + "\n", encoding="utf8")
 
@@ -476,13 +710,18 @@ class ModProject:
                     """
                     \"\"\"Runtime entrypoint used by ModTheSpire.\"\"\"
 
-                    from .project import enable_runtime
+                    from .project import enable_mechanics_runtime, enable_runtime
+
+                    MECHANICS_ONLY = False
 
 
                     def initialize():
                         \"\"\"Entry hook that ModTheSpire should invoke.\"\"\"
 
-                        enable_runtime()
+                        if MECHANICS_ONLY:
+                            enable_mechanics_runtime()
+                        else:
+                            enable_runtime()
 
 
                     initialize()

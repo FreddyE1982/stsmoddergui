@@ -88,8 +88,9 @@ Documentation lives in
 4. **Describe characters** using `CharacterBlueprint` from
    `modules.basemod_wrapper.project` and attach starting decks plus relics.
 5. **Iterate in a REPL** by calling `project.enable_runtime()` (already done in
-   the generated entrypoint). BaseMod hooks are registered for you so edits only
-   require a reload.
+   the generated entrypoint) or `project.enable_mechanics_runtime()` when
+   tinkering with experimental rule weaving mechanics. BaseMod hooks are
+   registered for you so edits only require a reload.
 6. **Bundle for ModTheSpire** through `compileandbundle(project, options)` or
    by reusing `project.bundle_options_from_layout(layout, ...)`.
 
@@ -116,6 +117,51 @@ layout = project.scaffold("/path/to/workspace", package_name="revenant_mod")
 `project.py` ships with a `PROJECT` singleton and `configure()` stub. Importing
 `entrypoint.py` (the ModTheSpire entry point) calls `enable_runtime()` which in
 turn registers BaseMod listeners, colours and cards.
+
+### Mechanics-only rule weaving projects
+
+Some projects only need to tweak mechanics or keywords without introducing a
+new character, deck or card pool.  The scaffolder now generates
+`enable_mechanics_runtime()` alongside `enable_runtime()` plus a
+`MECHANICS_ONLY` toggle in `entrypoint.py`.  Switching the flag to `True` (or
+calling `PROJECT.enable_mechanics_runtime()` from your own bootstrap) activates
+the `experimental.graalpy_rule_weaver` module, loads registered scripts and
+applies eager mutations.
+
+```python
+from pathlib import Path
+from modules.basemod_wrapper.experimental import graalpy_rule_weaver
+
+
+def configure() -> None:
+    PROJECT.register_mechanic_script_path(
+        lambda: Path(__file__).with_name("mechanics") / "rules.json"
+    )
+    PROJECT.register_mechanic_script_resource(
+        "revenant_mod.mechanics",
+        "elite_buffs.yaml",
+    )
+    PROJECT.register_mechanic_mutation(
+        graalpy_rule_weaver.MechanicMutation(
+            identifier="revenant_global_tweak",
+            description="Adjust base cards while playtesting mechanics-only builds.",
+            apply=lambda context: graalpy_rule_weaver.MechanicActivation(
+                identifier="revenant_global_tweak",
+                revert_callbacks=(context.adjust_card_values("Strike_R", value=7),),
+            ),
+        ),
+        activate=True,
+    )
+
+
+def enable_mechanics_runtime() -> None:
+    configure()
+    PROJECT.enable_mechanics_runtime()
+```
+
+Blueprint providers registered through `PROJECT.register_mechanic_blueprint_provider`
+are forwarded to the rule weaver engine so scripts can iterate existing card
+definitions (for example the `Deck.cards` classmethod on a `Deck` subclass).
 
 ## Card authoring options
 

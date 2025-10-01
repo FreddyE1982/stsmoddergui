@@ -17,6 +17,9 @@ directly to Python developers.
 - Runtime bootstrap helpers (`modules.modbuilder.runtime_env`) that describe bundled Python packages and generate platform-specific activation commands.
 - Forward-looking roadmap documented in `futures.md`.
 - Built-in deck analytics helper that converts validation snapshots into tables and JSON artefacts for dashboards and plugins.
+- Mechanics-only mod support that activates the `experimental.graalpy_rule_weaver`
+  engine through `ModProject.enable_mechanics_runtime()` so rule packs can ship
+  without creating new characters or decks.
 
 ## Getting started
 

@@ -523,6 +523,10 @@ class RuleWeaverEngine:
         for identifier in list(self._activations):
             self.deactivate_mutation(identifier)
 
+    def clear_blueprint_providers(self) -> None:
+        with self._lock:
+            self.blueprint_providers.clear()
+
     # ------------------------------------------------------------------
     @property
     def registered_mutations(self) -> Mapping[str, MechanicMutation]:
@@ -563,6 +567,7 @@ def activate() -> RuleWeaverEngine:
 
 def deactivate() -> None:
     _ENGINE.deactivate_all()
+    _ENGINE.clear_blueprint_providers()
     _refresh_plugin_exports()
 
 

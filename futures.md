@@ -205,3 +205,8 @@
   language/accent.  Document how directors select packs via
   `director.use_voice_pack("mentors/en_gb")` and expose the registration
   points through `PLUGIN_MANAGER` for tooling dashboards.
+- [todo] **Rule weaver script manifest verification** – Extend the new mechanics
+  runtime helpers with a `ProjectLayout` inspection pass that scans registered
+  script paths/resources, validates JSON/YAML structure ahead of bundling, and
+  publishes a manifest to `PLUGIN_MANAGER` so CI pipelines can diff mechanic
+  packs for unexpected mutations.
