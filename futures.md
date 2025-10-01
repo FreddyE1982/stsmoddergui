@@ -63,6 +63,13 @@
   submodule, document its activation hooks, and surface an `experimental.on`
   example in the wrapper README so teams can trial features without forking
   the stable API.
+- [todo] **Adaptive evolver tuning console** – Ship a CLI and dashboard that
+  visualises the persistent adaptive deck profile, highlights mutation
+  rationales, and allows designers to export/import heuristic weights.
+  Usage: extend `mods.adaptive_deck_evolver.runtime` with an inspection API,
+  build a `python -m mods.adaptive_deck_evolver inspect` entrypoint that dumps
+  the current `PlayerProfile`, and document how plugins can subscribe to the
+  emitted telemetry to provide custom UIs.
 - [todo] **LimeWire decryption pipeline** – Build a Python implementation of
   the LimeWire content decrypter so that the encrypted jars downloaded during
   bundling can be unwrapped automatically. Usage: mirror the
