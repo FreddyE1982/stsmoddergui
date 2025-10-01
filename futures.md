@@ -106,6 +106,12 @@
   supported placeholders in the wrapper README. Plugins should be able to
   contribute additional mappings through a shared registry exposed on
   `PLUGIN_MANAGER`.
+- [todo] **GraalPy stance director** – Layer a declarative director over the new
+  `Stance` base class so mods can register particle scripts, looping VFX, and
+  combat hooks through JSON manifests. Usage: provide a `register_stance_script`
+  helper that loads manifests, exposes them via `PLUGIN_MANAGER`, and binds the
+  generated Python callables to stance lifecycle events without touching
+  `AbstractStance` directly.
 - [todo] **ProjectLayout localisation variants** – Teach
   `ModProject.scaffold` to generate localisation folders for multiple
   languages in one go (eng, fra, deu, zhs, etc.) and expose a helper that

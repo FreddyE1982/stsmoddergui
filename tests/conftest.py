@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from types import SimpleNamespace
-from typing import Any
+from types import SimpleNamespace, ModuleType
+from typing import Any, Optional
 import sys
+import os
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from modules.basemod_wrapper import cards as cards_module
 from modules.basemod_wrapper import relics as relics_module
 from modules.basemod_wrapper import keywords as keywords_module
 from modules.basemod_wrapper import project as project_module
+from modules.basemod_wrapper import stances as stances_module
 from tests.stubs import (
     StubActionManager,
     StubApplyPowerAction,
@@ -20,6 +22,9 @@ from tests.stubs import (
     StubCardColor,
     StubCustomCard,
     StubCustomRelic,
+    StubAbstractStance,
+    StubColor,
+    StubTexture,
     StubDamageAction,
     StubDamageAllEnemiesAction,
     StubDamageInfo,
@@ -32,6 +37,9 @@ from tests.stubs import (
     StubPoisonPower,
     StubRelicTier,
     StubRelicType,
+    StubStanceAuraEffect,
+    StubStanceHelper,
+    StubStanceParticleEffect,
     StubSpire,
     StubStrengthPower,
     StubVulnerablePower,
@@ -105,6 +113,14 @@ def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
         FrailPower=StubFrailPower,
     )
 
+    stances_namespace = SimpleNamespace(AbstractStance=StubAbstractStance)
+    vfx_namespace = SimpleNamespace(
+        stance=SimpleNamespace(
+            StanceAuraEffect=StubStanceAuraEffect,
+            StanceParticleEffect=StubStanceParticleEffect,
+        )
+    )
+
     class StubMonsterGroup:
         def __init__(self) -> None:
             self.monsters: list[Any] = []
@@ -130,6 +146,7 @@ def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
         cards=cards_namespace,
         actions=actions_namespace,
         powers=powers_namespace,
+        stances=stances_namespace,
         dungeons=dungeon_namespace,
         relics=SimpleNamespace(
             AbstractRelic=SimpleNamespace(
@@ -138,13 +155,72 @@ def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
                 RelicType=StubRelicType,
             )
         ),
-        helpers=SimpleNamespace(CardLibrary=SimpleNamespace(getCard=lambda name: None)),
+        helpers=SimpleNamespace(
+            CardLibrary=SimpleNamespace(getCard=lambda name: None),
+            StanceHelper=StubStanceHelper,
+        ),
+        vfx=vfx_namespace,
     )
     spire_stub = StubSpire()
+    libgdx_stub = SimpleNamespace(graphics=SimpleNamespace(Color=StubColor, Texture=StubTexture))
+
+    if not use_real_dependencies:
+        from modules.basemod_wrapper.experimental import graalpy_runtime
+
+        monkeypatch.setitem(os.environ, "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE", "1")
+        monkeypatch.setitem(
+            os.environ,
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            sys.executable,
+        )
+        monkeypatch.setattr(graalpy_runtime.platform, "python_implementation", lambda: "GraalPy")
+
+        class _StubSupplier:
+            pass
+
+        _java_mapping = {
+            "com.megacrit.cardcrawl.stances.AbstractStance": StubAbstractStance,
+            "com.megacrit.cardcrawl.helpers.StanceHelper": StubStanceHelper,
+            "com.megacrit.cardcrawl.vfx.stance.StanceAuraEffect": StubStanceAuraEffect,
+            "com.megacrit.cardcrawl.vfx.stance.StanceParticleEffect": StubStanceParticleEffect,
+            "com.badlogic.gdx.graphics.Color": StubColor,
+            "com.badlogic.gdx.graphics.Texture": StubTexture,
+            "java.util.function.Supplier": _StubSupplier,
+        }
+
+        def _java_type(name: str):
+            try:
+                return _java_mapping[name]
+            except KeyError as exc:  # pragma: no cover - debug helper
+                raise KeyError(name) from exc
+
+        def _java_add_to_classpath(*_args, **_kwargs):  # pragma: no cover - helper stub
+            return None
+
+        def _java_implements(_interface):
+            def decorator(obj):
+                return obj
+
+            return decorator
+
+        def _java_array(_component, values):
+            return list(values)
+
+        java_module = ModuleType("java")
+        java_module.type = _java_type  # type: ignore[assignment]
+        java_module.add_to_classpath = _java_add_to_classpath  # type: ignore[assignment]
+        java_module.implements = _java_implements  # type: ignore[assignment]
+        java_module.array = _java_array  # type: ignore[assignment]
+        monkeypatch.setitem(sys.modules, "java", java_module)
+        stances_module._java_module.cache_clear()
+        stances_module._stance_helper.cache_clear()
+        stances_module._stance_aura_effect.cache_clear()
+        stances_module._stance_particle_effect.cache_clear()
 
     class StubBaseMod:
         relics_registered: list[tuple[object, object]] = []
         custom_pool_relics: list[tuple[object, object]] = []
+        custom_stances: list[tuple[str, object, Optional[object], Optional[object]]] = []
 
         @staticmethod
         def subscribe(_):
@@ -157,6 +233,10 @@ def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
         @classmethod
         def addRelicToCustomPool(cls, relic, color):
             cls.custom_pool_relics.append((relic, color))
+
+        @classmethod
+        def addCustomStance(cls, stance_id, factory, aura_supplier=None, particle_supplier=None):
+            cls.custom_stances.append((stance_id, factory, aura_supplier, particle_supplier))
 
     basemod_stub = SimpleNamespace(
         abstracts=SimpleNamespace(CustomCard=StubCustomCard, CustomRelic=StubCustomRelic),
@@ -171,6 +251,10 @@ def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
     relics_module._custom_relic_base.cache_clear()
     monkeypatch.setattr(project_module, "_cardcrawl", lambda: cardcrawl_stub)
     monkeypatch.setattr(project_module, "_basemod", lambda: basemod_stub)
+    monkeypatch.setattr(stances_module, "_cardcrawl", lambda: cardcrawl_stub)
+    monkeypatch.setattr(stances_module, "_basemod", lambda: basemod_stub)
+    monkeypatch.setattr(stances_module, "_libgdx", lambda: libgdx_stub)
+    stances_module._abstract_stance_base.cache_clear()
 
     class StubTempHPField:
         @staticmethod
@@ -212,6 +296,14 @@ def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
     spire_stub.reset()
     StubBaseMod.relics_registered.clear()
     StubBaseMod.custom_pool_relics.clear()
+    StubBaseMod.custom_stances.clear()
+    StubAbstractStance.stances.clear()
+    StubStanceAuraEffect.STANCE_COLORS.clear()
+    StubStanceAuraEffect.PARTICLE_COLORS.clear()
+    StubStanceAuraEffect.PARTICLE_TEXTURES.clear()
+    StubStanceParticleEffect.PARTICLE_COLORS.clear()
+    StubStanceHelper.stanceMap.clear()
+    StubStanceHelper.nameMap.clear()
 
 
 @pytest.fixture()
