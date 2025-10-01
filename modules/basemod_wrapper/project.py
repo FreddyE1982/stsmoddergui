@@ -31,6 +31,7 @@ from functools import lru_cache
 from .loader import BaseModBootstrapError, ensure_dependency_classpath
 from .java_backend import active_backend
 from .relics import RELIC_REGISTRY, RelicRecord, _resolve_enum as _resolve_relic_enum
+from .stances import STANCE_REGISTRY, StanceRecord, register_stance_runtime
 from plugins import PLUGIN_MANAGER
 
 if TYPE_CHECKING:  # pragma: no cover - typing helper
@@ -410,6 +411,8 @@ class ModProject:
         self._last_bundle: Optional[BundleResult] = None
         self._relic_records: Dict[str, RelicRecord] = {}
         self._registered_relics: set[str] = set()
+        self._stance_records: Dict[str, "StanceRecord"] = {}
+        self._registered_stances: set[str] = set()
 
     # ------------------------------------------------------------------
     # configuration API
@@ -479,6 +482,14 @@ class ModProject:
                 f"Relic '{record.identifier}' already registered by {existing.cls.__module__}.{existing.cls.__name__}."
             )
         self._relic_records[record.identifier] = record
+
+    def register_stance_record(self, record: StanceRecord) -> None:
+        existing = self._stance_records.get(record.identifier)
+        if existing is not None and existing.cls is not record.cls:
+            raise BaseModBootstrapError(
+                f"Stance '{record.identifier}' already registered by {existing.cls.__module__}.{existing.cls.__name__}."
+            )
+        self._stance_records[record.identifier] = record
 
     # ------------------------------------------------------------------
     # mechanics runtime configuration
@@ -860,6 +871,7 @@ class ModProject:
 
         project = self
         RELIC_REGISTRY.install_on_project(self)
+        STANCE_REGISTRY.install_on_project(self)
 
         class _Subscriber:
             def receiveEditCards(self):
@@ -879,6 +891,7 @@ class ModProject:
                     project.author,
                     lambda: None,
                 )
+                project._register_stances()
 
         subscriber = _Subscriber()
         _basemod().BaseMod.subscribe(subscriber)
@@ -921,6 +934,19 @@ class ModProject:
         PLUGIN_MANAGER.expose(
             f"mod_project:{self.mod_id}:relics",
             tuple(self._relic_records.values()),
+        )
+
+    def _register_stances(self) -> None:
+        if not self._stance_records:
+            return
+        for identifier, record in self._stance_records.items():
+            if identifier in self._registered_stances:
+                continue
+            register_stance_runtime(record)
+            self._registered_stances.add(identifier)
+        PLUGIN_MANAGER.expose(
+            f"mod_project:{self.mod_id}:stances",
+            tuple(self._stance_records.values()),
         )
 
     def _register_characters(self) -> None:

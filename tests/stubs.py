@@ -166,6 +166,58 @@ class StubCustomRelic:
         return type(self)(self.relicId, self.imgUrl, self.tier, self.landing_sound)
 
 
+class StubColor:
+    def __init__(self, r: float, g: float, b: float, a: float) -> None:
+        self.r = r
+        self.g = g
+        self.b = b
+        self.a = a
+
+
+class StubTexture:
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+
+class StubAbstractStance:
+    stances: dict[str, "StubAbstractStance"] = {}
+
+    def __init__(self) -> None:
+        self.ID = ""
+        self.name = ""
+        self.description = ""
+        self.c = None
+        self.auraColor = None
+        self.particleColor = None
+
+    def updateDescription(self) -> None:  # pragma: no cover - behavioural placeholder
+        return None
+
+    def updateAnimation(self) -> None:  # pragma: no cover - behavioural placeholder
+        return None
+
+    def onEnterStance(self) -> None:  # pragma: no cover - behavioural placeholder
+        return None
+
+    def onExitStance(self) -> None:  # pragma: no cover - behavioural placeholder
+        return None
+
+
+class StubStanceAuraEffect:
+    STANCE_COLORS: dict[str, StubColor] = {}
+    PARTICLE_COLORS: dict[str, StubColor] = {}
+    PARTICLE_TEXTURES: dict[str, StubTexture] = {}
+
+
+class StubStanceParticleEffect:
+    PARTICLE_COLORS: dict[str, StubColor] = {}
+
+
+class StubStanceHelper:
+    stanceMap: dict[str, object] = {}
+    nameMap: dict[str, str] = {}
+
+
 class StubStrengthPower:
     def __init__(self, owner, amount) -> None:
         self.owner = owner

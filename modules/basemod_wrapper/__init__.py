@@ -34,6 +34,7 @@ from .keywords import (
     keyword_scheduler,
 )
 from .relics import Relic, RELIC_REGISTRY
+from .stances import Stance, STANCE_REGISTRY
 from . import experimental
 
 ensure_jpype()
