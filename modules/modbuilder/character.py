@@ -14,6 +14,7 @@ from modules.basemod_wrapper.cards import SimpleCardBlueprint, build_card_locali
 from modules.basemod_wrapper.loader import BaseModBootstrapError, ensure_dependency_classpath
 from modules.basemod_wrapper.project import (
     BundleOptions,
+    BundlePackaging,
     CharacterAssets,
     CharacterBlueprint,
     ModProject,
@@ -173,6 +174,7 @@ class Character:
         additional_classpath: Optional[Sequence[Path]] = None,
         java_classpath: Optional[Sequence[Path]] = None,
         register_cards: bool = True,
+        packaging: Union[str, BundlePackaging] = BundlePackaging.DIRECTORY,
     ) -> Path:
         character = cls()
         assets_root_path = cls._resolve_assets_root(character, assets_root)
@@ -226,6 +228,7 @@ class Character:
             bundle_dependencies,
             java_classpath,
             extra_classpath,
+            packaging,
         )
         return project.compile_and_bundle(options)
 
@@ -744,6 +747,7 @@ class Character:
         dependencies: Sequence[str],
         java_classpath: Optional[Sequence[Path]],
         extra_classpath: Sequence[Path],
+        packaging: Union[str, BundlePackaging],
     ) -> BundleOptions:
         if java_classpath is not None:
             classpath = list(java_classpath)
@@ -765,6 +769,7 @@ class Character:
             sts_version="2020-12-01",
             mts_version="3.30.1",
             dependencies=dependencies,
+            packaging=packaging,
         )
         return options
 

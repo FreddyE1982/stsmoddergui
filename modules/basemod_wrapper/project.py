@@ -7,8 +7,22 @@ import shutil
 import subprocess
 import textwrap
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
 from importlib import import_module
 import importlib.resources as import_resources
@@ -20,6 +34,7 @@ from plugins import PLUGIN_MANAGER
 
 if TYPE_CHECKING:  # pragma: no cover - typing helper
     from .cards import SimpleCardBlueprint
+    from modules.modbuilder.compact import CompactBundleArtifacts
 
 ColorTuple = Tuple[float, float, float, float]
 
@@ -285,6 +300,16 @@ class _MechanicsRuntimePlan:
         return import_resources.as_file(ref)
 
 
+class BundlePackaging(Enum):
+    """Packaging strategies supported by :class:`BundleOptions`."""
+
+    DIRECTORY = "directory"
+    COMPACT = "compact"
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return self.value
+
+
 @dataclass(frozen=True)
 class ProjectLayout:
     """Represents the auto generated on-disk structure of a mod project."""
@@ -323,6 +348,37 @@ class BundleOptions:
     sts_version: str = "2020-12-01"
     mts_version: str = "3.30.1"
     dependencies: Sequence[str] = ("basemod", "stslib")
+    packaging: BundlePackaging = BundlePackaging.DIRECTORY
+
+    def __post_init__(self) -> None:
+        if isinstance(self.packaging, str):
+            try:
+                self.packaging = BundlePackaging(self.packaging.lower())
+            except ValueError as exc:
+                raise BaseModBootstrapError(
+                    f"Unknown bundle packaging '{self.packaging}'."
+                ) from exc
+
+
+@dataclass(frozen=True)
+class BundleResult:
+    """Summary describing artefacts produced by :func:`compile_and_bundle`."""
+
+    mod_directory: Path
+    packaging: BundlePackaging
+    compact: Optional["CompactBundleArtifacts"] = None
+
+    def as_dict(self) -> Dict[str, Any]:
+        payload: Dict[str, Any] = {
+            "mod_directory": str(self.mod_directory),
+            "packaging": self.packaging.value,
+        }
+        if self.compact is not None:
+            payload["compact"] = self.compact.as_dict()
+        return payload
+
+    def is_compact(self) -> bool:
+        return self.packaging is BundlePackaging.COMPACT
 
 
 class ModProject:
@@ -350,6 +406,7 @@ class ModProject:
         self._player_enum = None
         self.layout: Optional[ProjectLayout] = None
         self._mechanics_plan = _MechanicsRuntimePlan()
+        self._last_bundle: Optional[BundleResult] = None
 
     # ------------------------------------------------------------------
     # configuration API
@@ -848,6 +905,11 @@ class ModProject:
 
     # bundling
     # ------------------------------------------------------------------
+    def last_bundle_result(self) -> Optional[BundleResult]:
+        """Return metadata about the most recent bundling step."""
+
+        return self._last_bundle
+
     def bundle_options_from_layout(
         self,
         layout: ProjectLayout,
@@ -858,6 +920,7 @@ class ModProject:
         mts_version: Optional[str] = None,
         dependencies: Optional[Sequence[str]] = None,
         additional_classpath: Optional[Sequence[Path]] = None,
+        packaging: Union[str, BundlePackaging] = BundlePackaging.DIRECTORY,
     ) -> BundleOptions:
         """Produce :class:`BundleOptions` using a :class:`ProjectLayout`."""
 
@@ -880,15 +943,11 @@ class ModProject:
             sts_version=sts_version or "2020-12-01",
             mts_version=mts_version or "3.30.1",
             dependencies=dependencies or ("basemod", "stslib"),
+            packaging=packaging,
         )
         return opts
 
-    def compile_and_bundle(
-        self,
-        options: BundleOptions,
-        *,
-        layout: Optional[ProjectLayout] = None,
-    ) -> Path:
+    def _prepare_bundle_directory(self, options: BundleOptions) -> Path:
         output_dir = options.output_directory
         output_dir.mkdir(parents=True, exist_ok=True)
         mod_root = output_dir / self.name.replace(" ", "")
@@ -928,6 +987,31 @@ class ModProject:
         from modules.modbuilder.runtime_env import write_runtime_bootstrapper
 
         write_runtime_bootstrapper(mod_root)
+        return mod_root
+
+    def compile_and_bundle(
+        self,
+        options: BundleOptions,
+        *,
+        layout: Optional[ProjectLayout] = None,
+    ) -> Path:
+        mod_root = self._prepare_bundle_directory(options)
+
+        compact_artifacts: Optional["CompactBundleArtifacts"] = None
+        if options.packaging is BundlePackaging.COMPACT:
+            from modules.modbuilder import compact as compact_module
+
+            compact_artifacts = compact_module.build_compact_bundle(
+                project=self,
+                options=options,
+                mod_directory=mod_root,
+            )
+
+        self._last_bundle = BundleResult(
+            mod_directory=mod_root,
+            packaging=options.packaging,
+            compact=compact_artifacts,
+        )
         return mod_root
 
     def _render_enum_patch(self) -> str:
@@ -1037,6 +1121,8 @@ __all__ = [
     "CardRegistration",
     "ProjectLayout",
     "BundleOptions",
+    "BundlePackaging",
+    "BundleResult",
     "ModProject",
     "create_project",
     "compileandbundle",

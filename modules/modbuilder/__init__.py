@@ -11,6 +11,15 @@ from .character import (
     CharacterStartConfig,
     CharacterValidationReport,
 )
+from .compact import (
+    CompactBundleArtifacts,
+    CompactBundleError,
+    CompactBundleLoader,
+    CompactBundleMetadata,
+    build_compact_bundle,
+    create_pystsmod_archive,
+    load_compact_bundle,
+)
 from .runtime_env import (
     PlatformBootstrap,
     PythonRuntimeBootstrapPlan,
@@ -43,6 +52,12 @@ PLUGIN_MANAGER.expose("PythonRuntimeDescriptor", PythonRuntimeDescriptor)
 PLUGIN_MANAGER.expose("PythonRuntimeBootstrapPlan", PythonRuntimeBootstrapPlan)
 PLUGIN_MANAGER.expose("PlatformBootstrap", PlatformBootstrap)
 PLUGIN_MANAGER.expose("write_runtime_bootstrapper", write_runtime_bootstrapper)
+PLUGIN_MANAGER.expose("CompactBundleLoader", CompactBundleLoader)
+PLUGIN_MANAGER.expose("CompactBundleMetadata", CompactBundleMetadata)
+PLUGIN_MANAGER.expose("CompactBundleArtifacts", CompactBundleArtifacts)
+PLUGIN_MANAGER.expose("create_pystsmod_archive", create_pystsmod_archive)
+PLUGIN_MANAGER.expose("build_compact_bundle", build_compact_bundle)
+PLUGIN_MANAGER.expose("load_compact_bundle", load_compact_bundle)
 PLUGIN_MANAGER.expose_module("modules.modbuilder")
 
 __all__ = [
@@ -67,4 +82,11 @@ __all__ = [
     "PythonRuntimeBootstrapPlan",
     "PlatformBootstrap",
     "write_runtime_bootstrapper",
+    "CompactBundleError",
+    "CompactBundleMetadata",
+    "CompactBundleArtifacts",
+    "CompactBundleLoader",
+    "create_pystsmod_archive",
+    "build_compact_bundle",
+    "load_compact_bundle",
 ]

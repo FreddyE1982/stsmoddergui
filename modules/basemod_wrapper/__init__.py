@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Sequence
+from typing import Any, Dict, Iterable, Optional, Sequence, Union
 
 from .loader import (
     ensure_basemod_environment,
@@ -10,7 +10,15 @@ from .loader import (
     ensure_desktop_jar,
     ensure_jpype,
 )
-from .project import BundleOptions, ModProject, ProjectLayout, compileandbundle, create_project
+from .project import (
+    BundleOptions,
+    BundlePackaging,
+    BundleResult,
+    ModProject,
+    ProjectLayout,
+    compileandbundle,
+    create_project,
+)
 from .cards import (
     CardLocalizationEntry,
     ResolvedCardLocalization,
@@ -132,6 +140,7 @@ class BaseModEnvironment:
         mts_version: str = "3.30.1",
         dependencies: Optional[Sequence[str]] = None,
         additional_classpath: Optional[Sequence[Path]] = None,
+        packaging: Union[str, BundlePackaging] = BundlePackaging.DIRECTORY,
     ) -> BundleOptions:
         """Produce a :class:`BundleOptions` instance with sensible defaults."""
 
@@ -148,6 +157,7 @@ class BaseModEnvironment:
             sts_version=sts_version,
             mts_version=mts_version,
             dependencies=resolved_dependencies,
+            packaging=packaging,
         )
 
     # Convenience attribute access -------------------------------------------------
@@ -421,6 +431,8 @@ PLUGIN_MANAGER.expose("register_simple_card", register_simple_card)
 PLUGIN_MANAGER.expose("ModProject", ModProject)
 PLUGIN_MANAGER.expose("ProjectLayout", ProjectLayout)
 PLUGIN_MANAGER.expose("BundleOptions", BundleOptions)
+PLUGIN_MANAGER.expose("BundlePackaging", BundlePackaging)
+PLUGIN_MANAGER.expose("BundleResult", BundleResult)
 PLUGIN_MANAGER.expose("default_bundle_options", _ENVIRONMENT.default_bundle_options)
 PLUGIN_MANAGER.expose("experimental", experimental)
 PLUGIN_MANAGER.expose("ensure_desktop_jar", ensure_desktop_jar)
@@ -440,6 +452,8 @@ __all__ = [
     "ModProject",
     "ProjectLayout",
     "BundleOptions",
+    "BundlePackaging",
+    "BundleResult",
     "create_project",
     "compileandbundle",
     "build_card_localizations",
