@@ -37,6 +37,7 @@ from .models import (
     StyleVector,
 )
 from .persistence import PlayerProfile, ProfilePersistence
+from .relics import AdaptiveTelemetryCore
 from .runtime import AdaptiveMechanicMod, CombatRecorder
 
 __all__ = [
@@ -50,6 +51,7 @@ __all__ = [
     "DeckEvolutionEngine",
     "DeckMutation",
     "DeckMutationPlan",
+    "AdaptiveTelemetryCore",
     "FightingStyleHeuristic",
     "PlayerProfile",
     "ProfilePersistence",

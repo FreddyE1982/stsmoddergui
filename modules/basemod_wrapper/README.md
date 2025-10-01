@@ -38,6 +38,8 @@ are also published to the global plugin manager (`plugins.PLUGIN_MANAGER`):
   distribution.
 - `SimpleCardBlueprint` and `register_simple_card`: declarative helpers for
   building everyday cards without hand-written subclasses.
+- `Relic` and `RELIC_REGISTRY`: declarative relic base class with automatic
+  registration and plugin-friendly discovery.
 - `BaseModEnvironment`: access to the resolved dependency jars and default
   classpath should you need to integrate with custom tooling.
 
@@ -362,6 +364,39 @@ runs reuse cached builds and only reprocess when the source PNG changes.
 If you want to bypass `ModProject` entirely you can call
 `register_simple_card(project, blueprint)` directly. This is primarily useful
 inside custom tooling or plugin workflows.
+
+## Relic authoring
+
+Subclass :class:`modules.basemod_wrapper.relics.Relic` to register relics
+without manual plumbing. The metaclass instantiates a prototype as soon as the
+class is defined, stores it inside :data:`modules.basemod_wrapper.relics.RELIC_REGISTRY`
+and wires the prototype into `ModProject` when
+:meth:`modules.basemod_wrapper.project.ModProject.enable_runtime` runs.
+
+```python
+from modules.basemod_wrapper.relics import Relic
+
+
+class AdaptiveTelemetryCore(Relic):
+    mod_id = "adaptive_evolver"
+    identifier = "adaptive_evolver:telemetry_core"
+    display_name = "Adaptive Telemetry Core"
+    description_text = "Records combat telemetry and boosts evolution planning."
+    tier = "RARE"
+    landing_sound = "MAGICAL"
+    relic_pool = "SHARED"
+    image = "adaptive_evolver/images/relics/telemetry_core.png"
+
+    def on_combat_begin(self, mod, recorder):
+        recorder.add_note("Telemetry Core calibrates to the encounter.")
+
+    def on_plan_finalised(self, mod, plan):
+        plan.notes = tuple(sorted(set(plan.notes + ("Telemetry Core boost",))))
+```
+
+Projects can also opt-in manually via
+``modules.basemod_wrapper.relics.RELIC_REGISTRY.install_on_project(project)``
+when wiring mechanics-only experiences.
 
 ## Runtime iteration
 

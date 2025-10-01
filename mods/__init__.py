@@ -14,13 +14,15 @@ from __future__ import annotations
 
 from plugins import PLUGIN_MANAGER
 
+from .adaptive_deck_evolver import AdaptiveTelemetryCore
 from .adaptive_deck_evolver.runtime import AdaptiveMechanicMod
 
-__all__ = ["AdaptiveMechanicMod"]
+__all__ = ["AdaptiveMechanicMod", "AdaptiveTelemetryCore"]
 
 # Provide friendly aliases for plugin consumers while keeping the automatic
 # lazy exposure active.  The plugin manager already exports every repository
 # module lazily, however exposing the high level factory under a predictable key
 # makes extension authoring substantially easier.
 PLUGIN_MANAGER.expose("adaptive_mechanic_mod_factory", AdaptiveMechanicMod)
+PLUGIN_MANAGER.expose("adaptive_telemetry_core_relic", AdaptiveTelemetryCore)
 PLUGIN_MANAGER.expose_module("mods.adaptive_deck_evolver", alias="adaptive_deck_evolver")

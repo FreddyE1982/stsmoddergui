@@ -33,6 +33,7 @@ from .keywords import (
     apply_persistent_card_changes,
     keyword_scheduler,
 )
+from .relics import Relic, RELIC_REGISTRY
 from . import experimental
 
 ensure_jpype()
@@ -428,6 +429,8 @@ PLUGIN_MANAGER.expose("create_project", create_project)
 PLUGIN_MANAGER.expose("compileandbundle", compileandbundle)
 PLUGIN_MANAGER.expose("SimpleCardBlueprint", SimpleCardBlueprint)
 PLUGIN_MANAGER.expose("register_simple_card", register_simple_card)
+PLUGIN_MANAGER.expose("Relic", Relic)
+PLUGIN_MANAGER.expose("RelicRegistry", RELIC_REGISTRY)
 PLUGIN_MANAGER.expose("ModProject", ModProject)
 PLUGIN_MANAGER.expose("ProjectLayout", ProjectLayout)
 PLUGIN_MANAGER.expose("BundleOptions", BundleOptions)

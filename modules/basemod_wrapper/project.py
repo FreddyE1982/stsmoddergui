@@ -30,6 +30,7 @@ from functools import lru_cache
 
 from .loader import BaseModBootstrapError, ensure_dependency_classpath
 from .java_backend import active_backend
+from .relics import RELIC_REGISTRY, RelicRecord, _resolve_enum as _resolve_relic_enum
 from plugins import PLUGIN_MANAGER
 
 if TYPE_CHECKING:  # pragma: no cover - typing helper
@@ -407,6 +408,8 @@ class ModProject:
         self.layout: Optional[ProjectLayout] = None
         self._mechanics_plan = _MechanicsRuntimePlan()
         self._last_bundle: Optional[BundleResult] = None
+        self._relic_records: Dict[str, RelicRecord] = {}
+        self._registered_relics: set[str] = set()
 
     # ------------------------------------------------------------------
     # configuration API
@@ -468,6 +471,14 @@ class ModProject:
             raise BaseModBootstrapError("define_color must be called before adding characters.")
         blueprint.color = self.color_definition
         self.character_blueprints.append(blueprint)
+
+    def register_relic_record(self, record: RelicRecord) -> None:
+        existing = self._relic_records.get(record.identifier)
+        if existing is not None and existing.cls is not record.cls:
+            raise BaseModBootstrapError(
+                f"Relic '{record.identifier}' already registered by {existing.cls.__module__}.{existing.cls.__name__}."
+            )
+        self._relic_records[record.identifier] = record
 
     # ------------------------------------------------------------------
     # mechanics runtime configuration
@@ -848,10 +859,14 @@ class ModProject:
         self._player_enum = player_enum
 
         project = self
+        RELIC_REGISTRY.install_on_project(self)
 
         class _Subscriber:
             def receiveEditCards(self):
                 project._register_cards()
+
+            def receiveEditRelics(self):
+                project._register_relics()
 
             def receiveEditCharacters(self):
                 project._register_characters()
@@ -875,6 +890,38 @@ class ModProject:
             _basemod().BaseMod.addCard(card)
             if registration.make_basic:
                 _basemod().BaseMod.addBasicCard(card)
+
+    def _register_relics(self) -> None:
+        if not self._relic_records:
+            return
+        basemod = _basemod().BaseMod
+        cardcrawl = _cardcrawl()
+        relic_type_enum = None
+        color_enum = None
+        if cardcrawl is not None:
+            relic_type_enum = getattr(getattr(cardcrawl.relics, "AbstractRelic", None), "RelicType", None)
+            color_enum = getattr(getattr(cardcrawl.cards, "AbstractCard", None), "CardColor", None)
+        for identifier, record in self._relic_records.items():
+            if identifier in self._registered_relics:
+                continue
+            if record.pool.upper() == "CUSTOM":
+                color_id = record.color_id
+                if not color_id:
+                    if not self.color_definition:
+                        raise BaseModBootstrapError(
+                            f"Relic '{identifier}' requires a colour definition before registration."
+                        )
+                    color_id = self.color_definition.identifier
+                color_value = _resolve_relic_enum(color_enum, str(color_id), "card color")
+                basemod.addRelicToCustomPool(record.instance, color_value)
+            else:
+                relic_type = _resolve_relic_enum(relic_type_enum, record.pool, "relic pool")
+                basemod.addRelic(record.instance, relic_type)
+            self._registered_relics.add(identifier)
+        PLUGIN_MANAGER.expose(
+            f"mod_project:{self.mod_id}:relics",
+            tuple(self._relic_records.values()),
+        )
 
     def _register_characters(self) -> None:
         if not self.color_definition:
