@@ -65,6 +65,16 @@ that plugs straight into ``Deck`` subclasses. See
 ``modules.basemod_wrapper.experimental.graalpy_adaptive_illustrations`` and the
 ``how to/graalpy-adaptive-illustrations.md`` recipe for end-to-end usage.
 
+### GraalPy live tutorial narrator
+
+The ``experimental.graalpy_live_tutorial_narrator`` module streams combat events
+into a GraalPy narration queue.  Its ``TutorialNarrationEngine`` lets tooling
+register voice lines, while ``TutorialNarrationDirector`` inspects
+``Character``/``Deck`` definitions to generate onboarding hints automatically.
+Documentation lives in
+``modules.basemod_wrapper.experimental.graalpy_live_tutorial_narrator`` and
+``how to/live-tutorial-narrator.md``.
+
 ## High level workflow
 
 1. **Create a project** via `create_project(...)`. The resulting `ModProject`

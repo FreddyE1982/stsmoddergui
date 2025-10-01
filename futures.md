@@ -185,3 +185,11 @@
   shader-inspired blends) and document how decks can opt-in with a single
   `director.apply_presets("buddy_glow")` call so future updates stay
   data-driven.
+- [todo] **Narration sample pack exchange** – Build on
+  `experimental.graalpy_live_tutorial_narrator` by introducing a plugin-driven
+  marketplace for voice packs and synthesis presets. Usage: expose a
+  `register_voice_pack(name, loader)` helper on the narration engine so plugins
+  can publish text-to-speech hooks, stream audio assets, and tag lines by
+  language/accent.  Document how directors select packs via
+  `director.use_voice_pack("mentors/en_gb")` and expose the registration
+  points through `PLUGIN_MANAGER` for tooling dashboards.
