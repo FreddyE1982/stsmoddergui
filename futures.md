@@ -47,6 +47,12 @@
   rebuilds Pillow for the host platform, registers a polyglot JVM backend and
   exposes plugin hooks so toggling the experiment immediately reroutes all
   BaseMod bridge calls through GraalPy.
+- [complete] **Rule-weaver battle mutators** –
+  `experimental.graalpy_rule_weaver` layers a GraalPy-powered mutation engine
+  over card blueprints and the keyword registry.  Mods can register
+  `MechanicMutation` instances, load declarative rule scripts, and rely on the
+  plugin exports to coordinate mechanic tweaks across tooling, live builds and
+  playtests.
 
 ## Upcoming work
 
