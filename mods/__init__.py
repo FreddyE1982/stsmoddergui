@@ -16,8 +16,15 @@ from plugins import PLUGIN_MANAGER
 
 from .adaptive_deck_evolver import AdaptiveTelemetryCore
 from .adaptive_deck_evolver.runtime import AdaptiveMechanicMod
+from .digitalesmonster import (
+    DigitalesMonsterProject,
+    DigitalesMonsterProjectConfig,
+    DigitalesMonsterCharacter,
+    DigitalesMonsterDeck,
+    bootstrap_digitalesmonster_project,
+)
 
-__all__ = ["AdaptiveMechanicMod", "AdaptiveTelemetryCore"]
+__all__ = ["AdaptiveMechanicMod", "AdaptiveTelemetryCore", "DigitalesMonsterProject", "DigitalesMonsterProjectConfig", "DigitalesMonsterCharacter", "DigitalesMonsterDeck", "bootstrap_digitalesmonster_project"]
 
 # Provide friendly aliases for plugin consumers while keeping the automatic
 # lazy exposure active.  The plugin manager already exports every repository
@@ -26,3 +33,6 @@ __all__ = ["AdaptiveMechanicMod", "AdaptiveTelemetryCore"]
 PLUGIN_MANAGER.expose("adaptive_mechanic_mod_factory", AdaptiveMechanicMod)
 PLUGIN_MANAGER.expose("adaptive_telemetry_core_relic", AdaptiveTelemetryCore)
 PLUGIN_MANAGER.expose_module("mods.adaptive_deck_evolver", alias="adaptive_deck_evolver")
+PLUGIN_MANAGER.expose("digitalesmonster_bootstrap_project", bootstrap_digitalesmonster_project)
+PLUGIN_MANAGER.expose("digitalesmonster_project_class", DigitalesMonsterProject)
+PLUGIN_MANAGER.expose_module("mods.digitalesmonster", alias="digitalesmonster")

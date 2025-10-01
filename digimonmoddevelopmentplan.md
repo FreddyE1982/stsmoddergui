@@ -2,9 +2,9 @@
 
 Die folgenden Schritte sind als eigenständige, klar umrissene Aufgaben konzipiert. Jede Aufgabe ist mit `[todo]` markiert und baut auf den vorangehenden auf. Nach der Umsetzung aller Aufgaben ist der Mod gemäß der Spezifikation funktionsvollständig.
 
-1. [todo] Projektgrundlage vorbereiten: Neues Mod-Paket unter Nutzung von `modules.modbuilder` anlegen, bestehenden Plugin-Manager einbinden und GraalPy-Experiment über `experimental.graalpy_runtime` aktivieren.
-2. [todo] Forschungsbasis erweitern: Für jede Form der Agumon-Evolutionslinien (Adventure, Tamers, Savers inkl. Armor- und Burst-Varianten) deutsche Attackennamen und relevante Seriendetails über DigiPedia sammeln und im `research/`-Verzeichnis dokumentieren.
-3. [todo] Persistente Datenfelder prüfen und erweitern: Bestehende Persistenz-Utilities (z. B. StSLib PersistFields) evaluieren und ein Speicherschema für Level-Stabilitätswerte (Start, Max, Aktuell pro Level) definieren.
+1. [complete] Projektgrundlage vorbereiten: Neues Mod-Paket unter Nutzung von `modules.modbuilder` anlegen, bestehenden Plugin-Manager einbinden und GraalPy-Experiment über `experimental.graalpy_runtime` aktivieren.
+2. [complete] Forschungsbasis erweitern: Für jede Form der Agumon-Evolutionslinien (Adventure, Tamers, Savers inkl. Armor- und Burst-Varianten) deutsche Attackennamen und relevante Seriendetails über DigiPedia sammeln und im `research/`-Verzeichnis dokumentieren.
+3. [complete] Persistente Datenfelder prüfen und erweitern: Bestehende Persistenz-Utilities (z. B. StSLib PersistFields) evaluieren und ein Speicherschema für Level-Stabilitätswerte (Start, Max, Aktuell pro Level) definieren.
 4. [todo] Stance-Basisklasse prüfen: Vorhandene `Stance`-Implementierungen analysieren und ein erweiterbares Digimon-Stance-Framework entwerfen, das Plug-ins Zugriff auf alle relevanten Hooks erhält.
 5. [todo] Rookie-Stance „Natürliches Rookie-Level" implementieren: HP-Werte, Grundwerte und Start-Buffs definieren, Stabilitätslogik einbinden und Charakterstart auf dieses Level festlegen.
 6. [todo] Champion-Stance mit Digivice-Voraussetzungen implementieren: Stance-Werte, Stabilitätsverwaltung und Rückfallmechanik inklusive Trigger bei Stabilität ≤ 0 fertigstellen.
