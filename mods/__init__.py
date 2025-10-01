@@ -1,0 +1,26 @@
+"""Repository packaged mods and mechanic engines.
+
+The :mod:`mods` namespace collects gameplay systems that can be shipped as
+mechanics-only experiences.  Modules located here are designed to be entirely
+plugin-friendly: they expose their public API through the global
+:mod:`plugins` manager so downstream tooling can discover runtime objects,
+register extensions and inspect persistent state.
+
+The :class:`AdaptiveMechanicMod` defined in
+:mod:`mods.adaptive_deck_evolver.runtime` is exposed immediately for
+convenience.
+"""
+from __future__ import annotations
+
+from plugins import PLUGIN_MANAGER
+
+from .adaptive_deck_evolver.runtime import AdaptiveMechanicMod
+
+__all__ = ["AdaptiveMechanicMod"]
+
+# Provide friendly aliases for plugin consumers while keeping the automatic
+# lazy exposure active.  The plugin manager already exports every repository
+# module lazily, however exposing the high level factory under a predictable key
+# makes extension authoring substantially easier.
+PLUGIN_MANAGER.expose("adaptive_mechanic_mod_factory", AdaptiveMechanicMod)
+PLUGIN_MANAGER.expose_module("mods.adaptive_deck_evolver", alias="adaptive_deck_evolver")
