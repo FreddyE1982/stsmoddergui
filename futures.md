@@ -252,3 +252,7 @@
   high contrast PNGs under `assets/adaptive_evolver/images/relics/` and update
   the relic documentation with sizing guidelines so bundling workflows include
   finalised art instead of placeholders.
+- [todo] **Digitales Monster stability CLI** – Build a command line helper that prints and migrates saved stability
+  profiles. Usage: expose `python -m mods.digitalesmonster.persistence audit` which loads the current
+  profile, validates ranges against project defaults, and provides plugin hooks so balancing tools can
+  veto runs when values fall outside expected ranges.
