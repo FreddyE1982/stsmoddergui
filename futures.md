@@ -177,6 +177,12 @@
   `export_timelines(path: Path)` on the module so tooling can persist annotated
   turn-by-turn breakdowns, then document how plugins can subscribe to the
   timeline feed to generate UI overlays or debugging notebooks.
+- [todo] **Ghost session export harness** – Extend
+  `experimental.graalpy_coaching_ghosts` with helpers that persist session
+  histories to JSON so teams can replay coaching deltas after internal
+  playtests. Usage: surface `export_session(session_id, path)` on the engine,
+  include an importer for historical comparisons, and document how plugins can
+  diff exported sessions to surface actionable training drills.
 
 - [todo] **Adaptive illustration preset marketplace** – Extend
   `experimental.graalpy_adaptive_illustrations` with transform bundles that
