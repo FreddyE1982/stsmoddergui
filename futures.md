@@ -63,6 +63,12 @@
   submodule, document its activation hooks, and surface an `experimental.on`
   example in the wrapper README so teams can trial features without forking
   the stable API.
+- [todo] **In-process compact loader activation** – Teach the compact bundling
+  pipeline to hydrate `.pystsmod` archives directly inside the ModTheSpire
+  JVM. Usage: extend the generated loader jar to bootstrap the Python runtime,
+  surface the archive contents as an in-memory class loader, and update
+  `modules.modbuilder.runtime_env` to consume `CompactBundleLoader`
+  descriptors when launching mods.
 - [todo] **Adaptive evolver tuning console** – Ship a CLI and dashboard that
   visualises the persistent adaptive deck profile, highlights mutation
   rationales, and allows designers to export/import heuristic weights.
