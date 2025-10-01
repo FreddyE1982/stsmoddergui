@@ -6,3 +6,4 @@ plus their documented helpers) instead of low-level BaseMod plumbing whenever po
  reach for those abstractions first.
 - When adding new teaching material remember to point readers back to the ready-made bundling helpers such as `Character.createMod` and `Deck.statistics()` so tutorials stay aligned with the automation surface.
 - Binary assets must never be committed. When image placeholders are required, encode them as base64 strings inside text files and document their purpose.
+- Images must always be stored as base64-encoded text assets (e.g. `.txt` files) rather than binary image files, and every such placeholder must explain the intended resolution and usage context.
