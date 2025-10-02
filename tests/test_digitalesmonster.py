@@ -210,3 +210,186 @@ def test_champion_requires_digivice_and_digisoul(use_real_dependencies: bool, st
             os.environ.pop(key, None)
         if use_real_dependencies:
             return
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_ultra_stance_instability_branch(use_real_dependencies: bool, stubbed_runtime) -> None:
+    project = DigitalesMonsterProject()
+    try:
+        project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        project._ensure_stances_loaded()
+        from mods.digitalesmonster import DigimonStanceRequirementError  # noqa: WPS433 - runtime import
+
+        champion_id = PLUGIN_MANAGER.exposed["digitalesmonster_champion_stance"]
+        ultra_id = PLUGIN_MANAGER.exposed["digitalesmonster_ultra_stance"]
+        skull_id = PLUGIN_MANAGER.exposed["digitalesmonster_skullgreymon_stance"]
+        context = project.create_stance_context(
+            digisoul=5,
+            digivice_active=True,
+            relics=("Digivice",),
+        )
+        project.enter_default_stance(context=context)
+        context.digisoul = 2
+        with pytest.raises(DigimonStanceRequirementError):
+            project.stance_manager.enter(ultra_id, context, reason="insufficient-digisoul")
+
+        context.digisoul = 5
+        project.stance_manager.enter(champion_id, context, reason="champion-sync")
+        transition = project.stance_manager.enter(ultra_id, context, reason="ultra-ready")
+        assert transition.new_identifier == ultra_id
+        assert context.metadata["ultra_mode"]["active"]
+
+        for _ in range(8):
+            project.stance_manager.adjust_stability(-25, reason="ultra-instability")
+            if project.stance_manager.current_stance.identifier == skull_id:
+                break
+        assert project.stance_manager.current_stance.identifier == skull_id
+        skull_meta = context.metadata["skullgreymon"]
+        assert skull_meta["active"]
+        assert context.powers.get("Vulnerable", 0) >= 2
+    except BaseModBootstrapError:
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+        if use_real_dependencies:
+            return
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_mega_and_burst_modes(use_real_dependencies: bool, stubbed_runtime) -> None:
+    project = DigitalesMonsterProject()
+    try:
+        project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        project._ensure_stances_loaded()
+        from mods.digitalesmonster import DigimonStanceRequirementError  # noqa: WPS433 - runtime import
+
+        champion_id = PLUGIN_MANAGER.exposed["digitalesmonster_champion_stance"]
+        ultra_id = PLUGIN_MANAGER.exposed["digitalesmonster_ultra_stance"]
+        mega_id = PLUGIN_MANAGER.exposed["digitalesmonster_mega_stance"]
+        burst_id = PLUGIN_MANAGER.exposed["digitalesmonster_burst_stance"]
+
+        context = project.create_stance_context(
+            digisoul=9,
+            digivice_active=True,
+            relics=("Digivice",),
+        )
+        project.enter_default_stance(context=context)
+        project.stance_manager.enter(champion_id, context, reason="champion-bridge")
+        project.stance_manager.enter(ultra_id, context, reason="ultra-bridge")
+
+        context.digisoul = 5
+        with pytest.raises(DigimonStanceRequirementError):
+            project.stance_manager.enter(mega_id, context, reason="insufficient")
+
+        context.digisoul = 9
+        mega_transition = project.stance_manager.enter(mega_id, context, reason="warp")
+        assert mega_transition.new_identifier == mega_id
+        assert context.metadata["warp_digitation"]["active"]
+
+        context.digisoul = 6
+        with pytest.raises(DigimonStanceRequirementError):
+            project.stance_manager.enter(burst_id, context, reason="low-digisoul")
+
+        context.digisoul = 9
+        burst_transition = project.stance_manager.enter(burst_id, context, reason="burst")
+        assert burst_transition.new_identifier == burst_id
+        burst_meta = context.metadata["burst_mode"]
+        assert burst_meta["active"]
+        assert context.player_max_hp > burst_meta["pre_max_hp"]
+        project.stance_manager.tick_turn(reason="burst-turn")
+        if project.stance_manager.current_stance.identifier == burst_id:
+            assert context.player_hp < context.player_max_hp
+        else:
+            assert project.stance_manager.current_stance.identifier == mega_id
+
+        for _ in range(6):
+            project.stance_manager.adjust_stability(-30, reason="burst-instability")
+            if project.stance_manager.current_stance.identifier in {
+                mega_id,
+                ultra_id,
+                project.default_stance_identifier,
+            }:
+                break
+        assert project.stance_manager.current_stance.identifier in {
+            mega_id,
+            ultra_id,
+            project.default_stance_identifier,
+        }
+        assert context.metadata["burst_mode"]["active"] is False
+    except BaseModBootstrapError:
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+        if use_real_dependencies:
+            return
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_armor_digiegg_pipeline(use_real_dependencies: bool, stubbed_runtime) -> None:
+    project = DigitalesMonsterProject()
+    try:
+        project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        project._ensure_stances_loaded()
+        from mods.digitalesmonster import DigimonStanceRequirementError  # noqa: WPS433 - runtime import
+
+        armor_id = PLUGIN_MANAGER.exposed["digitalesmonster_armor_stance"]
+        rookie_id = project.default_stance_identifier
+        context = project.create_stance_context(digisoul=1, digivice_active=False)
+        project.enter_default_stance(context=context)
+
+        with pytest.raises(DigimonStanceRequirementError):
+            project.stance_manager.enter(armor_id, context, reason="no-egg")
+
+        context.metadata["armor_egg"] = "Digi-Ei des Mutes"
+        context.digisoul = 3
+        transition = project.stance_manager.enter(armor_id, context, reason="armor-ready")
+        assert transition.new_identifier == armor_id
+        pipeline = context.metadata["armor_pipeline"]
+        assert pipeline["active"]
+        assert "digi-ei" in pipeline["egg"]
+
+        project.stance_manager.tick_turn(reason="armor-turn")
+        assert pipeline["turns"] >= 1
+
+        for _ in range(8):
+            project.stance_manager.adjust_stability(-25, reason="armor-instability")
+            if project.stance_manager.current_stance.identifier == rookie_id:
+                break
+        assert project.stance_manager.current_stance.identifier == rookie_id
+        assert context.metadata["armor_pipeline"]["egg_shattered"]
+    except BaseModBootstrapError:
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+        if use_real_dependencies:
+            return

@@ -8,9 +8,9 @@ Die folgenden Schritte sind als eigenständige, klar umrissene Aufgaben konzipie
 4. [complete] Stance-Basisklasse prüfen: Vorhandene `Stance`-Implementierungen analysieren und ein erweiterbares Digimon-Stance-Framework entwerfen, das Plug-ins Zugriff auf alle relevanten Hooks erhält.
 5. [complete] Rookie-Stance „Natürliches Rookie-Level" implementieren: HP-Werte, Grundwerte und Start-Buffs definieren, Stabilitätslogik einbinden und Charakterstart auf dieses Level festlegen.
 6. [complete] Champion-Stance mit Digivice-Voraussetzungen implementieren: Stance-Werte, Stabilitätsverwaltung und Rückfallmechanik inklusive Trigger bei Stabilität ≤ 0 fertigstellen.
-7. [todo] Ultra-Stance (inkl. SkullGreymon-Abzweig) implementieren: Zusätzliche Modifikatoren, Rückfallpfad und spezielle Debuffs für instabile Digitation ausarbeiten.
-8. [todo] Mega- und Burst-Formen (inkl. Warp-Digitation) als Stances umsetzen: Werte, dauerhafte Buffs und Sonderlogiken (z. B. Burst Mode HP-Modifikatoren) hinterlegen.
-9. [todo] Armor-Stance erstellen: Interaktion mit Digi-Eiern abbilden, alternative Level-Pipeline und Stabilitätsverhalten implementieren.
+7. [complete] Ultra-Stance (inkl. SkullGreymon-Abzweig) implementieren: Zusätzliche Modifikatoren, Rückfallpfad und spezielle Debuffs für instabile Digitation ausarbeiten.
+8. [complete] Mega- und Burst-Formen (inkl. Warp-Digitation) als Stances umsetzen: Werte, dauerhafte Buffs und Sonderlogiken (z. B. Burst Mode HP-Modifikatoren) hinterlegen.
+9. [complete] Armor-Stance erstellen: Interaktion mit Digi-Eiern abbilden, alternative Level-Pipeline und Stabilitätsverhalten implementieren.
 10. [todo] Jogress-/Fusion-Stance(s) (Omnimon etc.) implementieren: Zufalls- oder triggerbasierte Aktivierung und Rückkehrbedingungen definieren.
 11. [todo] Level-Übergangsmanager programmieren: Karten-, Relikt- und Kampf-Trigger auswerten, Stabilitätsanpassungen ausführen und Stance-Wechsel koordinieren.
 12. [todo] Stabilitäts-Persistenz verdrahten: Startwert-/Maxwert-Anpassungen bei Sieg/Niederlage erfassen und zwischen Runs speichern.
