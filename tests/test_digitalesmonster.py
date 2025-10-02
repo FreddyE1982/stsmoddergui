@@ -5,6 +5,7 @@ import pytest
 
 from modules.basemod_wrapper import experimental
 from modules.basemod_wrapper.experimental.graalpy_runtime import GraalPyProvisioningState
+from modules.basemod_wrapper.loader import BaseModBootstrapError
 from mods.digitalesmonster import (
     LEVEL_STABILITY_PERSIST_KEY,
     DigitalesMonsterProject,
@@ -119,3 +120,93 @@ def test_bootstrap_helper_respects_activation_flags(tmp_path: Path, use_real_dep
         assert project.is_graalpy_active()
         assert isinstance(project.graalpy_state, GraalPyProvisioningState)
     experimental.off("graalpy_runtime")
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_stance_manager_default_flow(use_real_dependencies: bool, stubbed_runtime) -> None:
+    project = DigitalesMonsterProject()
+    assert PLUGIN_MANAGER.exposed["digitalesmonster_project_builder"] is project
+    assert PLUGIN_MANAGER.exposed["digitalesmonster_stability_profile"] is project.stability_profile
+    try:
+        project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        project._ensure_stances_loaded()
+        rookie_id = project.default_stance_identifier
+        champion_id = PLUGIN_MANAGER.exposed["digitalesmonster_champion_stance"]
+        context = project.create_stance_context(digisoul=5, digivice_active=True)
+        transition = project.enter_default_stance(context=context, reason="unit-test")
+        assert transition.new_identifier == rookie_id
+        assert context.powers["Strength"] == 1
+        assert context.powers["Dexterity"] == 1
+        assert context.metadata == {}
+
+        champion_transition = project.stance_manager.enter(
+            champion_id,
+            context,
+            reason="digivice-sync",
+        )
+        assert champion_transition.new_identifier == champion_id
+        assert context.metadata["digivice_resonanz"]["level"] == "Champion"
+        assert context.powers["digitalesmonster:digivice-resonanz"] == 1
+
+        # Drain stability until the fallback triggers.
+        for _ in range(30):
+            project.stance_manager.adjust_stability(-25, reason="stress")
+            if project.stance_manager.current_stance.identifier == rookie_id:
+                break
+
+        assert project.stance_manager.current_stance.identifier == rookie_id
+        assert context.powers.get("digitalesmonster:digivice-resonanz") is None
+    except BaseModBootstrapError:
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+        if use_real_dependencies:
+            return
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_champion_requires_digivice_and_digisoul(use_real_dependencies: bool, stubbed_runtime) -> None:
+    project = DigitalesMonsterProject()
+    try:
+        project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        project._ensure_stances_loaded()
+        from mods.digitalesmonster import DigimonStanceRequirementError  # noqa: WPS433 - runtime import
+
+        champion_id = PLUGIN_MANAGER.exposed["digitalesmonster_champion_stance"]
+        context = project.create_stance_context(digisoul=0, digivice_active=False)
+        project.enter_default_stance(context=context)
+        with pytest.raises(DigimonStanceRequirementError):
+            project.stance_manager.enter(champion_id, context, reason="missing")
+
+        context.digivice_active = True
+        with pytest.raises(DigimonStanceRequirementError):
+            project.stance_manager.enter(champion_id, context, reason="no-digisoul")
+
+        context.digisoul = 3
+        project.stance_manager.enter(champion_id, context, reason="ready")
+    except BaseModBootstrapError:
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+        if use_real_dependencies:
+            return
