@@ -341,15 +341,39 @@ class DigitalesMonsterProject:
         if self.stance_runtime_ready:
             return
         try:
-            from mods.digitalesmonster.stances import DigiviceChampionStance, NaturalRookieStance  # type: ignore
+            from mods.digitalesmonster.stances import (  # type: ignore
+                ArmorDigieggStance,
+                BurstMegaStance,
+                DigiviceChampionStance,
+                DigiviceUltraStance,
+                NaturalRookieStance,
+                SkullGreymonInstabilityStance,
+                WarpMegaStance,
+            )
 
-            self.stance_manager.prepare_stance(NaturalRookieStance)
-            self.stance_manager.prepare_stance(DigiviceChampionStance)
+            for stance_cls in (
+                NaturalRookieStance,
+                DigiviceChampionStance,
+                DigiviceUltraStance,
+                SkullGreymonInstabilityStance,
+                WarpMegaStance,
+                BurstMegaStance,
+                ArmorDigieggStance,
+            ):
+                self.stance_manager.prepare_stance(stance_cls)
+
             self.default_stance_identifier = NaturalRookieStance.identifier
             self.stance_manager.fallback_identifier = NaturalRookieStance.identifier
             self.stance_runtime_ready = True
             self.expose("digitalesmonster_stance_runtime_ready", True)
             self.expose("digitalesmonster_champion_stance", DigiviceChampionStance.identifier)
+            self.expose("digitalesmonster_ultra_stance", DigiviceUltraStance.identifier)
+            self.expose(
+                "digitalesmonster_skullgreymon_stance", SkullGreymonInstabilityStance.identifier
+            )
+            self.expose("digitalesmonster_mega_stance", WarpMegaStance.identifier)
+            self.expose("digitalesmonster_burst_stance", BurstMegaStance.identifier)
+            self.expose("digitalesmonster_armor_stance", ArmorDigieggStance.identifier)
         except BaseModBootstrapError as exc:
             raise BaseModBootstrapError(
                 "GraalPy-Stance-Laufzeit nicht verfügbar. Aktivieren Sie graalpy_runtime vor dem Stance-Wechsel."

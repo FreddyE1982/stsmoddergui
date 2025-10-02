@@ -43,6 +43,11 @@ __all__ = [
     "StanceTransition",
     "NaturalRookieStance",
     "DigiviceChampionStance",
+    "DigiviceUltraStance",
+    "SkullGreymonInstabilityStance",
+    "WarpMegaStance",
+    "BurstMegaStance",
+    "ArmorDigieggStance",
 ]
 
 _STANCE_EXPORTS = {
@@ -59,6 +64,11 @@ _STANCE_EXPORTS = {
     "StanceTransition": "mods.digitalesmonster.stances",
     "NaturalRookieStance": "mods.digitalesmonster.stances",
     "DigiviceChampionStance": "mods.digitalesmonster.stances",
+    "DigiviceUltraStance": "mods.digitalesmonster.stances",
+    "SkullGreymonInstabilityStance": "mods.digitalesmonster.stances",
+    "WarpMegaStance": "mods.digitalesmonster.stances",
+    "BurstMegaStance": "mods.digitalesmonster.stances",
+    "ArmorDigieggStance": "mods.digitalesmonster.stances",
 }
 
 

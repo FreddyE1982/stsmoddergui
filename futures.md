@@ -69,6 +69,18 @@
   when `graalpy_runtime` switches on, re-run the stance registration helpers,
   and update the plugin exports so UI overlays and analytics plugins can react
   without polling the project façade.
+- [todo] **SkullGreymon Korrumpierungsereignisse** – Ergänze Ereignis- und
+  Kampfhooks, die den SkullGreymon-Abzweig in Kartenbelohnungen, Events und
+  Relikte einspeisen. Usage: erweitere den Levelmanager um eine "corruption"
+  Telemetrie, triggere Plugin-Broadcasts bei jedem SkullGreymon-Einstieg und
+  erlaube Relikten, Stabilitätsstrafen oder Bonusheilungen abhängig vom
+  `skullgreymon`-Metadatenblock zu registrieren.
+- [todo] **Digi-Ei Reliktkanalisation** – Implementiere eine Inventar- und
+  Reliktbrücke, die Armor-Digitation automatisch auf spezifische Digi-Eier
+  mappt. Usage: erweitere den Stance-Manager um eine `armor_pipeline`
+  Integrations-API, die Relikte als `ArmorEggProvider` registriert, Stabilität
+  dynamisch nach Eityp justiert und Plugin-Hooks bereitstellt, um neue Eier mit
+  Spezialeffekten einzubinden.
 - [todo] **Overlay animation presets** – Extend the runtime overlay director
   with reusable easing timelines (fade, slide, pulse) and scripted sequences.
   Usage: add `OverlayAnimation` descriptors that the manager can attach to an

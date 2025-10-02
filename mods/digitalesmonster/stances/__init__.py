@@ -32,11 +32,21 @@ __all__ = [
     "StanceTransition",
     "NaturalRookieStance",
     "DigiviceChampionStance",
+    "DigiviceUltraStance",
+    "SkullGreymonInstabilityStance",
+    "WarpMegaStance",
+    "BurstMegaStance",
+    "ArmorDigieggStance",
 ]
 
 _DEFERRED_EXPORTS = {
     "NaturalRookieStance": "mods.digitalesmonster.stances.rookie",
     "DigiviceChampionStance": "mods.digitalesmonster.stances.champion",
+    "DigiviceUltraStance": "mods.digitalesmonster.stances.ultra",
+    "SkullGreymonInstabilityStance": "mods.digitalesmonster.stances.ultra",
+    "WarpMegaStance": "mods.digitalesmonster.stances.mega",
+    "BurstMegaStance": "mods.digitalesmonster.stances.mega",
+    "ArmorDigieggStance": "mods.digitalesmonster.stances.armor",
 }
 
 
