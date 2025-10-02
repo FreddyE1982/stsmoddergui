@@ -26,6 +26,7 @@ from .cards import (
     build_card_localizations,
     register_simple_card,
 )
+from .card_types import CardType, CardTypeRegistry, CARD_TYPE_REGISTRY
 from .keywords import (
     KEYWORD_REGISTRY,
     Keyword,
@@ -475,6 +476,9 @@ __all__ = [
     "ResolvedCardLocalization",
     "SimpleCardBlueprint",
     "register_simple_card",
+    "CardType",
+    "CardTypeRegistry",
+    "CARD_TYPE_REGISTRY",
     "Keyword",
     "KeywordRegistry",
     "KEYWORD_REGISTRY",

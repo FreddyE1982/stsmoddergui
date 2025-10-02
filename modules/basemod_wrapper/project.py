@@ -34,6 +34,7 @@ from functools import lru_cache
 from .loader import BaseModBootstrapError, ensure_dependency_classpath
 from .java_backend import active_backend
 from .relics import RELIC_REGISTRY, RelicRecord, _resolve_enum as _resolve_relic_enum
+from .card_types import CARD_TYPE_REGISTRY, CardTypeRecord
 from .stances import STANCE_REGISTRY, StanceRecord, register_stance_runtime
 from plugins import PLUGIN_MANAGER
 
@@ -706,6 +707,7 @@ class ModProject:
         self._registered_relics: set[str] = set()
         self._stance_records: Dict[str, "StanceRecord"] = {}
         self._registered_stances: set[str] = set()
+        self._card_type_records: Dict[str, CardTypeRecord] = {}
         self._localization_entries: Tuple[LocalizableTextEntry, ...] = ()
 
     # ------------------------------------------------------------------
@@ -785,6 +787,20 @@ class ModProject:
                 f"Stance '{record.identifier}' already registered by {existing.cls.__module__}.{existing.cls.__name__}."
             )
         self._stance_records[record.identifier] = record
+
+    @property
+    def card_type_records(self) -> Mapping[str, CardTypeRecord]:
+        """Immutable view of the registered card type metadata."""
+
+        return MappingProxyType(self._card_type_records)
+
+    def register_card_type_record(self, record: CardTypeRecord) -> None:
+        existing = self._card_type_records.get(record.identifier)
+        if existing is not None and existing.cls is not record.cls:
+            raise BaseModBootstrapError(
+                f"Card type '{record.identifier}' already registered by {existing.cls.__module__}.{existing.cls.__name__}."
+            )
+        self._card_type_records[record.identifier] = record
 
     # ------------------------------------------------------------------
     # mechanics runtime configuration
@@ -1167,6 +1183,7 @@ class ModProject:
         project = self
         RELIC_REGISTRY.install_on_project(self)
         STANCE_REGISTRY.install_on_project(self)
+        CARD_TYPE_REGISTRY.install_on_project(self)
 
         class _Subscriber:
             def receiveEditCards(self):
@@ -1618,6 +1635,7 @@ class ModProject:
         *,
         layout: Optional[ProjectLayout] = None,
     ) -> Path:
+        CARD_TYPE_REGISTRY.install_on_project(self)
         mod_root = self._prepare_bundle_directory(options)
 
         compact_artifacts: Optional["CompactBundleArtifacts"] = None
@@ -1641,29 +1659,41 @@ class ModProject:
         class_name = f"{self.mod_id.title().replace('_', '')}Enums"
         identifier = self.color_definition.identifier if self.color_definition else self.mod_id.upper()
         player_enum = self.mod_id.upper()
-        return textwrap.dedent(
-            f"""
-            package {self.mod_id}.patches;
-
-            import com.evacipated.cardcrawl.modthespire.lib.SpireEnum;
-            import com.megacrit.cardcrawl.cards.AbstractCard;
-            import com.megacrit.cardcrawl.characters.AbstractPlayer;
-
-            public class {class_name} {{
-                public static class CardColor {{
-                    @SpireEnum
-                    public static AbstractCard.CardColor {identifier};
-                    @SpireEnum(name = "{identifier}")
-                    public static AbstractCard.CardColor LIBRARY_COLOR;
-                }}
-
-                public static class PlayerClass {{
-                    @SpireEnum
-                    public static AbstractPlayer.PlayerClass {player_enum};
-                }}
-            }}
-            """
-        ).strip()
+        sections = [
+            f"package {self.mod_id}.patches;",
+            "",
+            "import com.evacipated.cardcrawl.modthespire.lib.SpireEnum;",
+            "import com.megacrit.cardcrawl.cards.AbstractCard;",
+            "import com.megacrit.cardcrawl.characters.AbstractPlayer;",
+            "",
+            f"public class {class_name} {{",
+            "    public static class CardColor {",
+            "        @SpireEnum",
+            f"        public static AbstractCard.CardColor {identifier};",
+            f"        @SpireEnum(name = \"{identifier}\")",
+            "        public static AbstractCard.CardColor LIBRARY_COLOR;",
+            "    }",
+        ]
+        if self._card_type_records:
+            sections.append("")
+            sections.append("    public static class CardType {")
+            for record in sorted(self._card_type_records.values(), key=lambda item: item.identifier):
+                sections.append("        @SpireEnum")
+                sections.append(
+                    f"        public static AbstractCard.CardType {record.identifier};"
+                )
+            sections.append("    }")
+        sections.extend(
+            [
+                "",
+                "    public static class PlayerClass {",
+                "        @SpireEnum",
+                f"        public static AbstractPlayer.PlayerClass {player_enum};",
+                "    }",
+                "}",
+            ]
+        )
+        return "\n".join(sections)
 
     def _render_modthespire_manifest(self, options: BundleOptions) -> str:
         manifest = {

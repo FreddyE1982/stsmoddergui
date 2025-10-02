@@ -394,6 +394,57 @@ Exhaustive blueprints automatically translate the `{uses}` placeholder into the
 `!stslib:ex!` runtime token so players always see the remaining uses without
 sprinkling raw StSLib variables into descriptions.
 
+### Custom card types
+
+Use :class:`modules.basemod_wrapper.card_types.CardType` when you want to expand
+``AbstractCard.CardType`` beyond the built-in Attack/Skill/Power trio. Declaring
+a subclass automatically registers the new enum value, exposes a banner
+descriptor and ensures the generated enum patch is written during
+``compileandbundle``:
+
+```python
+from modules.basemod_wrapper.card_types import CardType
+
+
+class Technique(CardType):
+    mod_id = "revenant"
+    identifier = "TECHNIQUE"
+    display_name = "Technique"
+    base_type = "SKILL"
+```
+
+The ``base_type`` attribute keeps gameplay validation consistent with an
+existing category (for example skills must still declare a primary effect).
+Once a type is declared you can reference it from ``SimpleCardBlueprint`` via
+either the identifier or the display name:
+
+```python
+combo = SimpleCardBlueprint(
+    identifier="RevenantTechnique",
+    title="Soul Technique",
+    description="Gain {block} Block and apply {secondary} Weak.",
+    cost=1,
+    card_type="Technique",
+    target="enemy",
+    rarity="rare",
+    effect="block",
+    value=8,
+    secondary_value=2,
+)
+```
+
+Generated cards automatically advertise the descriptor in the banner (for
+example ``Skill | Technique``) and runtime code can compare
+``card.type == <YourModule>.CardType.TECHNIQUE`` after the enum patch has been
+compiled.
+
+Plugins are notified whenever a card type is registered or removed via the
+``on_card_type_registered`` and ``on_card_type_unregistered`` broadcasts. Both
+hooks receive the :class:`CardTypeRecord` and the active registry so tooling can
+mirror the available metadata. Projects can introspect their configured card
+types through :attr:`modules.basemod_wrapper.project.ModProject.card_type_records`,
+which returns an immutable mapping of identifiers to records.
+
 #### Inner art automation
 
 Calling `innerCardImage(...)` prompts the wrapper to clone and build the

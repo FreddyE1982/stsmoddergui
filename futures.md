@@ -178,6 +178,19 @@
   manifest/telemetry systems so plugins can detect the override, and document
   the flag in the simple card how-to with a reminder that production builds
   should leave `playtest` disabled.
+- [todo] **Custom card type UI integration** – Teach the card type registry to
+  surface banner text and compendium metadata so non-standard types no longer
+  fall back to the BaseMod "??" label. Usage: extend
+  `modules.basemod_wrapper.card_types.CardType` with optional tooltip strings,
+  emit a patch that overrides `AbstractCard.getCardTypeString`, and make sure
+  the information is available to plugins via `PLUGIN_MANAGER` so tooling can
+  render custom type filters inside deck builders.
+- [todo] **Card type asset scaffolding** – Allow mod authors to associate
+  banner textures and frame overlays with custom card types without leaving the
+  Python toolchain. Usage: extend `CardType` to accept optional art descriptors,
+  teach the bundler to emit placeholder textures when none are provided, and
+  broadcast the resolved asset paths so plugins can preview custom frames inside
+  card editors.
 - [todo] **Keyword timeline hooks** – Expand the newly introduced `Keyword`
   scheduler so keywords can subscribe to additional combat lifecycle events
   (enemy intent changes, card draws, shuffles). Usage: expose optional

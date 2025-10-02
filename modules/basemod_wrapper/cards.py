@@ -13,6 +13,7 @@ from plugins import PLUGIN_MANAGER
 
 from .loader import BaseModBootstrapError
 from .card_assets import InnerCardImageResult, prepare_inner_card_image, validate_inner_card_image
+from .card_types import CARD_TYPE_REGISTRY, CardTypeRecord
 
 if TYPE_CHECKING:  # pragma: no cover - typing helper
     from .project import ModProject
@@ -209,6 +210,27 @@ def _coerce_mapping(value: str, mapping: Mapping[str, str], label: str) -> str:
     if candidate in mapping.values():
         return candidate
     raise BaseModBootstrapError(f"Unknown {label} '{value}'.")
+
+
+def _resolve_card_type(value: object) -> Tuple[str, Optional[CardTypeRecord]]:
+    record = CARD_TYPE_REGISTRY.resolve(value)
+    if record is not None:
+        return record.identifier, record
+    if isinstance(value, str):
+        key = _normalise(value)
+        if key in _TYPE_ALIASES:
+            return _TYPE_ALIASES[key], None
+        candidate = value.strip().upper()
+        if candidate in _TYPE_ALIASES.values():
+            return candidate, None
+    else:
+        candidate = str(value).strip().upper()
+        if candidate in _TYPE_ALIASES.values():
+            return candidate, None
+        key = _normalise(str(value))
+        if key in _TYPE_ALIASES:
+            return _TYPE_ALIASES[key], None
+    raise BaseModBootstrapError(f"Unknown card type '{value}'.")
 
 
 def _resolve_enum(container: object, name: str, label: str) -> object:
@@ -603,13 +625,22 @@ class SimpleCardBlueprint:
     _normalised_localizations: Mapping[str, CardLocalizationEntry] = field(
         default_factory=dict, init=False, repr=False
     )
+    _card_type_record: Optional[CardTypeRecord] = field(default=None, init=False, repr=False)
+    _base_card_type: str = field(default="ATTACK", init=False, repr=False)
+    _card_type_descriptor: Optional[str] = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "identifier", self.identifier)
-        object.__setattr__(self, "card_type", _coerce_mapping(self.card_type, _TYPE_ALIASES, "card type"))
+        resolved_card_type, record = _resolve_card_type(self.card_type)
+        object.__setattr__(self, "card_type", resolved_card_type)
+        base_card_type = record.base_type if record is not None else resolved_card_type
+        object.__setattr__(self, "_card_type_record", record)
+        object.__setattr__(self, "_base_card_type", base_card_type)
+        descriptor = record.descriptor() if record is not None else None
+        object.__setattr__(self, "_card_type_descriptor", descriptor)
         object.__setattr__(self, "target", _coerce_mapping(self.target, _TARGET_ALIASES, "card target"))
         object.__setattr__(self, "rarity", _coerce_mapping(self.rarity, _RARITY_ALIASES, "card rarity"))
-        if self.card_type != "ATTACK":
+        if self._base_card_type != "ATTACK":
             if not self.effect:
                 raise BaseModBootstrapError("Skill and power cards must declare an effect keyword.")
             normalised = _normalise(self.effect)
@@ -744,7 +775,7 @@ class SimpleCardBlueprint:
         )
 
         resolved_effects: List[EffectSpec] = []
-        if self.card_type != "ATTACK" and self.effect:
+        if self._base_card_type != "ATTACK" and self.effect:
             primary_field = _EFFECT_VALUE_FIELD[self.effect]
             resolved_effects.append(
                 _normalise_effect_descriptor(
@@ -787,11 +818,23 @@ class SimpleCardBlueprint:
 
     @property
     def value_field(self) -> str:
-        if self.card_type == "ATTACK":
+        if self._base_card_type == "ATTACK":
             return "damage"
         if not self.effect:
             return "magic"
         return _EFFECT_VALUE_FIELD[self.effect]
+
+    @property
+    def base_card_type(self) -> str:
+        return self._base_card_type
+
+    @property
+    def card_type_descriptor(self) -> Optional[str]:
+        return self._card_type_descriptor
+
+    @property
+    def card_type_record(self) -> Optional[CardTypeRecord]:
+        return self._card_type_record
 
     def innerCardImage(self, path: str) -> "SimpleCardBlueprint":
         resolved = validate_inner_card_image(Path(path))
@@ -884,7 +927,7 @@ class SimpleCardFactory:
         card_target = _resolve_enum(CardTarget, blueprint.target, "card target")
         card_rarity = _resolve_enum(CardRarity, blueprint.rarity, "card rarity")
 
-        if blueprint.card_type == "ATTACK" and blueprint.target not in {"ENEMY", "ALL_ENEMY"}:
+        if blueprint.base_card_type == "ATTACK" and blueprint.target not in {"ENEMY", "ALL_ENEMY"}:
             raise BaseModBootstrapError("Attack cards must target ENEMY or ALL_ENEMY when using the simple factory.")
         if blueprint.effect in _SELF_EFFECTS and blueprint.target not in {"SELF", "SELF_AND_ENEMY", "ALL"}:
             raise BaseModBootstrapError(
@@ -930,6 +973,7 @@ class SimpleCardFactory:
                 )
                 self._simple_blueprint = blueprint
                 self.simple_color = color
+                self._card_type_descriptor_value = blueprint.card_type_descriptor
                 if value_field == "damage":
                     self.baseDamage = blueprint.value
                     self.damage = blueprint.value
@@ -971,7 +1015,7 @@ class SimpleCardFactory:
                 self.initializeDescription()
 
             def use(self, player: object, monster: Optional[object]) -> None:
-                if blueprint.card_type == "ATTACK":
+                if blueprint.base_card_type == "ATTACK":
                     _play_attack(self, player, monster, blueprint, attack_effect)
                     if blueprint._resolved_effects:
                         _execute_effect_sequence(
@@ -982,6 +1026,20 @@ class SimpleCardFactory:
                         self, player, monster, blueprint, blueprint._resolved_effects
                     )
                 _keyword_registry().trigger(self, player, monster)
+
+            def getCardDescriptors(self):
+                try:
+                    base_descriptors = super().getCardDescriptors()
+                except AttributeError:
+                    base_descriptors = None
+                if base_descriptors is None:
+                    descriptors: List[str] = []
+                else:
+                    descriptors = list(base_descriptors)
+                descriptor = getattr(self, "_card_type_descriptor_value", None)
+                if descriptor and descriptor not in descriptors:
+                    descriptors.append(descriptor)
+                return descriptors
 
             def upgrade(self) -> None:
                 if not self.upgraded:

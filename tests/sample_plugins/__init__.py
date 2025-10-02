@@ -2,5 +2,6 @@
 
 __all__ = [
     "plugin_alpha",
+    "card_type_listener",
     "nested",
 ]

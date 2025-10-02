@@ -11,6 +11,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from modules.basemod_wrapper import cards as cards_module
+from modules.basemod_wrapper import card_types as card_types_module
 from modules.basemod_wrapper import relics as relics_module
 from modules.basemod_wrapper import keywords as keywords_module
 from modules.basemod_wrapper import project as project_module
@@ -246,6 +247,7 @@ def stubbed_runtime(monkeypatch, use_real_dependencies: bool):
     monkeypatch.setattr(cards_module, "_cardcrawl", lambda: cardcrawl_stub)
     monkeypatch.setattr(cards_module, "_basemod", lambda: basemod_stub)
     monkeypatch.setattr(cards_module, "_spire", lambda: spire_stub)
+    monkeypatch.setattr(card_types_module, "_cardcrawl", lambda: cardcrawl_stub)
     monkeypatch.setattr(relics_module, "_cardcrawl", lambda: cardcrawl_stub)
     monkeypatch.setattr(relics_module, "_basemod", lambda: basemod_stub)
     relics_module._custom_relic_base.cache_clear()
