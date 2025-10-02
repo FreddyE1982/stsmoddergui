@@ -11,6 +11,7 @@ from modules.basemod_wrapper import (
     create_project,
     spire,
 )
+from modules.basemod_wrapper.cards import SimpleCardBlueprint
 
 
 @pytest.mark.requires_desktop_jar
@@ -78,6 +79,11 @@ def test_compile_and_bundle_with_stslib(tmp_path, desktop_jar_path):
     with zipfile.ZipFile(patch_jar) as archive:
         assert "buddy/patches/BuddyEnums.class" in archive.namelist()
 
+    manifest_path = output_root / "BuddyMod.yaml"
+    assert manifest_path.exists()
+    manifest_text = manifest_path.read_text(encoding="utf8")
+    assert "Localization manifest" in manifest_text
+
 
 @pytest.mark.requires_desktop_jar
 def test_compile_and_bundle_without_stslib(tmp_path, desktop_jar_path):
@@ -115,6 +121,118 @@ def test_compile_and_bundle_without_stslib(tmp_path, desktop_jar_path):
     manifest = json.loads((output_root / "ModTheSpire.json").read_text(encoding="utf8"))
     assert manifest["dependencies"] == ["basemod"]
     assert (output_root / f"{mod_id}_patches.jar").exists()
+
+    manifest_path = output_root / "VanillaMod.yaml"
+    assert manifest_path.exists()
+
+
+@pytest.mark.requires_desktop_jar
+def test_localization_manifest_applies_translations(tmp_path, desktop_jar_path):
+    if desktop_jar_path is None:
+        pytest.skip("desktop-1.0.jar is required to compile enum patches")
+
+    mod_id = "locbuddy"
+    project = create_project(mod_id, "Loc Buddy", "Translator", "Manifest merge check")
+    layout = project.scaffold(tmp_path, package_name="loc_mod")
+
+    texture_names = [
+        "attack.png",
+        "skill.png",
+        "power.png",
+        "orb.png",
+        "attack_small.png",
+        "skill_small.png",
+        "power_small.png",
+        "orb_small.png",
+    ]
+    for name in texture_names:
+        (layout.images_root / name).write_text("texture", encoding="utf8")
+
+    card_image = layout.cards_image_root / "TestCard.png"
+    card_image.write_text("card", encoding="utf8")
+
+    project.define_color(
+        "LOC_BLUE",
+        card_color=(0.2, 0.4, 0.9, 1.0),
+        trail_color=(0.1, 0.3, 0.7, 1.0),
+        slash_color=(0.6, 0.6, 1.0, 1.0),
+        attack_bg=project.resource_path("images/attack.png"),
+        skill_bg=project.resource_path("images/skill.png"),
+        power_bg=project.resource_path("images/power.png"),
+        orb=project.resource_path("images/orb.png"),
+        attack_bg_small=project.resource_path("images/attack_small.png"),
+        skill_bg_small=project.resource_path("images/skill_small.png"),
+        power_bg_small=project.resource_path("images/power_small.png"),
+        orb_small=project.resource_path("images/orb_small.png"),
+    )
+
+    blueprint = SimpleCardBlueprint(
+        identifier="TestCard",
+        title="Test Card",
+        description="Deal {damage} damage.",
+        cost=1,
+        card_type="attack",
+        target="enemy",
+        rarity="common",
+        value=8,
+        image=project.resource_path("images/cards/TestCard.png"),
+    )
+    project.add_simple_card(blueprint)
+
+    options = project.bundle_options_from_layout(
+        layout,
+        output_directory=tmp_path / "dist",
+        additional_classpath=[desktop_jar_path],
+    )
+
+    manifest_payload = "\n".join(
+        [
+            '- category: "cards"',
+            '  source: "cards.json"',
+            '  path: "TestCard/DESCRIPTION"',
+            '  identifier: "TestCard"',
+            '  field: "DESCRIPTION"',
+            '  originalLanguage: "eng"',
+            '  originalText: "Deal !D! damage."',
+            '  de: "Füge !D! Schaden zu."',
+            "",
+        ]
+    )
+    manifest_input = layout.resource_root.parent / "LocBuddy.yaml"
+    manifest_input.write_text(manifest_payload, encoding="utf8")
+
+    output_root = project.compile_and_bundle(options)
+
+    manifest_output = output_root / "LocBuddy.yaml"
+    assert manifest_output.exists()
+    manifest_text = manifest_output.read_text(encoding="utf8")
+    assert 'de: "Füge !D! Schaden zu."' in manifest_text
+
+    eng_cards = (
+        output_root
+        / "resources"
+        / mod_id
+        / "localizations"
+        / "eng"
+        / "cards.json"
+    )
+    de_cards = (
+        output_root
+        / "resources"
+        / mod_id
+        / "localizations"
+        / "de"
+        / "cards.json"
+    )
+
+    assert eng_cards.exists()
+    assert de_cards.exists()
+
+    eng_data = json.loads(eng_cards.read_text(encoding="utf8"))
+    de_data = json.loads(de_cards.read_text(encoding="utf8"))
+
+    assert eng_data["TestCard"]["DESCRIPTION"] == "Deal !D! damage."
+    assert de_data["TestCard"]["DESCRIPTION"] == "Füge !D! Schaden zu."
 
 
 def test_unified_spire_actions_and_keywords():
