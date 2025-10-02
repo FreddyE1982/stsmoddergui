@@ -37,6 +37,9 @@ __all__ = [
     "WarpMegaStance",
     "BurstMegaStance",
     "ArmorDigieggStance",
+    "JogressFusionStance",
+    "OmnimonFusionStance",
+    "ImperialdramonPaladinModeStance",
 ]
 
 _DEFERRED_EXPORTS = {
@@ -47,6 +50,9 @@ _DEFERRED_EXPORTS = {
     "WarpMegaStance": "mods.digitalesmonster.stances.mega",
     "BurstMegaStance": "mods.digitalesmonster.stances.mega",
     "ArmorDigieggStance": "mods.digitalesmonster.stances.armor",
+    "JogressFusionStance": "mods.digitalesmonster.stances.fusion",
+    "OmnimonFusionStance": "mods.digitalesmonster.stances.fusion",
+    "ImperialdramonPaladinModeStance": "mods.digitalesmonster.stances.fusion",
 }
 
 

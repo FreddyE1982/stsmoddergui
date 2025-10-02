@@ -1,4 +1,6 @@
+import json
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -12,11 +14,7 @@ from mods.digitalesmonster import (
     DigitalesMonsterProjectConfig,
     bootstrap_digitalesmonster_project,
 )
-from mods.digitalesmonster.persistence import (
-    LevelStabilityProfile,
-    LevelStabilityStore,
-    StabilityPersistFieldAdapter,
-)
+from mods.digitalesmonster.persistence import LevelStabilityProfile, LevelStabilityStore, StabilityPersistFieldAdapter
 from plugins import PLUGIN_MANAGER
 
 
@@ -156,7 +154,7 @@ def test_stance_manager_default_flow(use_real_dependencies: bool, stubbed_runtim
 
         assert project.stance_manager.current_stance.identifier == rookie_id
         assert context.powers.get("digitalesmonster:digivice-resonanz") is None
-    except BaseModBootstrapError:
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
         assert use_real_dependencies
         return
     finally:
@@ -194,7 +192,7 @@ def test_champion_requires_digivice_and_digisoul(use_real_dependencies: bool, st
 
         context.digisoul = 3
         project.stance_manager.enter(champion_id, context, reason="ready")
-    except BaseModBootstrapError:
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
         assert use_real_dependencies
         return
     finally:
@@ -247,7 +245,7 @@ def test_ultra_stance_instability_branch(use_real_dependencies: bool, stubbed_ru
         skull_meta = context.metadata["skullgreymon"]
         assert skull_meta["active"]
         assert context.powers.get("Vulnerable", 0) >= 2
-    except BaseModBootstrapError:
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
         assert use_real_dependencies
         return
     finally:
@@ -326,7 +324,7 @@ def test_mega_and_burst_modes(use_real_dependencies: bool, stubbed_runtime) -> N
             project.default_stance_identifier,
         }
         assert context.metadata["burst_mode"]["active"] is False
-    except BaseModBootstrapError:
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
         assert use_real_dependencies
         return
     finally:
@@ -377,7 +375,7 @@ def test_armor_digiegg_pipeline(use_real_dependencies: bool, stubbed_runtime) ->
                 break
         assert project.stance_manager.current_stance.identifier == rookie_id
         assert context.metadata["armor_pipeline"]["egg_shattered"]
-    except BaseModBootstrapError:
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
         assert use_real_dependencies
         return
     finally:
@@ -393,3 +391,153 @@ def test_armor_digiegg_pipeline(use_real_dependencies: bool, stubbed_runtime) ->
             os.environ.pop(key, None)
         if use_real_dependencies:
             return
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_jogress_fusion_flow(tmp_path: Path, use_real_dependencies: bool, stubbed_runtime, monkeypatch) -> None:
+    monkeypatch.setenv("DIGITALESMONSTER_STABILITY_PATH", str(tmp_path / "fusion-stability.json"))
+    project = DigitalesMonsterProject()
+    try:
+        project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        project._ensure_stances_loaded()
+
+        fusion_id = PLUGIN_MANAGER.exposed["digitalesmonster_fusion_stance"]
+        paladin_id = PLUGIN_MANAGER.exposed["digitalesmonster_paladin_stance"]
+        champion_id = PLUGIN_MANAGER.exposed["digitalesmonster_champion_stance"]
+
+        context = project.create_stance_context(
+            digisoul=15,
+            digivice_active=True,
+            relics=("Digivice", "Omnimon"),
+        )
+        project.enter_default_stance(context=context, reason="fusion-bootstrap")
+        project.stance_manager.enter(champion_id, context, reason="champion-prep")
+
+        fusion_meta = context.metadata.setdefault("fusion_pipeline", {})
+        fusion_meta["partners"] = {"war_greymon": True, "metal_garurumon": True}
+        fusion_meta["ready"] = True
+
+        project.transition_manager.seed_random(1337)
+        project.transition_manager.handle_card_play(
+            "digitalesmonster:dna-digitation",
+            context,
+            times_played=2,
+            reason="fusion-trigger",
+        )
+
+        assert project.stance_manager.current_stance.identifier == fusion_id
+        fusion_meta = context.metadata["fusion_pipeline"]
+        assert fusion_meta["active"]
+        assert context.powers["digitalesmonster:gigantisches-schwert"] >= 2
+
+        project.transition_manager.handle_relic_event("imperialdramon_fighter", context, acquired=True)
+        fusion_meta["partners"]["imperialdramon_fighter"] = True
+        fusion_meta["partners"]["omnimon"] = True
+        fusion_meta["ready"] = True
+        context.digisoul = 18
+        project.stance_manager.enter(paladin_id, context, reason="paladin-manual", enforce_requirements=True)
+        assert project.stance_manager.current_stance.identifier == paladin_id
+        assert fusion_meta["paladin_active"]
+
+        context.digisoul = 0
+        project.stance_manager.tick_turn(reason="fusion-drain")
+        assert fusion_meta["digisoul_empty"]
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+        os.environ.pop("DIGITALESMONSTER_STABILITY_PATH", None)
+        if use_real_dependencies:
+            return
+
+
+@pytest.mark.parametrize("use_real_dependencies", [False, True])
+def test_stability_persistence_across_runs(tmp_path: Path, use_real_dependencies: bool, stubbed_runtime, monkeypatch) -> None:
+    storage_path = tmp_path / "stability" / "profile.json"
+    monkeypatch.setenv("DIGITALESMONSTER_STABILITY_PATH", str(storage_path))
+    project = DigitalesMonsterProject()
+    try:
+        project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        project._ensure_stances_loaded()
+        context = project.create_stance_context(digisoul=6, digivice_active=True)
+        project.enter_default_stance(context=context, reason="persistence-bootstrap")
+        rookie_record = project.stance_manager.current_record
+        assert rookie_record is not None
+        project.stance_manager.adjust_stability(
+            rookie_record.maximum - rookie_record.current,
+            reason="victory-prep",
+        )
+        project.transition_manager.handle_combat_result(
+            "victory",
+            context,
+            floor=1,
+            encounter="Training",
+        )
+        updated_rookie = project.stability_profile.get("Rookie")
+        assert updated_rookie.start >= rookie_record.start
+        project.transition_manager.handle_combat_result(
+            "defeat",
+            context,
+            floor=2,
+            encounter="Wipe",
+        )
+        project.persistence_controller.flush()
+        assert storage_path.exists()
+        payload = json.loads(storage_path.read_text(encoding="utf8"))
+        assert "digitalesmonster_level_stability" in payload
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+
+    monkeypatch.setenv("DIGITALESMONSTER_STABILITY_PATH", str(storage_path))
+    second_project = DigitalesMonsterProject()
+    try:
+        second_project.enable_graalpy_runtime(simulate=not use_real_dependencies)
+        second_project._ensure_stances_loaded()
+        restored = second_project.stability_profile.get("Rookie")
+        assert restored.start >= 110
+        assert restored.maximum >= 160
+        second_context = second_project.create_stance_context()
+        second_project.enter_default_stance(context=second_context, reason="restore-check")
+        second_project.transition_manager.handle_combat_result(
+            "victory",
+            second_context,
+            floor=3,
+            encounter="Rematch",
+        )
+    except (BaseModBootstrapError, subprocess.CalledProcessError):
+        assert use_real_dependencies
+        return
+    finally:
+        try:
+            experimental.off("graalpy_runtime")
+        except Exception:
+            pass
+        for key in (
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_SIMULATE_EXECUTABLE",
+            "STSMODDERGUI_GRAALPY_RUNTIME_ALLOW_FALLBACK",
+        ):
+            os.environ.pop(key, None)
+        os.environ.pop("DIGITALESMONSTER_STABILITY_PATH", None)

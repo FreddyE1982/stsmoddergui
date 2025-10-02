@@ -11,9 +11,9 @@ Die folgenden Schritte sind als eigenständige, klar umrissene Aufgaben konzipie
 7. [complete] Ultra-Stance (inkl. SkullGreymon-Abzweig) implementieren: Zusätzliche Modifikatoren, Rückfallpfad und spezielle Debuffs für instabile Digitation ausarbeiten.
 8. [complete] Mega- und Burst-Formen (inkl. Warp-Digitation) als Stances umsetzen: Werte, dauerhafte Buffs und Sonderlogiken (z. B. Burst Mode HP-Modifikatoren) hinterlegen.
 9. [complete] Armor-Stance erstellen: Interaktion mit Digi-Eiern abbilden, alternative Level-Pipeline und Stabilitätsverhalten implementieren.
-10. [todo] Jogress-/Fusion-Stance(s) (Omnimon etc.) implementieren: Zufalls- oder triggerbasierte Aktivierung und Rückkehrbedingungen definieren.
-11. [todo] Level-Übergangsmanager programmieren: Karten-, Relikt- und Kampf-Trigger auswerten, Stabilitätsanpassungen ausführen und Stance-Wechsel koordinieren.
-12. [todo] Stabilitäts-Persistenz verdrahten: Startwert-/Maxwert-Anpassungen bei Sieg/Niederlage erfassen und zwischen Runs speichern.
+10. [complete] Jogress-/Fusion-Stance(s) (Omnimon etc.) implementieren: Zufalls- oder triggerbasierte Aktivierung und Rückkehrbedingungen definieren.
+11. [complete] Level-Übergangsmanager programmieren: Karten-, Relikt- und Kampf-Trigger auswerten, Stabilitätsanpassungen ausführen und Stance-Wechsel koordinieren.
+12. [complete] Stabilitäts-Persistenz verdrahten: Startwert-/Maxwert-Anpassungen bei Sieg/Niederlage erfassen und zwischen Runs speichern.
 13. [todo] Gemeinsamen Kartenpool (levelunabhängige Angriffe/Blocks/Skills/Power) mit vollständigen deutschen Texten und Upgrades anlegen, einschließlich `inner_card_image`-Referenzen.
 14. [todo] Level-spezifische Attack-Karten implementieren: Für jede Digimon-Form passende kanonische Attackennamen und Effekte codieren, Level-Beschränkungen und Upgrades hinzufügen.
 15. [todo] Level-spezifische Skill- und Power-Karten umsetzen: Mechaniken auf Stance-Fähigkeiten abstimmen, Stabilitäts-Interaktion berücksichtigen und Upgrades anbieten.

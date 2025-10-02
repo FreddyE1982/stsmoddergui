@@ -37,7 +37,13 @@ from modules.basemod_wrapper.experimental.graalpy_runtime import GraalPyProvisio
 from modules.basemod_wrapper.loader import BaseModBootstrapError
 from modules.basemod_wrapper.project import ModProject, create_project
 from modules.modbuilder import Character, CharacterColorConfig, CharacterImageConfig, CharacterStartConfig, Deck
-from mods.digitalesmonster.persistence import LevelStabilityProfile
+from mods.digitalesmonster.level_manager import LevelTransitionManager
+from mods.digitalesmonster.persistence import (
+    LevelStabilityProfile,
+    LevelStabilityStore,
+    StabilityPersistenceController,
+    StabilityPersistenceRules,
+)
 from mods.digitalesmonster.stances.base import (
     DigimonStanceContext,
     DigimonStanceManager,
@@ -147,6 +153,11 @@ class DigitalesMonsterProject:
     stance_manager: DigimonStanceManager = field(init=False)
     default_stance_identifier: str = field(init=False)
     stance_runtime_ready: bool = field(init=False, default=False)
+    transition_manager: LevelTransitionManager = field(init=False)
+    stability_store: LevelStabilityStore = field(init=False)
+    persistence_controller: StabilityPersistenceController = field(init=False)
+    persistence_rules: StabilityPersistenceRules = field(init=False)
+    default_triggers_registered: bool = field(init=False, default=False)
 
     def __post_init__(self) -> None:
         self._project = create_project(
@@ -190,6 +201,10 @@ class DigitalesMonsterProject:
         self.expose("digitalesmonster_default_stance", self.default_stance_identifier)
         self.expose("digitalesmonster_champion_stance", DEFAULT_CHAMPION_IDENTIFIER)
         self.expose("digitalesmonster_stance_runtime_ready", self.stance_runtime_ready)
+        self.expose("digitalesmonster_level_transition_manager", self.transition_manager)
+        self.expose("digitalesmonster_stability_store", self.stability_store)
+        self.expose("digitalesmonster_stability_persistence", self.persistence_controller)
+        self.expose("digitalesmonster_stability_rules", self.persistence_rules)
 
     def enable_graalpy_runtime(
         self,
@@ -336,6 +351,15 @@ class DigitalesMonsterProject:
         self.default_stance_identifier = DEFAULT_ROOKIE_IDENTIFIER
         self.stance_manager.fallback_identifier = DEFAULT_ROOKIE_IDENTIFIER
         self.stance_runtime_ready = False
+        self.persistence_rules = StabilityPersistenceRules()
+        self.stability_store = LevelStabilityStore(self._resolve_stability_path())
+        self.persistence_controller = StabilityPersistenceController(
+            self.stability_profile,
+            self.stability_store,
+            rules=self.persistence_rules,
+        )
+        self.transition_manager = LevelTransitionManager(self.stance_manager, self.stability_profile)
+        self.transition_manager.bind_persistence(self.persistence_controller)
 
     def _ensure_stances_loaded(self) -> None:
         if self.stance_runtime_ready:
@@ -346,8 +370,10 @@ class DigitalesMonsterProject:
                 BurstMegaStance,
                 DigiviceChampionStance,
                 DigiviceUltraStance,
+                ImperialdramonPaladinModeStance,
                 NaturalRookieStance,
                 SkullGreymonInstabilityStance,
+                OmnimonFusionStance,
                 WarpMegaStance,
             )
 
@@ -359,9 +385,12 @@ class DigitalesMonsterProject:
                 WarpMegaStance,
                 BurstMegaStance,
                 ArmorDigieggStance,
+                OmnimonFusionStance,
+                ImperialdramonPaladinModeStance,
             ):
                 self.stance_manager.prepare_stance(stance_cls)
 
+            self.persistence_controller.synchronise_profile()
             self.default_stance_identifier = NaturalRookieStance.identifier
             self.stance_manager.fallback_identifier = NaturalRookieStance.identifier
             self.stance_runtime_ready = True
@@ -374,10 +403,23 @@ class DigitalesMonsterProject:
             self.expose("digitalesmonster_mega_stance", WarpMegaStance.identifier)
             self.expose("digitalesmonster_burst_stance", BurstMegaStance.identifier)
             self.expose("digitalesmonster_armor_stance", ArmorDigieggStance.identifier)
+            self.expose("digitalesmonster_fusion_stance", OmnimonFusionStance.identifier)
+            self.expose("digitalesmonster_paladin_stance", ImperialdramonPaladinModeStance.identifier)
+            if not self.default_triggers_registered:
+                self.transition_manager.register_default_triggers(
+                    fusion_identifier=OmnimonFusionStance.identifier
+                )
+                self.default_triggers_registered = True
         except BaseModBootstrapError as exc:
             raise BaseModBootstrapError(
                 "GraalPy-Stance-Laufzeit nicht verfügbar. Aktivieren Sie graalpy_runtime vor dem Stance-Wechsel."
             ) from exc
+
+    def _resolve_stability_path(self) -> Path:
+        override = os.environ.get("DIGITALESMONSTER_STABILITY_PATH")
+        if override:
+            return Path(override).expanduser()
+        return Path.cwd() / ".digitalesmonster" / "stability.json"
 
 
 def bootstrap_digitalesmonster_project(
