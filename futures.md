@@ -274,3 +274,10 @@
   profiles. Usage: expose `python -m mods.digitalesmonster.persistence audit` which loads the current
   profile, validates ranges against project defaults, and provides plugin hooks so balancing tools can
   veto runs when values fall outside expected ranges.
+- [todo] **Jogress partner manifest** – Extend the new level transition manager so fusion partners are
+  described in declarative JSON manifests. Usage: load manifests on project bootstrap, map partner IDs to
+  cards/relics, and allow plugins to register additional partner pairs for future Jogress stances without
+  modifying core code.
+- [todo] **Stability progression dashboard** – Surface the persisted stability deltas in a rich analytics
+  overlay or CLI report. Usage: build atop `StabilityPersistenceController` to visualise per-level start/
+  max history, highlight defeat penalties and let designers fine-tune the progression constants.

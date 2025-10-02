@@ -20,6 +20,8 @@ __all__ = [
     "LevelStabilityProfile",
     "LevelStabilityStore",
     "StabilityPersistFieldAdapter",
+    "StabilityPersistenceRules",
+    "StabilityPersistenceController",
     "LEVEL_STABILITY_PERSIST_KEY",
 ]
 
@@ -213,9 +215,128 @@ class StabilityPersistFieldAdapter:
                 )
 
 
+@dataclass(frozen=True)
+class StabilityPersistenceRules:
+    """Konfigurierbare Regeln für Stabilitäts-Persistenz."""
+
+    victory_start_bonus: int = 4
+    victory_max_bonus: int = 2
+    victory_cap: int = 200
+    victory_threshold: int = 5
+    defeat_start_penalty: int = 6
+    defeat_max_penalty: int = 0
+    minimum_start: int = 8
+    defeat_floor: int = 5
+    save_on_result: bool = True
+
+
+class StabilityPersistenceController:
+    """Kapselt Lade-/Speicherlogik für Stabilitätsprofile."""
+
+    def __init__(
+        self,
+        profile: LevelStabilityProfile,
+        store: LevelStabilityStore,
+        *,
+        rules: Optional[StabilityPersistenceRules] = None,
+    ) -> None:
+        self.profile = profile
+        self.store = store
+        self.rules = rules or StabilityPersistenceRules()
+        self._persisted = store.load()
+        self._dirty = False
+        self._initialised = False
+
+    def synchronise_profile(self) -> None:
+        """Merge persisted Werte in das laufende Profil."""
+
+        for record in self._persisted.records():
+            if record.level in self.profile._records:
+                self.profile.update_level(
+                    record.level,
+                    start=record.start,
+                    maximum=record.maximum,
+                    current=record.current,
+                )
+            else:
+                self.profile.register_level(
+                    record.level,
+                    start=record.start,
+                    maximum=record.maximum,
+                    current=record.current,
+                )
+        self._initialised = True
+
+    def record_result(
+        self,
+        result: str,
+        *,
+        context,
+        stance_manager,
+    ) -> None:
+        """Persistiert Änderungen abhängig vom Kampfergebnis."""
+
+        if not self._initialised:
+            self.synchronise_profile()
+        normalized = result.lower().strip()
+        if normalized == "victory":
+            self._apply_victory_rules()
+        elif normalized == "defeat":
+            self._apply_defeat_rules(stance_manager)
+        else:
+            return
+        self._dirty = True
+        if self.rules.save_on_result:
+            self.flush()
+
+    def _apply_victory_rules(self) -> None:
+        for record in self.profile.records():
+            if record.maximum - record.current > self.rules.victory_threshold:
+                continue
+            new_start = min(record.maximum, record.start + self.rules.victory_start_bonus)
+            new_max = min(self.rules.victory_cap, record.maximum + self.rules.victory_max_bonus)
+            new_current = max(new_start, record.current)
+            self.profile.update_level(
+                record.level,
+                start=new_start,
+                maximum=new_max,
+                current=new_current,
+            )
+
+    def _apply_defeat_rules(self, stance_manager) -> None:
+        level_identifier: Optional[str] = None
+        if stance_manager.current_stance is not None:
+            level_identifier = stance_manager.current_stance.stability.level
+        elif stance_manager.current_record is not None:
+            level_identifier = stance_manager.current_record.level
+        if not level_identifier:
+            return
+        try:
+            record = self.profile.get(level_identifier)
+        except KeyError:
+            return
+        new_start = max(self.rules.minimum_start, record.start - self.rules.defeat_start_penalty)
+        new_max = max(new_start, record.maximum - self.rules.defeat_max_penalty)
+        new_current = max(self.rules.defeat_floor, min(record.current, new_max))
+        self.profile.update_level(
+            level_identifier,
+            start=new_start,
+            maximum=new_max,
+            current=new_current,
+        )
+
+    def flush(self) -> None:
+        if not self._dirty:
+            return
+        self.store.save(self.profile)
+        self._dirty = False
+
+
 PLUGIN_MANAGER.expose("LevelStabilityRecord", LevelStabilityRecord)
 PLUGIN_MANAGER.expose("LevelStabilityProfile", LevelStabilityProfile)
 PLUGIN_MANAGER.expose("LevelStabilityStore", LevelStabilityStore)
 PLUGIN_MANAGER.expose("StabilityPersistFieldAdapter", StabilityPersistFieldAdapter)
+PLUGIN_MANAGER.expose("StabilityPersistenceController", StabilityPersistenceController)
+PLUGIN_MANAGER.expose("StabilityPersistenceRules", StabilityPersistenceRules)
 PLUGIN_MANAGER.expose("digitalesmonster_level_stability_key", LEVEL_STABILITY_PERSIST_KEY)
 PLUGIN_MANAGER.expose_module("mods.digitalesmonster.persistence", alias="digitalesmonster_persistence")

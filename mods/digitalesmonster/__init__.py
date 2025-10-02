@@ -48,6 +48,9 @@ __all__ = [
     "WarpMegaStance",
     "BurstMegaStance",
     "ArmorDigieggStance",
+    "JogressFusionStance",
+    "OmnimonFusionStance",
+    "ImperialdramonPaladinModeStance",
 ]
 
 _STANCE_EXPORTS = {
@@ -69,6 +72,9 @@ _STANCE_EXPORTS = {
     "WarpMegaStance": "mods.digitalesmonster.stances",
     "BurstMegaStance": "mods.digitalesmonster.stances",
     "ArmorDigieggStance": "mods.digitalesmonster.stances",
+    "JogressFusionStance": "mods.digitalesmonster.stances",
+    "OmnimonFusionStance": "mods.digitalesmonster.stances",
+    "ImperialdramonPaladinModeStance": "mods.digitalesmonster.stances",
 }
 
 
