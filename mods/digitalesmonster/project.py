@@ -34,8 +34,15 @@ from typing import Dict, Iterable, Mapping, Optional, Sequence
 
 from modules.basemod_wrapper import experimental
 from modules.basemod_wrapper.experimental.graalpy_runtime import GraalPyProvisioningState
+from modules.basemod_wrapper.loader import BaseModBootstrapError
 from modules.basemod_wrapper.project import ModProject, create_project
 from modules.modbuilder import Character, CharacterColorConfig, CharacterImageConfig, CharacterStartConfig, Deck
+from mods.digitalesmonster.persistence import LevelStabilityProfile
+from mods.digitalesmonster.stances.base import (
+    DigimonStanceContext,
+    DigimonStanceManager,
+    StanceTransition,
+)
 from plugins import PLUGIN_MANAGER
 
 __all__ = [
@@ -45,6 +52,17 @@ __all__ = [
     "DigitalesMonsterCharacter",
     "bootstrap_digitalesmonster_project",
 ]
+
+
+DEFAULT_ROOKIE_IDENTIFIER = "digitalesmonster:natural_rookie"
+DEFAULT_CHAMPION_IDENTIFIER = "digitalesmonster:digivice_champion"
+DEFAULT_ROOKIE_STATS = {
+    "hp": 70,
+    "max_hp": 70,
+    "block": 4,
+    "strength": 1,
+    "dexterity": 1,
+}
 
 
 @dataclass(slots=True)
@@ -80,13 +98,19 @@ class DigitalesMonsterCharacter(Character):
             "Agumons Evolutionslinien treffen auf Stabilitäts- und DigiSoul-Mechaniken."
         )
         self.version = "0.1.0"
-        self.start = CharacterStartConfig(hp=70, max_hp=70, gold=99, deck=DigitalesMonsterDeck)
+        self.start = CharacterStartConfig(
+            hp=DEFAULT_ROOKIE_STATS["hp"],
+            max_hp=DEFAULT_ROOKIE_STATS["max_hp"],
+            gold=99,
+            deck=DigitalesMonsterDeck,
+        )
         self.loadout_description = (
             "Beginnt als natürliches Rookie-Level mit Fokus auf Stabilität und DigiSoul-Aufbau."
         )
         self.energyPerTurn = 3
         self.handSize = 5
         self.orbSlots = 0
+        self.starting_stance_identifier = DEFAULT_ROOKIE_IDENTIFIER
         self.color = CharacterColorConfig(
             identifier="DIGITALESMONSTER_ORANGE",
             card_color=(0.95, 0.58, 0.18, 1.0),
@@ -119,6 +143,10 @@ class DigitalesMonsterProject:
     _project: ModProject = field(init=False)
     _graalpy_state: Optional[GraalPyProvisioningState] = field(init=False, default=None)
     _plugin_exports: Dict[str, object] = field(init=False, default_factory=dict)
+    stability_profile: LevelStabilityProfile = field(init=False)
+    stance_manager: DigimonStanceManager = field(init=False)
+    default_stance_identifier: str = field(init=False)
+    stance_runtime_ready: bool = field(init=False, default=False)
 
     def __post_init__(self) -> None:
         self._project = create_project(
@@ -128,6 +156,7 @@ class DigitalesMonsterProject:
             self.config.description,
             version=self.config.version,
         )
+        self._initialise_stances()
         if self.auto_expose:
             self._expose_to_plugins()
 
@@ -156,6 +185,11 @@ class DigitalesMonsterProject:
         self.expose("digitalesmonster_project_metadata", self.config)
         self.expose("digitalesmonster_mod_project", self._project)
         self.expose("digitalesmonster_project_builder", self)
+        self.expose("digitalesmonster_stability_profile", self.stability_profile)
+        self.expose("digitalesmonster_stance_manager", self.stance_manager)
+        self.expose("digitalesmonster_default_stance", self.default_stance_identifier)
+        self.expose("digitalesmonster_champion_stance", DEFAULT_CHAMPION_IDENTIFIER)
+        self.expose("digitalesmonster_stance_runtime_ready", self.stance_runtime_ready)
 
     def enable_graalpy_runtime(
         self,
@@ -212,6 +246,48 @@ class DigitalesMonsterProject:
 
         return experimental.is_active("graalpy_runtime")
 
+    def create_stance_context(
+        self,
+        *,
+        player_hp: Optional[int] = None,
+        player_max_hp: Optional[int] = None,
+        block: int = 0,
+        strength: int = 0,
+        dexterity: int = 0,
+        relics: Sequence[str] = (),
+        digisoul: int = 0,
+        digivice_active: bool = False,
+    ) -> DigimonStanceContext:
+        stats = DEFAULT_ROOKIE_STATS
+        context = self.stance_manager.create_context(
+            player_hp=player_hp if player_hp is not None else stats["hp"],
+            player_max_hp=player_max_hp if player_max_hp is not None else stats["max_hp"],
+            block=block or stats["block"],
+            strength=strength or stats["strength"],
+            dexterity=dexterity or stats["dexterity"],
+            relics=relics,
+            digisoul=digisoul,
+            digivice_active=digivice_active,
+        )
+        self.expose("digitalesmonster_active_stance_context", context)
+        return context
+
+    def enter_default_stance(
+        self,
+        context: Optional[DigimonStanceContext] = None,
+        *,
+        reason: str = "bootstrap",
+    ) -> StanceTransition:
+        self._ensure_stances_loaded()
+        context = context or self.create_stance_context()
+        transition = self.stance_manager.enter(
+            self.default_stance_identifier,
+            context,
+            reason=reason,
+            enforce_requirements=False,
+        )
+        return transition
+
     def configure_character_assets(self, character: Optional[DigitalesMonsterCharacter] = None) -> None:
         """Register the current colour definition and placeholder assets."""
 
@@ -250,6 +326,34 @@ class DigitalesMonsterProject:
         )
         self.expose("digitalesmonster_character_color", color)
         self.expose("digitalesmonster_character_image", character.image)
+
+    def _initialise_stances(self) -> None:
+        self.stability_profile = LevelStabilityProfile()
+        self.stance_manager = DigimonStanceManager(
+            self.stability_profile,
+            fallback_identifier=DEFAULT_ROOKIE_IDENTIFIER,
+        )
+        self.default_stance_identifier = DEFAULT_ROOKIE_IDENTIFIER
+        self.stance_manager.fallback_identifier = DEFAULT_ROOKIE_IDENTIFIER
+        self.stance_runtime_ready = False
+
+    def _ensure_stances_loaded(self) -> None:
+        if self.stance_runtime_ready:
+            return
+        try:
+            from mods.digitalesmonster.stances import DigiviceChampionStance, NaturalRookieStance  # type: ignore
+
+            self.stance_manager.prepare_stance(NaturalRookieStance)
+            self.stance_manager.prepare_stance(DigiviceChampionStance)
+            self.default_stance_identifier = NaturalRookieStance.identifier
+            self.stance_manager.fallback_identifier = NaturalRookieStance.identifier
+            self.stance_runtime_ready = True
+            self.expose("digitalesmonster_stance_runtime_ready", True)
+            self.expose("digitalesmonster_champion_stance", DigiviceChampionStance.identifier)
+        except BaseModBootstrapError as exc:
+            raise BaseModBootstrapError(
+                "GraalPy-Stance-Laufzeit nicht verfügbar. Aktivieren Sie graalpy_runtime vor dem Stance-Wechsel."
+            ) from exc
 
 
 def bootstrap_digitalesmonster_project(

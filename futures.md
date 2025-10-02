@@ -63,6 +63,12 @@
   submodule, document its activation hooks, and surface an `experimental.on`
   example in the wrapper README so teams can trial features without forking
   the stable API.
+- [todo] **Deferred stance runtime bootstrap** – Introduce a readiness
+  coordinator that finalises Digimon stances once the GraalPy backend becomes
+  available. Usage: emit a `digitalesmonster_stance_runtime_ready` broadcast
+  when `graalpy_runtime` switches on, re-run the stance registration helpers,
+  and update the plugin exports so UI overlays and analytics plugins can react
+  without polling the project façade.
 - [todo] **Overlay animation presets** – Extend the runtime overlay director
   with reusable easing timelines (fade, slide, pulse) and scripted sequences.
   Usage: add `OverlayAnimation` descriptors that the manager can attach to an
