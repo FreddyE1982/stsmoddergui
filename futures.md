@@ -63,6 +63,41 @@
   submodule, document its activation hooks, and surface an `experimental.on`
   example in the wrapper README so teams can trial features without forking
   the stable API.
+- [todo] **Embedded Python runtime architecture blueprint** – Document how the
+  bundling pipeline can package a self-contained Python runtime inside the
+  ModTheSpire loader jar. Usage: analyse GraalPy, CPython embeddable builds,
+  and GraalVM distribution footprints per platform, capture licensing
+  implications, outline the directory layout required inside the jar, and
+  define how `modules.modbuilder.runtime_env` will describe the embedded
+  interpreter and dependency payloads to plugins.
+- [todo] **Cross-platform runtime packaging toolchain** – Extend
+  `tools` helpers with a build matrix that assembles GraalPy (or alternative
+  embeddable interpreters) plus all declared Python dependencies into
+  platform-specific payloads. Usage: add CLI entry points that resolve
+  wheel/sdist requirements via `modules.modbuilder.BundleOptions`, compile
+  native extensions where necessary, and emit signed archives ready for jar
+  embedding while recording provenance manifests for plugin consumption.
+- [todo] **Jar-integrated runtime bootstrapper** – Teach
+  `modules.modbuilder.runtime_env` and the compact loader generator to extract
+  the embedded interpreter at launch, detect the host OS/architecture, and
+  initialise the bundled environment without external installers. Usage:
+  update the generated `bootstrap_mod.py` to prefer the in-jar runtime,
+  surface readiness events through `PLUGIN_MANAGER`, and fall back to
+  existing discovery flows when the packaged runtime is unavailable.
+- [todo] **Dependency synchronisation and update workflows** – Implement a
+  manifest-driven updater that refreshes embedded runtime payloads whenever
+  dependency versions change. Usage: extend `compileandbundle` so it emits a
+  `runtime_payload.json` describing packages, build hashes, supported
+  platforms, and plugin-visible metadata; ship tooling that validates the
+  payload before publishing to Steam Workshop and warns when host binaries are
+  missing.
+- [todo] **Workshop distribution documentation and QA** – Produce comprehensive
+  guides and automated tests that validate the embedded-runtime workflow.
+  Usage: update `how to` manuals with step-by-step packaging instructions,
+  build smoke tests that execute the jar-only distribution on Windows and
+  Linux runners, and expose QA hooks via `PLUGIN_MANAGER` so external tools
+  can audit runtime extraction, dependency imports, and ModTheSpire
+  integration.
 - [todo] **Deferred stance runtime bootstrap** – Introduce a readiness
   coordinator that finalises Digimon stances once the GraalPy backend becomes
   available. Usage: emit a `digitalesmonster_stance_runtime_ready` broadcast
