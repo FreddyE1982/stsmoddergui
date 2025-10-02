@@ -149,6 +149,12 @@
   signature with `languages: Sequence[str]` and update `ProjectLayout` with a
   mapping from language codes to directories so future tutorials can
   demonstrate multi-language text packs out of the box.
+- [todo] **Localization manifest coverage expansion** – Extend the
+  compile-time localisation manifest to capture relic, stance and keyword
+  strings sourced from runtime registries so YAML contributors see every
+  player-facing tooltip. Usage: surface registry snapshots before bundling,
+  merge them into the manifest generator, and document how plugins can
+  contribute additional registries for bespoke mods.
 - [todo] **Asset templating helpers** – Provide optional PNG placeholders
   whenever `scaffold` creates texture slots. Usage: add an
   `include_placeholders: bool` flag that writes simple coloured PNGs using
